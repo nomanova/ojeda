@@ -22,10 +22,15 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+        <!-- Email -->
+        <PackageReference Include="PreMailer.Net" Version="2.2.0" />
+        <PackageReference Include="MailKit" Version="2.13.0" />
         <!-- Automapper -->
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+        <!-- Utils -->
+        <PackageReference Include="TimeZoneConverter" Version="3.5.0" />
     </ItemGroup>
     
     <!-- Settings -->
@@ -35,6 +40,12 @@
 
     <ItemGroup Condition="Exists('appsettings.Local.json')">
         <None Include="appsettings.Local.json" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Database\Migrations" />
+      <Folder Include="Database\Models" />
+      <Folder Include="Database\Seeders" />
     </ItemGroup>
     
 </Project>

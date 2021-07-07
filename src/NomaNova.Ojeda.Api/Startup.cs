@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using NomaNova.Ojeda.Api.Database;
+using NomaNova.Ojeda.Api.Database.Interfaces;
 using NomaNova.Ojeda.Api.Options;
 using NomaNova.Ojeda.Api.Options.Application;
 using NomaNova.Ojeda.Api.Options.Framework;
 using NomaNova.Ojeda.Api.Services;
 using NomaNova.Ojeda.Api.Services.Interfaces;
+using NomaNova.Ojeda.Api.Utils;
 
 namespace NomaNova.Ojeda.Api
 {
@@ -28,7 +30,9 @@ namespace NomaNova.Ojeda.Api
         {
             AddOptions(services);
             AddServices(services);
+            AddDatabase(services);
             AddAutoMapper(services);
+            AddSwagger(services);
             AddMvc(services);
         }
 
@@ -39,11 +43,14 @@ namespace NomaNova.Ojeda.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseFileServer();
+            UseSwagger(app);
+            
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
+                endpoints.MapControllers();
             });
         }
 
@@ -61,17 +68,45 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ITimeKeeper, TimeKeeper>();
             services.TryAddSingleton<ISerializer, Serializer>();
         }
-        
+
+        private static void AddDatabase(IServiceCollection services)
+        {
+            services.TryAddSingleton<IDatabaseContextBuilder, DatabaseContextBuilder>();
+
+            services.AddDbContext<DatabaseContext>();
+        }
+
         private static void AddAutoMapper(IServiceCollection services)
         {
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
-        
+
+        private static void AddSwagger(IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc(Swagger.GetDoc(), Swagger.GetInfo());
+                options.IncludeXmlComments(Swagger.GetXmlPath(typeof(Startup).Assembly));
+            });
+
+            services.AddSwaggerGenNewtonsoftSupport();
+        }
+
         private static void AddMvc(IServiceCollection services)
         {
-            services.AddMvc()
+            services
+                .AddMvc(AppMvcOptions.Apply)
                 .ConfigureApiBehaviorOptions(AppApiBehaviorOptions.Apply)
                 .AddNewtonsoftJson(Serializer.ApplyJsonSettings);
+        }
+        
+        private static void UseSwagger(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint(Swagger.GetJsonPath(), Swagger.GetDefinition());
+            });
         }
     }
 }

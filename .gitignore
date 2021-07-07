@@ -5,3 +5,5 @@
 bin/
 obj/
 
+appsettings.Development.json
+

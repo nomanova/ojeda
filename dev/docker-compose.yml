@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  mail:
+    container_name: ojeda-mail
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+  database:
+    container_name: ojeda-db
+    image: postgres:13.3-alpine
+    volumes:
+      - ojeda-db-vol:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=ojeda
+      - POSTGRES_USER=ojeda
+      - POSTGRES_PASSWORD=ojeda
+volumes:
+  ojeda-db-vol:

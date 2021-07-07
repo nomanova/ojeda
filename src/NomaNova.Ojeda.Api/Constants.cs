@@ -2,6 +2,13 @@ namespace NomaNova.Ojeda.Api
 {
     public static class Constants
     {
+        public const string AppName = "Ojeda";
+        
+        public const string CompanyName = "nomanova";
+        public const string CompanyEmail = "hello@nomanova.com";
+        
+        public const string AppSettingsFile = "appsettings.json";
+        
         public const string EnvProduction = "Production";
         public const string EnvDevelopment = "Development";
         
