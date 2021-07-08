@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace NomaNova.Ojeda.Api.Database.Interfaces
+namespace NomaNova.Ojeda.Api.Database.Context.Interfaces
 {
     public interface IDatabaseContext
     {

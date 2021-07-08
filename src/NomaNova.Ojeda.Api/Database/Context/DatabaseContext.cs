@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using NomaNova.Ojeda.Api.Database.Interfaces;
+using NomaNova.Ojeda.Api.Database.Context.Interfaces;
 
-namespace NomaNova.Ojeda.Api.Database
+namespace NomaNova.Ojeda.Api.Database.Context
 {
     public class DatabaseContext : DbContext, IDatabaseContext
     {

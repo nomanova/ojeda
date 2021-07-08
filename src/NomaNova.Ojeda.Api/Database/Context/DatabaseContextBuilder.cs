@@ -1,10 +1,10 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using NomaNova.Ojeda.Api.Database.Interfaces;
+using NomaNova.Ojeda.Api.Database.Context.Interfaces;
 using NomaNova.Ojeda.Api.Options.Application;
 
-namespace NomaNova.Ojeda.Api.Database
+namespace NomaNova.Ojeda.Api.Database.Context
 {
     public class DatabaseContextBuilder : IDatabaseContextBuilder
     {

@@ -6,7 +6,7 @@ using NomaNova.Ojeda.Api.Options;
 using NomaNova.Ojeda.Api.Options.Application;
 using MsOptions = Microsoft.Extensions.Options;
 
-namespace NomaNova.Ojeda.Api.Database
+namespace NomaNova.Ojeda.Api.Database.Context
 {
     public abstract class ContextFactory
     {
