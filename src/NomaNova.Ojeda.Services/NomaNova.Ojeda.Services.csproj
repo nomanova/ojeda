@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Automapper -->
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\NomaNova.Ojeda.Core\NomaNova.Ojeda.Core.csproj" />
+      <ProjectReference Include="..\NomaNova.Ojeda.Data\NomaNova.Ojeda.Data.csproj" />
+      <ProjectReference Include="..\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj" />
+    </ItemGroup>
+
+</Project>
