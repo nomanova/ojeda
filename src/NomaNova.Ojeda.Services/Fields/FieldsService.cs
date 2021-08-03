@@ -4,24 +4,21 @@ using System.Threading.Tasks;
 using AutoMapper;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Fields;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Services.Fields.Validators;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
-    public class FieldsService : IFieldsService
+    public class FieldsService : BaseService, IFieldsService
     {
-        private readonly ITimeKeeper _timeKeeper;
         private readonly IMapper _mapper;
         private readonly IRepository<Field> _fieldsRepository;
         
         public FieldsService(
-            ITimeKeeper timeKeeper,
             IMapper mapper,
             IRepository<Field> fieldsRepository)
         {
-            _timeKeeper = timeKeeper;
             _mapper = mapper;
             _fieldsRepository = fieldsRepository;
         }
@@ -40,8 +37,8 @@ namespace NomaNova.Ojeda.Services.Fields
 
         public async Task<FieldDto> CreateFieldAsync(CreateFieldDto createFieldDto, CancellationToken cancellationToken)
         {
-            // TODO: validation
-            
+            await Validate(new CreateFieldDtoValidator(), createFieldDto, cancellationToken);
+
             var field = _mapper.Map<Field>(createFieldDto);
             field.Id = Guid.NewGuid().ToString();
 
@@ -53,7 +50,7 @@ namespace NomaNova.Ojeda.Services.Fields
         public async Task<FieldDto> UpdateFieldAsync(string id, UpdateFieldDto updateFieldDto,
             CancellationToken cancellationToken)
         {
-            // TODO: validation
+            await Validate(new UpdateFieldDtoValidator(), updateFieldDto, cancellationToken);
             
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 

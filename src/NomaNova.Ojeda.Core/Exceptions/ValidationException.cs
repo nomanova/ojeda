@@ -1,15 +1,20 @@
 using System;
-using NomaNova.Ojeda.Api.Models;
+using System.Collections.Generic;
 
 namespace NomaNova.Ojeda.Core.Exceptions
 {
     public class ValidationException : Exception
     {
-        public Error Error { get; }
+        public IEnumerable<ValidationError> Errors { get; }
 
-        public ValidationException(Error error)
+        public ValidationException(ValidationError error)
         {
-            Error = error;
+            Errors = new List<ValidationError>{error};
+        }
+        
+        public ValidationException(IEnumerable<ValidationError> errors)
+        {
+            Errors = errors;
         }
     }
 }

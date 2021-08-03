@@ -1,13 +1,13 @@
-namespace NomaNova.Ojeda.Models
+namespace NomaNova.Ojeda.Core
 {
-    public class ErrorDto
+    public class Error
     {
         public string Code { get; set; }
 
         public string Message { get; set; }
     }
     
-    public class ValidationErrorDto : ErrorDto
+    public class ValidationError : Error
     {
         public string Property { get; set; }
     }
