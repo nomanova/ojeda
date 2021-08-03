@@ -1,21 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Api", "src\NomaNova.Ojeda.Api\NomaNova.Ojeda.Api.csproj", "{D7F5EE3A-2917-48A1-A862-7E2B3427AED2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Api", "src\api\NomaNova.Ojeda.Api\NomaNova.Ojeda.Api.csproj", "{D7F5EE3A-2917-48A1-A862-7E2B3427AED2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{085F0C0F-B35E-4EF2-B006-717D53C1E755}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Files", "_Files", "{085F0C0F-B35E-4EF2-B006-717D53C1E755}"
 ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Core", "src\NomaNova.Ojeda.Core\NomaNova.Ojeda.Core.csproj", "{5EEFDD59-668C-4A96-87F9-9E3782FF6D20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Core", "src\api\NomaNova.Ojeda.Core\NomaNova.Ojeda.Core.csproj", "{5EEFDD59-668C-4A96-87F9-9E3782FF6D20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Data", "src\NomaNova.Ojeda.Data\NomaNova.Ojeda.Data.csproj", "{F7107A10-3FBE-4FA0-B82A-4F7C30242E02}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Data", "src\api\NomaNova.Ojeda.Data\NomaNova.Ojeda.Data.csproj", "{F7107A10-3FBE-4FA0-B82A-4F7C30242E02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Services", "src\NomaNova.Ojeda.Services\NomaNova.Ojeda.Services.csproj", "{917349EF-38EA-46BE-ACF4-F2CEC6622FC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Services", "src\api\NomaNova.Ojeda.Services\NomaNova.Ojeda.Services.csproj", "{917349EF-38EA-46BE-ACF4-F2CEC6622FC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Api.Client", "src\NomaNova.Ojeda.Api.Client\NomaNova.Ojeda.Api.Client.csproj", "{9435E5BA-AF72-43C7-9C97-9223CDCC5AED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Api.Client", "src\shared\NomaNova.Ojeda.Api.Client\NomaNova.Ojeda.Api.Client.csproj", "{9435E5BA-AF72-43C7-9C97-9223CDCC5AED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Models", "src\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj", "{237C3254-57E4-4776-9C5F-F26187E82864}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Models", "src\shared\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj", "{237C3254-57E4-4776-9C5F-F26187E82864}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{DFA2B0B9-2BA9-4503-BDED-C5797E553B8E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{3D783B88-20A5-40F5-87CF-9DF43CF0E2AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,5 +51,13 @@ Global
 		{237C3254-57E4-4776-9C5F-F26187E82864}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{237C3254-57E4-4776-9C5F-F26187E82864}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{237C3254-57E4-4776-9C5F-F26187E82864}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D7F5EE3A-2917-48A1-A862-7E2B3427AED2} = {DFA2B0B9-2BA9-4503-BDED-C5797E553B8E}
+		{5EEFDD59-668C-4A96-87F9-9E3782FF6D20} = {DFA2B0B9-2BA9-4503-BDED-C5797E553B8E}
+		{F7107A10-3FBE-4FA0-B82A-4F7C30242E02} = {DFA2B0B9-2BA9-4503-BDED-C5797E553B8E}
+		{917349EF-38EA-46BE-ACF4-F2CEC6622FC2} = {DFA2B0B9-2BA9-4503-BDED-C5797E553B8E}
+		{9435E5BA-AF72-43C7-9C97-9223CDCC5AED} = {3D783B88-20A5-40F5-87CF-9DF43CF0E2AA}
+		{237C3254-57E4-4776-9C5F-F26187E82864} = {3D783B88-20A5-40F5-87CF-9DF43CF0E2AA}
 	EndGlobalSection
 EndGlobal
