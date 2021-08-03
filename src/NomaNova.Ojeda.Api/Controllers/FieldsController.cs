@@ -1,9 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
+using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Fields;
 using NomaNova.Ojeda.Services.Fields;
 
@@ -42,7 +45,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(FieldDto), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<ValidationErrorDto>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
             [FromBody] CreateFieldDto createFieldDto, 
             CancellationToken cancellationToken = default)
@@ -58,7 +61,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(FieldDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(IEnumerable<ValidationErrorDto>),StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,

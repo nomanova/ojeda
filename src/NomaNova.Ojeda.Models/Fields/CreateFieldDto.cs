@@ -6,6 +6,6 @@ namespace NomaNova.Ojeda.Models.Fields
         
         public string Description { get; set; }
         
-        public FieldTypeDto FieldType { get; set; }
+        public FieldTypeDto Type { get; set; }
     }
 }
