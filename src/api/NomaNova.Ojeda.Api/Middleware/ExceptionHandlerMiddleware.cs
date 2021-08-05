@@ -11,7 +11,7 @@ using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core;
 using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
-using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.Errors;
 
 namespace NomaNova.Ojeda.Api.Middleware
 {
@@ -75,14 +75,18 @@ namespace NomaNova.Ojeda.Api.Middleware
 
             private async Task BadRequestResponse(HttpContext context, IEnumerable<ValidationError> errors)
             {
-                var validationErrorDtoList = errors.Select(validationError => new ValidationErrorDto
+                var errorDto = new ErrorDto
                 {
-                    Code = validationError.Code,
-                    Message = validationError.Message,
-                    Property = validationError.Property
-                }).ToList();
+                    Code = (int) HttpStatusCode.BadRequest,
+                    Message = "Invalid request",
+                    Errors = errors.Select(validationError => new ValidationErrorDto
+                    {
+                        Field = validationError.Field,
+                        Message = validationError.Message
+                    }).ToList()
+                };
 
-                var json = _serializer.Serialize(validationErrorDtoList);
+                var json = _serializer.Serialize(errorDto);
 
                 await ErrorResponse(context, HttpStatusCode.BadRequest, json);
             }
@@ -90,12 +94,12 @@ namespace NomaNova.Ojeda.Api.Middleware
             private async Task InternalServerErrorResponse(HttpContext context, Exception ex)
             {
                 var correlationId = Guid.NewGuid();
-                _logger.LogCritical(ex, "CorrelationId: {CorrelationId}", correlationId);
+                _logger.LogCritical(ex, "Correlation id: {CorrelationId}", correlationId);
 
                 var errorDto = new ErrorDto
                 {
-                    Code = "INTERNAL_SERVER_EXCEPTION",
-                    Message = $"CorrelationId: {correlationId}"
+                    Code = (int) HttpStatusCode.InternalServerError,
+                    Message = $"Correlation id: {correlationId}"
                 };
 
                 var json = _serializer.Serialize(errorDto);

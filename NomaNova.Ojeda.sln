@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Data", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Services", "src\api\NomaNova.Ojeda.Services\NomaNova.Ojeda.Services.csproj", "{917349EF-38EA-46BE-ACF4-F2CEC6622FC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Api.Client", "src\shared\NomaNova.Ojeda.Api.Client\NomaNova.Ojeda.Api.Client.csproj", "{9435E5BA-AF72-43C7-9C97-9223CDCC5AED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Client", "src\shared\NomaNova.Ojeda.Client\NomaNova.Ojeda.Client.csproj", "{9435E5BA-AF72-43C7-9C97-9223CDCC5AED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Models", "src\shared\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj", "{237C3254-57E4-4776-9C5F-F26187E82864}"
 EndProject

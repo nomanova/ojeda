@@ -18,9 +18,8 @@ namespace NomaNova.Ojeda.Services
                 var validationErrorList = result.Errors
                     .Select(validationFailure => new ValidationError
                     {
-                        Code = validationFailure.ErrorCode, 
-                        Message = validationFailure.ErrorMessage, 
-                        Property = validationFailure.PropertyName
+                        Field = validationFailure.PropertyName,
+                        Message = validationFailure.ErrorMessage
                     }).ToList();
 
                 throw new ValidationException(validationErrorList);
