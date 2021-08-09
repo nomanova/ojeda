@@ -1,12 +1,4 @@
 ﻿{
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:41182",
-      "sslPort": 44334
-    }
-  },
   "profiles": {
     "Ojeda Api": {
       "commandName": "Project",
