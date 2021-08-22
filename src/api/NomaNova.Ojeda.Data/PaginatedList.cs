@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,11 +9,11 @@ namespace NomaNova.Ojeda.Data
 {
     public class PaginatedList<T> : List<T>
     {
-        public int TotalCount { get; private set; }
+        public int TotalCount { get; }
         
-        public int PageNumber { get; private set; }
+        public int PageNumber { get; }
         
-        public int TotalPages { get; private set; }
+        public int TotalPages { get; }
 
         public PaginatedList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
         {
@@ -28,19 +29,19 @@ namespace NomaNova.Ojeda.Data
         public bool HasNextPage => PageNumber < TotalPages;
 
         public static async Task<PaginatedList<T>> CreateAsync(
-            IQueryable<T> source, int pageNumber, int pageSize)
+            IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var count = await source.CountAsync();
-            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var count = await source.CountAsync(cancellationToken);
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
             
             return new PaginatedList<T>(items, count, pageNumber, pageSize);
         }
 
         public static async Task<PaginatedList<T>> CreateAsync(
-            IOrderedQueryable<T> source, int pageNumber, int pageSize)
+            IOrderedQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
-            var count = await source.CountAsync();
-            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var count = await source.CountAsync(cancellationToken);
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
             
             return new PaginatedList<T>(items, count, pageNumber, pageSize);
         }

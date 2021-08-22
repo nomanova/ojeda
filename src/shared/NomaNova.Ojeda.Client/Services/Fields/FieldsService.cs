@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
+using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Fields;
 
 namespace NomaNova.Ojeda.Client.Services.Fields
@@ -18,6 +19,16 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         {
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<FieldDto>(HttpMethod.Get, path, null, cancellationToken);
+        }
+
+        public async Task<OjedaDataResult<PaginatedListDto<FieldDto>>> GetAsync(
+            string query = null,
+            string orderBy = null, bool orderAsc = true,
+            int pageNumber = 1, int pageSize = 20, 
+            CancellationToken cancellationToken = default)
+        {
+            var path = $"{BasePath}?query={query}&orderBy={orderBy}&orderAsc={orderAsc}&pageNumber={pageNumber}&pageSize={pageSize}";
+            return await SendForDataAsync<PaginatedListDto<FieldDto>>(HttpMethod.Get, path, null, cancellationToken);
         }
 
         public async Task<OjedaDataResult<FieldDto>> CreateAsync(CreateFieldDto field,

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using NomaNova.Ojeda.Client;
 
 namespace NomaNova.Ojeda.Web
 {
@@ -14,7 +15,7 @@ namespace NomaNova.Ojeda.Web
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp =>
-                new HttpClient {BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)}
+                new OjedaClientBuilder("https://localhost:5001").Build()
             );
 
             await builder.Build().RunAsync();

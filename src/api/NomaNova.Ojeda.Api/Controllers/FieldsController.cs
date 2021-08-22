@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
+using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Errors;
 using NomaNova.Ojeda.Models.Fields;
 using NomaNova.Ojeda.Services.Fields;
@@ -35,6 +36,30 @@ namespace NomaNova.Ojeda.Api.Controllers
         {
             var fieldDto = await _fieldsService.GetFieldByIdAsync(id, cancellationToken);
             return Ok(fieldDto);
+        }
+
+        /// <summary>
+        /// Get all fields
+        /// </summary>
+        /// <param name="query">Optional search query filtering results based on the searchable fields.</param>
+        /// <param name="orderBy">Optional field name on which to order the results.</param>
+        /// <param name="orderAsc">Optional ordering direction indication, default is ascending order.</param>
+        /// <param name="pageNumber">Optional result page number.</param>
+        /// <param name="pageSize">Optional result page size.</param>
+        [HttpGet]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(PaginatedListDto<FieldDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Get(
+            [FromQuery] string query  = null,
+            [FromQuery] string orderBy  = null,
+            [FromQuery] bool orderAsc  = true,
+            [FromQuery] int pageNumber = Constants.DefaultQueryPageNumber,
+            [FromQuery] int pageSize = Constants.DefaultQueryPageSize,
+            CancellationToken cancellationToken = default)
+        {
+            var paginatedFieldsDto = 
+                await _fieldsService.GetFieldsAsync(query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+            return Ok(paginatedFieldsDto);
         }
 
         /// <summary>

@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Fields;
 using NomaNova.Ojeda.Services.Fields.Validators;
 
@@ -33,6 +35,18 @@ namespace NomaNova.Ojeda.Services.Fields
             }
 
             return _mapper.Map<FieldDto>(field);
+        }
+
+        public async Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
+            string query, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+            var paginatedFields = 
+                    await _fieldsRepository.GetAsync(query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+
+            var paginatedFieldsDto = _mapper.Map<PaginatedListDto<FieldDto>>(paginatedFields);
+            paginatedFieldsDto.Items = paginatedFields.Select(f => _mapper.Map<FieldDto>(f)).ToList();
+
+            return paginatedFieldsDto;
         }
 
         public async Task<FieldDto> CreateFieldAsync(CreateFieldDto createFieldDto, CancellationToken cancellationToken)

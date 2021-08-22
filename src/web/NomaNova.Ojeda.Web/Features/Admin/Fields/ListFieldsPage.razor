@@ -1,0 +1,52 @@
+@page "/admin/fields"
+@inject OjedaClient Ojeda
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Fields</li>
+    </ol>
+</nav>
+
+<h3>Fields</h3>
+
+@if (_fields == null)
+{
+    <p>Loading fields...</p>   
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th class="py-2">Name</th>
+                <th class="py-2">Description</th>
+                <th class="py-2">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var field in _fields)
+            {
+                <tr>
+                    <td class="pb-2 pr-3">@field.Name</td>
+                    <td class="pb-2 pr-3">@field.Description</td>
+                    <td class="pb-2 pr-3">@field.Type</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<FieldDto> _fields;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Ojeda.FieldsService.GetAsync();
+
+        if (result.Success)
+        {
+            _fields = result.Data.Items;
+        }
+    }
+}

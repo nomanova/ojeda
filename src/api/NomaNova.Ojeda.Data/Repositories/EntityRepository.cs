@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using NomaNova.Ojeda.Core;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Context;
+using NomaNova.Ojeda.Data.Options;
 
 namespace NomaNova.Ojeda.Data.Repositories
 {
@@ -11,18 +13,36 @@ namespace NomaNova.Ojeda.Data.Repositories
     {
         private readonly ITimeKeeper _timeKeeper;
         private readonly DatabaseContext _context;
+        private readonly DatabaseOptions _options;
  
         public EntityRepository(
             ITimeKeeper timeKeeper, 
-            DatabaseContext context)
+            DatabaseContext context,
+            IOptions<DatabaseOptions> options)
         {
             _timeKeeper = timeKeeper;
             _context = context;
+            _options = options.Value;
         }
         
         public async Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             return await _context.Set<TEntity>().FindAsync(new object[] {id}, cancellationToken);
+        }
+
+        public async Task<PaginatedList<TEntity>> GetAsync(
+            string query,
+            string orderBy, bool orderAsc,
+            int pageNumber, int pageSize,
+            CancellationToken cancellationToken)
+        {
+            var queryable = _context.Set<TEntity>().AsQueryable();
+
+            queryable = queryable
+                .ExecuteQueryFilter(query, _options.Type)
+                .ExecuteOrderBy(orderBy, orderAsc);
+            
+            return await PaginatedList<TEntity>.CreateAsync(queryable, pageNumber, pageSize, cancellationToken);
         }
 
         public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken)

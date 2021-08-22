@@ -1,6 +1,5 @@
-using NomaNova.Ojeda.Api.Options.Application;
-using NomaNova.Ojeda.Data;
 using NomaNova.Ojeda.Data.Options;
+using NomaNova.Ojeda.Api.Options.Application;
 
 namespace NomaNova.Ojeda.Api.Options
 {
@@ -11,5 +10,7 @@ namespace NomaNova.Ojeda.Api.Options
         public FileStoreOptions FileStore { get; set; }
 
         public DatabaseOptions Database { get; set; }
+
+        public SecurityOptions Security { get; set; }
     }
 }

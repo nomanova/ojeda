@@ -41,6 +41,7 @@ namespace NomaNova.Ojeda.Api
             AddFileStore(services);
             AddDatabase(services);
             AddAutoMapper(services);
+            AddCors(services);
             AddSwagger(services);
             AddMvc(services);
         }
@@ -52,6 +53,7 @@ namespace NomaNova.Ojeda.Api
             UseSwagger(app);
             
             app.UseRouting();
+            app.UseCors(Constants.CorsPolicy);
 
             app.UseExceptionMiddleware();
 
@@ -68,10 +70,12 @@ namespace NomaNova.Ojeda.Api
             services.ConfigureAndValidate<GlobalOptions>(nameof(AppOptions.Global), _configuration);
             services.ConfigureAndValidate<FileStoreOptions>(nameof(AppOptions.FileStore), _configuration);
             services.ConfigureAndValidate<DatabaseOptions>(nameof(AppOptions.Database), _configuration);
+            services.ConfigureAndValidate<SecurityOptions>(nameof(AppOptions.Security), _configuration);
             
             _appOptions.Global = _configuration.GetSettings<GlobalOptions>(nameof(AppOptions.Global));
             _appOptions.FileStore = _configuration.GetSettings<FileStoreOptions>(nameof(AppOptions.FileStore));
             _appOptions.Database = _configuration.GetSettings<DatabaseOptions>(nameof(AppOptions.Database));
+            _appOptions.Security = _configuration.GetSettings<SecurityOptions>(nameof(AppOptions.Security));
         }
 
         private static void AddServices(IServiceCollection services)
@@ -109,6 +113,11 @@ namespace NomaNova.Ojeda.Api
         private static void AddAutoMapper(IServiceCollection services)
         {
             services.AddAutoMapper(typeof(FieldProfile).Assembly);
+        }
+
+        private void AddCors(IServiceCollection services)
+        {
+            services.AddCors(options => AppCorsOptions.Apply(options, _appOptions.Security));
         }
 
         private static void AddSwagger(IServiceCollection services)
