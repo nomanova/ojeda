@@ -18,3 +18,17 @@
     right: 0.75rem;
     top: 0.5rem;
 }
+
+.validation-message {
+    color: red;
+}
+
+input.invalid,
+select.invalid {
+    border-color: red;
+}
+
+input.valid.modified,
+select.valid.modified {
+    border-color: green;
+}

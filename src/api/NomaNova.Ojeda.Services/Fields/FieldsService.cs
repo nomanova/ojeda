@@ -8,7 +8,6 @@ using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Fields;
-using NomaNova.Ojeda.Services.Fields.Validators;
 
 namespace NomaNova.Ojeda.Services.Fields
 {

@@ -1,4 +1,5 @@
 @page "/admin/fields"
+@inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
 <nav aria-label="breadcrumb">
@@ -10,13 +11,37 @@
 
 <h3>Fields</h3>
 
+<div class="clearfix my-4">
+    
+    <DebounceInput id="inp-search" class="form-control w-50 float-left" placeholder="Search..." autocomplete="off"
+                   @bind-Value="@_searchQuery" @bind-Value:event="OnInput"
+                   DebounceTime="@SearchDebounceMs"
+                   MinLength="@SearchMinInputChars"
+                   OnValueChanged="OnSearchAsync" />
+    
+    <button class="btn btn-primary float-right" @onclick="OnAddField">Add Field</button>
+    
+</div>
+
 @if (_fields == null)
 {
     <p>Loading fields...</p>   
 }
+else if (!_fields.Any())
+{
+    if (string.IsNullOrEmpty(_searchQuery))
+    {
+        <p>No fields available.</p>      
+    }
+    else
+    {
+        <p>No search results.</p> 
+    }
+}
 else
 {
-    <table>
+    
+    <table class="w-100">
         <thead>
             <tr>
                 <th class="py-2">Name</th>
@@ -38,11 +63,31 @@ else
 }
 
 @code {
+        
+    private const int SearchMinInputChars = 1;
+    private const int SearchDebounceMs = 400;
+
+    private string _searchQuery = "";
     private IEnumerable<FieldDto> _fields;
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await Ojeda.FieldsService.GetAsync();
+        await GetFieldsAsync();
+    }
+
+    private async Task OnSearchAsync(string query)
+    {
+        await GetFieldsAsync(query);
+    }
+
+    private void OnAddField()
+    {
+        NavManager.NavigateTo("/admin/fields/add");
+    }
+
+    private async Task GetFieldsAsync(string query = null)
+    {
+        var result = await Ojeda.FieldsService.GetAsync(query);
 
         if (result.Success)
         {
