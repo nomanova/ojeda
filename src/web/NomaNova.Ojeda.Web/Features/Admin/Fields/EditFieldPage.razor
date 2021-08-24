@@ -1,0 +1,62 @@
+@page "/admin/fields/edit/{FieldId}"
+@layout AdminLayout
+
+@inject NavigationManager NavManager
+@inject OjedaClient Ojeda
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+        <li class="breadcrumb-item"><a href="/admin/fields">Fields</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+
+<h3>Edit Field</h3>
+
+@if (_isLoading)
+{
+    <p>Loading fields...</p>   
+}
+else
+{
+    <FieldForm Field="_field" OnSubmit="OnSubmitEditField"></FieldForm>    
+}
+
+@code {
+    
+    private bool _isLoading;
+    private FieldDto _field = new FieldDto();
+    
+    [Parameter]
+    public string FieldId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        var result = await Ojeda.FieldsService.GetByIdAsync(FieldId);
+
+        if (result.Success)
+        {
+            var fieldDto = result.Data;
+
+            _field.Id = fieldDto.Id;
+            _field.Name = fieldDto.Name;
+            _field.Description = fieldDto.Description;
+            _field.Type = fieldDto.Type;
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task OnSubmitEditField(FieldDto field)
+    {
+        var result = await Ojeda.FieldsService.UpdateAsync(field.Id, field);
+
+        if (result.Success)
+        {
+            NavManager.NavigateTo("/admin/fields");
+        }
+    }
+}

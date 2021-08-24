@@ -39,6 +39,11 @@ namespace NomaNova.Ojeda.Services.Fields
         public async Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
             string query, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(orderBy))
+            {
+                orderBy = nameof(Field.Name);
+            }
+
             var paginatedFields = 
                     await _fieldsRepository.GetAsync(query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
@@ -48,11 +53,11 @@ namespace NomaNova.Ojeda.Services.Fields
             return paginatedFieldsDto;
         }
 
-        public async Task<FieldDto> CreateFieldAsync(CreateFieldDto createFieldDto, CancellationToken cancellationToken)
+        public async Task<FieldDto> CreateFieldAsync(FieldDto fieldDto, CancellationToken cancellationToken)
         {
-            await Validate(new CreateFieldDtoValidator(), createFieldDto, cancellationToken);
+            await Validate(new FieldDtoValidator(), fieldDto, cancellationToken);
 
-            var field = _mapper.Map<Field>(createFieldDto);
+            var field = _mapper.Map<Field>(fieldDto);
             field.Id = Guid.NewGuid().ToString();
 
             field = await _fieldsRepository.InsertAsync(field, cancellationToken);
@@ -60,10 +65,10 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<FieldDto> UpdateFieldAsync(string id, UpdateFieldDto updateFieldDto,
+        public async Task<FieldDto> UpdateFieldAsync(string id, FieldDto fieldDto,
             CancellationToken cancellationToken)
         {
-            await Validate(new UpdateFieldDtoValidator(), updateFieldDto, cancellationToken);
+            await Validate(new FieldDtoValidator(), fieldDto, cancellationToken);
             
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -72,7 +77,8 @@ namespace NomaNova.Ojeda.Services.Fields
                 throw new NotFoundException();
             }
 
-            field = _mapper.Map(updateFieldDto, field);
+            field = _mapper.Map(fieldDto, field);
+            field.Id = id;
             field = await _fieldsRepository.UpdateAsync(field, cancellationToken);
 
             return _mapper.Map<FieldDto>(field);

@@ -1,0 +1,26 @@
+@inherits LayoutComponentBase
+
+<div>
+    
+        <!-- header -->
+        <Header></Header>
+    
+        <!-- content -->
+        <div id="page" class="d-flex" style="height: calc(100vh - 60px);">
+                
+            <!-- sidebar -->
+            <Sidebar>
+                <div>
+                    <div class="text-uppercase text-muted">Assets</div>
+                    <ul class="m-0 mt-1">
+                        <li><a href="/admin/fields">Fields</a></li>
+                    </ul>
+                </div>
+            </Sidebar>
+                
+            <!-- page -->
+            <Page>@Body</Page>
+                
+        </div>
+        
+</div>

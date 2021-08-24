@@ -1,4 +1,6 @@
 @page "/admin/fields/add"
+@layout AdminLayout
+
 @inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
@@ -12,63 +14,19 @@
 
 <h3>Add Field</h3>
 
-<EditForm Model="_field" OnValidSubmit="OnSubmitForm">
-    
-    <FluentValidationValidator></FluentValidationValidator>
-    
-    <div class="form-group w-50">
-        <label for="fieldName" class="font-weight-bold text-secondary">Name</label>
-        <InputText @bind-Value="_field.Name" class="form-control" id="fieldName"></InputText>
-        <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
-    </div>
-    
-    <div class="form-group w-50">
-        <label for="fieldDescription" class="font-weight-bold text-secondary">Description</label>
-        <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription"></InputText>
-        <ValidationMessage For="@(() => _field.Description)"></ValidationMessage>
-    </div>
-    
-    <div class="form-group w-50">
-        <label for="fieldType" class="font-weight-bold text-secondary">Type</label>
-        <InputSelect @bind-Value="_field.Type" class="form-control" id="fieldType">
-            @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
-            {
-                <option value="@type">@type</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => _field.Type)"></ValidationMessage>
-    </div>
-
-    <div class="my-4">
-        <button class="btn btn-primary" type="submit">Submit</button>
-        <button class="btn btn-secondary" type="button" @onclick="OnReset">Reset</button>
-        <button class="btn" type="button" @onclick="OnCancel">Cancel</button>
-    </div>
-    
-</EditForm>
+<FieldForm @ref="_fieldForm" OnSubmit="OnSubmitNewField"></FieldForm>
 
 @code {
 
-    private CreateFieldDto _field = new CreateFieldDto();
+    private FieldForm _fieldForm;
 
-    private async Task OnSubmitForm()
+    private async Task OnSubmitNewField(FieldDto field)
     {
-        var result = await Ojeda.FieldsService.CreateAsync(_field);
+        var result = await Ojeda.FieldsService.CreateAsync(field);
 
         if (result.Success)
         {
             NavManager.NavigateTo("/admin/fields");
         }
     }
-
-    private void OnReset()
-    {
-        _field = new CreateFieldDto();
-    }
-
-    private void OnCancel()
-    {
-        NavManager.NavigateTo("/admin/fields");
-    }
-
 }

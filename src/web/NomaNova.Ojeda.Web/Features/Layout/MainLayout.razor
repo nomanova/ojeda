@@ -1,7 +1,27 @@
 @inherits LayoutComponentBase
 
-<Header></Header>
+<div>
+    
+    <!-- header -->
+    <Header>
+        <ul class="list-unstyled m-0">
+            <li>
+                <a href="/admin" class="text-dark text-decoration-none">
+                    <i class="fs-6 bi-gear"></i>
+                </a>
+            </li>
+        </ul>
+    </Header>
 
-<main class="container mt-5 mb-5">
-    @Body
-</main>
+    <!-- content -->
+    <div id="page" class="d-flex" style="height: calc(100vh - 60px);">
+        
+        <!-- sidebar -->
+        <Sidebar></Sidebar>
+
+        <!-- page -->
+        <Page>@Body</Page>
+        
+    </div>
+
+</div>

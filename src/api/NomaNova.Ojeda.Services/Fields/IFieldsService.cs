@@ -13,11 +13,9 @@ namespace NomaNova.Ojeda.Services.Fields
         Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
             string query, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         
-        Task<FieldDto> CreateFieldAsync(
-            CreateFieldDto createFieldDto, CancellationToken cancellationToken = default);
+        Task<FieldDto> CreateFieldAsync(FieldDto fieldDto, CancellationToken cancellationToken = default);
 
-        Task<FieldDto> UpdateFieldAsync(string id, UpdateFieldDto updateFieldDto,
-            CancellationToken cancellationToken);
+        Task<FieldDto> UpdateFieldAsync(string id, FieldDto fieldDto, CancellationToken cancellationToken = default);
 
         Task DeleteFieldAsync(string id, CancellationToken cancellationToken = default);
     }

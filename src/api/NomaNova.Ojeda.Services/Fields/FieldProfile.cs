@@ -13,8 +13,7 @@ namespace NomaNova.Ojeda.Services.Fields
             CreateMap<Field, FieldDto>();
             CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>();
 
-            CreateMap<CreateFieldDto, Field>();
-            CreateMap<UpdateFieldDto, Field>();
+            CreateMap<FieldDto, Field>();
         }
     }
 }

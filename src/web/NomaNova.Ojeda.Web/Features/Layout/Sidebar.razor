@@ -1,5 +1,8 @@
-<h3>Sidebar</h3>
+<div id="sidebar" class="bg-light p-3" style="width: 200px; border-right: 1px solid #dee2e6;">
+    @ChildContent
+</div>
 
 @code {
-    
+    [Parameter] 
+    public RenderFragment ChildContent { get; set; }
 }

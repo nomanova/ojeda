@@ -1,4 +1,6 @@
 @page "/admin/fields"
+@layout AdminLayout
+
 @inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
@@ -11,15 +13,15 @@
 
 <h3>Fields</h3>
 
-<div class="clearfix my-4">
-    
-    <DebounceInput id="inp-search" class="form-control w-50 float-left" placeholder="Search..." autocomplete="off"
-                   @bind-Value="@_searchQuery" @bind-Value:event="OnInput"
-                   DebounceTime="@SearchDebounceMs"
-                   MinLength="@SearchMinInputChars"
-                   OnValueChanged="OnSearchAsync" />
-    
-    <button class="btn btn-primary float-right" @onclick="OnAddField">Add Field</button>
+<div class="d-flex my-3">
+
+    <DebounceInput id="inp-search" class="form-control w-25" type="search" placeholder="Search..." autocomplete="off"
+                         @bind-Value="_searchQuery" @bind-Value:event="OnInput"
+                         DebounceTime="SearchDebounceMs"
+                         MinLength="SearchMinInputChars"
+                         OnValueChanged="OnSearchAsync" />
+
+    <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>
     
 </div>
 
@@ -41,25 +43,34 @@ else if (!_fields.Any())
 else
 {
     
-    <table class="w-100">
+    <table class="table table-striped w-100">
         <thead>
-            <tr>
-                <th class="py-2">Name</th>
-                <th class="py-2">Description</th>
-                <th class="py-2">Type</th>
-            </tr>
+        <tr>
+            <th class="py-2">Name</th>
+            <th class="py-2">Description</th>
+            <th class="py-2">Type</th>
+            <th class="py-2">Actions</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var field in _fields)
-            {
-                <tr>
-                    <td class="pb-2 pr-3">@field.Name</td>
-                    <td class="pb-2 pr-3">@field.Description</td>
-                    <td class="pb-2 pr-3">@field.Type</td>
-                </tr>
-            }
+        @foreach (var field in _fields)
+        {
+            <tr>
+                <td class="pb-2 pr-3">@field.Name</td>
+                <td class="pb-2 pr-3">@field.Description</td>
+                <td class="pb-2 pr-3">@field.Type</td>
+                <td class="pb-2 pr-3">
+                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(field.Id))">Edit</a> |
+                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(field.Id))">Delete</a>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
+    
+    <div class="my-4">
+        <Pager PageCount="@_pageCount" CurrentPage="@_currentPage" OnPageChanged="@OnPageChanged"></Pager>    
+    </div>
 }
 
 @code {
@@ -68,8 +79,11 @@ else
     private const int SearchDebounceMs = 400;
 
     private string _searchQuery = "";
-    private IEnumerable<FieldDto> _fields;
+    private ICollection<FieldDto> _fields;
 
+    private int _pageCount;
+    private int _currentPage;
+    
     protected override async Task OnInitializedAsync()
     {
         await GetFieldsAsync();
@@ -80,18 +94,49 @@ else
         await GetFieldsAsync(query);
     }
 
-    private void OnAddField()
+    private void OnAdd()
     {
         NavManager.NavigateTo("/admin/fields/add");
     }
 
-    private async Task GetFieldsAsync(string query = null)
+    private void OnEdit(string id)
     {
-        var result = await Ojeda.FieldsService.GetAsync(query);
+        NavManager.NavigateTo($"/admin/fields/edit/{id}");
+    }
+
+    private async Task OnDelete(string id)
+    {
+        var result = await Ojeda.FieldsService.DeleteAsync(id);
 
         if (result.Success)
         {
-            _fields = result.Data.Items;
+            var toRemove = _fields.FirstOrDefault(f => f.Id.Equals(id));
+            if (toRemove != null)
+            {
+                _fields.Remove(toRemove);
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task OnPageChanged(int pageNumber)
+    {
+        await GetFieldsAsync(_searchQuery, pageNumber);
+    }
+
+    private async Task GetFieldsAsync(string query = null, int pageNumber = 1)
+    {
+        var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber);
+
+        if (result.Success)
+        {
+            var paginatedData = result.Data;
+
+            _fields = paginatedData.Items;
+            _pageCount = paginatedData.TotalPages;
+            _currentPage = paginatedData.PageNumber;
+            
+            StateHasChanged();
         }
     }
 }

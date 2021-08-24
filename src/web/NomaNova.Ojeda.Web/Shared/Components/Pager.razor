@@ -1,0 +1,75 @@
+<nav>
+  <ul class="pagination">
+
+@if (PageCount >= 1)
+{
+  var hasPrevious = CurrentPage > 1 && PageCount > 1;
+  var hasNext = CurrentPage < PageCount;
+
+  <!-- Previous -->
+  @if (hasPrevious)
+    {
+      <li class="page-item">
+      <a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(CurrentPage - 1))">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+  </li>
+    }
+    else
+    {
+      <li class="page-item disabled">
+        <a class="page-link" role="button">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    }
+
+  <!-- Pages -->
+  for (var i = 1; i <= PageCount; i++)
+  {
+    var currentIndex = i;
+    
+    if (i == CurrentPage)
+    {
+      <li class="page-item active"><a class="page-link" role="button">@i</a></li>
+    }
+    else
+    {
+      <li class="page-item"><a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(currentIndex))">@i</a></li>
+    }
+  }
+
+  <!-- Next -->
+  @if (hasNext)
+  {
+    <li class="page-item">
+      <a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(CurrentPage + 1))">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  }
+  else
+  {
+    <li class="page-item disabled">
+      <a class="page-link" role="button">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  }
+}
+    
+  </ul>
+</nav>
+
+@code {
+  [Parameter] public int PageCount { get; set; }
+
+  [Parameter] public int CurrentPage { get; set; }
+
+  [Parameter] public Func<int, Task> OnPageChanged { get; set; }
+  
+  private void PagerButtonClicked(int page)
+  {
+    OnPageChanged?.Invoke(page);
+  }
+}

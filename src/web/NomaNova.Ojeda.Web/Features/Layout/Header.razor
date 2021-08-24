@@ -1,5 +1,13 @@
-<nav class="navbar shadow">
-    <a class="navbar-brand" href="/">
-        Ojeda
+<header id="header" class="d-flex align-items-center justify-content-between bg-light border-bottom" style="height: 60px;">
+    <a href="/" class="mx-3 text-dark text-decoration-none">
+        <span class="fs-4">Ojeda</span>
     </a>
-</nav>
+    <div class="d-flex align-items-center mx-3">
+        @ChildContent
+    </div>
+</header>
+
+@code {
+    [Parameter] 
+    public RenderFragment ChildContent { get; set; }
+}

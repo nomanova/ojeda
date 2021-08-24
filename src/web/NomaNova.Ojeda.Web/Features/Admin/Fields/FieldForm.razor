@@ -1,0 +1,88 @@
+@inject NavigationManager NavManager
+
+<EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
+    
+    <FluentValidationValidator></FluentValidationValidator>
+    
+    <div class="mb-3 w-50">
+        <label for="fieldName" class="form-label">Name*</label>
+        <InputText @bind-Value="_field.Name" class="form-control" id="fieldName"></InputText>
+        <div id="fieldNameHelp" class="form-text">The field name must be unique.</div>
+        <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
+    </div>
+    
+    <div class="mb-3 w-50">
+        <label for="fieldDescription" class="form-label">Description</label>
+        <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription"></InputText>
+        <div id="fieldDescriptionHelp" class="form-text">Optional, will be used as hint for the field input.</div>
+        <ValidationMessage For="@(() => _field.Description)"></ValidationMessage>
+    </div>
+    
+    <div class="mb-3 w-50">
+        <label for="fieldType" class="form-label">Type*</label>
+        <InputSelect @bind-Value="_field.Type" class="form-control" id="fieldType">
+            @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
+            {
+                <option value="@type">@type</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => _field.Type)"></ValidationMessage>
+    </div>
+
+    <div class="my-4">
+        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-secondary" type="button" @onclick="OnReset">Reset</button>
+        <button class="btn" type="button" @onclick="OnCancel">Cancel</button>
+    </div>
+    
+</EditForm>
+
+@code {
+    private FieldDto _field;
+    private EditContext _editContext;
+
+    [Parameter]
+    public FieldDto Field { get; set; }
+
+    [Parameter] 
+    public Func<FieldDto, Task> OnSubmit { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        Init();
+        
+        if (Field != null)
+        {
+            _field.Id = Field.Id;
+            _field.Name = Field.Name;
+            _field.Description = Field.Description;
+            _field.Type = Field.Type;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Init();
+    }
+    
+    private void OnReset()
+    {
+        Init();
+    }
+    
+    private void OnCancel()
+    {
+        NavManager.NavigateTo("/admin/fields");
+    }
+    
+    private async Task OnSubmitForm() => await OnSubmit(_field);
+    
+    private void Init()
+    {
+        _field = new FieldDto();
+        _editContext = new EditContext(_field);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+}

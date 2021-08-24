@@ -1,0 +1,8 @@
+<div id="page" class="m-3" style="flex: 1 0 auto;">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] 
+    public RenderFragment ChildContent { get; set; }
+}
