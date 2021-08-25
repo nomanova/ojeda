@@ -1,3 +1,4 @@
+@using System.Reflection
 @inject NavigationManager NavManager
 
 <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
@@ -6,21 +7,21 @@
     
     <div class="mb-3 w-50">
         <label for="fieldName" class="form-label">Name*</label>
-        <InputText @bind-Value="_field.Name" class="form-control" id="fieldName"></InputText>
+        <InputText @bind-Value="_field.Name" class="form-control" id="fieldName" disabled="@_isLoading"></InputText>
         <div id="fieldNameHelp" class="form-text">The field name must be unique.</div>
         <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
     </div>
     
     <div class="mb-3 w-50">
         <label for="fieldDescription" class="form-label">Description</label>
-        <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription"></InputText>
+        <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription" disabled="@_isLoading"></InputText>
         <div id="fieldDescriptionHelp" class="form-text">Optional, will be used as hint for the field input.</div>
         <ValidationMessage For="@(() => _field.Description)"></ValidationMessage>
     </div>
     
     <div class="mb-3 w-50">
         <label for="fieldType" class="form-label">Type*</label>
-        <InputSelect @bind-Value="_field.Type" class="form-control" id="fieldType">
+        <InputSelect @bind-Value="_field.Type" class="form-control" id="fieldType" disabled="@_isLoading">
             @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
             {
                 <option value="@type">@type</option>
@@ -30,9 +31,16 @@
     </div>
 
     <div class="my-4">
-        <button class="btn btn-primary" type="submit">Submit</button>
-        <button class="btn btn-secondary" type="button" @onclick="OnReset">Reset</button>
-        <button class="btn" type="button" @onclick="OnCancel">Cancel</button>
+        <button class="btn btn-primary" type="submit" disabled="@_isLoading">
+            @if (_isLoading)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>   
+            }
+            Submit
+        </button>
+        <button class="btn btn-secondary" type="button" @onclick="OnReset" disabled="@_isLoading">Reset</button>
+        <button class="btn" type="button" @onclick="OnCancel" disabled="@_isLoading">Cancel</button>
     </div>
     
 </EditForm>
@@ -40,6 +48,8 @@
 @code {
     private FieldDto _field;
     private EditContext _editContext;
+    
+    private bool _isLoading;
 
     [Parameter]
     public FieldDto Field { get; set; }
@@ -69,19 +79,38 @@
     
     private void OnReset()
     {
+        if (_isLoading)
+        {
+            return;
+        }
+
         Init();
     }
     
     private void OnCancel()
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         NavManager.NavigateTo("/admin/fields");
     }
-    
-    private async Task OnSubmitForm() => await OnSubmit(_field);
-    
-    private void Init()
+
+    private async Task OnSubmitForm()
     {
-        _field = new FieldDto();
+        _isLoading = true;
+        Init(_field);
+
+        await OnSubmit(_field);
+
+        _isLoading = false;
+    }
+    
+    private void Init(FieldDto field = null)
+    {
+        _field = field ?? new FieldDto();
+
         _editContext = new EditContext(_field);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }

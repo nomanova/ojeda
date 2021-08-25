@@ -2,6 +2,7 @@
 @layout AdminLayout
 
 @inject NavigationManager NavManager
+@inject IToastService ToastService
 @inject OjedaClient Ojeda
 
 <nav aria-label="breadcrumb">
@@ -13,16 +14,24 @@
 
 <h3>Fields</h3>
 
-<div class="d-flex my-3">
+<div class="d-flex justify-content-between my-3">
 
-    <DebounceInput id="inp-search" class="form-control w-25" type="search" placeholder="Search..." autocomplete="off"
-                         @bind-Value="_searchQuery" @bind-Value:event="OnInput"
-                         DebounceTime="SearchDebounceMs"
-                         MinLength="SearchMinInputChars"
-                         OnValueChanged="OnSearchAsync" />
-
-    <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>
+    <div class="d-flex">
+          <DebounceInput id="inp-search" class="form-control" style="width: 350px;" type="search" placeholder="Search..." autocomplete="off"
+            DebounceTime="SearchDebounceMs"
+            MinLength="SearchMinInputChars"
+            OnValueChanged="OnSearchAsync" />
+              
+          <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>  
+    </div>
     
+    @if (_isLoading)
+    {
+        <div class="spinner-border text-primary" style="width: 38px; height: 38px;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+
 </div>
 
 @if (_fields == null)
@@ -33,16 +42,15 @@ else if (!_fields.Any())
 {
     if (string.IsNullOrEmpty(_searchQuery))
     {
-        <p>No fields available.</p>      
+        <p>No fields available.</p>
     }
     else
     {
-        <p>No search results.</p> 
+        <p>No search results.</p>
     }
 }
 else
 {
-    
     <table class="table table-striped w-100">
         <thead>
         <tr>
@@ -74,7 +82,9 @@ else
 }
 
 @code {
-        
+
+    private bool _isLoading;
+    
     private const int SearchMinInputChars = 1;
     private const int SearchDebounceMs = 400;
 
@@ -91,6 +101,7 @@ else
 
     private async Task OnSearchAsync(string query)
     {
+        _searchQuery = query;
         await GetFieldsAsync(query);
     }
 
@@ -106,6 +117,9 @@ else
 
     private async Task OnDelete(string id)
     {
+        _isLoading = true;
+        StateHasChanged();
+        
         var result = await Ojeda.FieldsService.DeleteAsync(id);
 
         if (result.Success)
@@ -114,8 +128,21 @@ else
             if (toRemove != null)
             {
                 _fields.Remove(toRemove);
-                StateHasChanged();
             }
+        }
+        else
+        {
+            ToastService.ShowError($"Could not delete field. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+
+        if (!_fields.Any() && _currentPage > 1)
+        {
+            await GetFieldsAsync(_searchQuery, _currentPage - 1);
+        }
+        else
+        {
+            _isLoading = false;
+            StateHasChanged();   
         }
     }
 
@@ -126,17 +153,26 @@ else
 
     private async Task GetFieldsAsync(string query = null, int pageNumber = 1)
     {
+        _isLoading = true;
+        StateHasChanged();
+        
         var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber);
-
+        
         if (result.Success)
         {
             var paginatedData = result.Data;
-
+        
             _fields = paginatedData.Items;
             _pageCount = paginatedData.TotalPages;
             _currentPage = paginatedData.PageNumber;
-            
-            StateHasChanged();
         }
+        else
+        {
+            _fields = new List<FieldDto>();
+            ToastService.ShowError($"Could not load fields. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+        
+        _isLoading = false;
+        StateHasChanged();
     }
 }

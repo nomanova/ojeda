@@ -1,6 +1,5 @@
-using System;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Blazored.Toast;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NomaNova.Ojeda.Client;
@@ -17,6 +16,8 @@ namespace NomaNova.Ojeda.Web
             builder.Services.AddScoped(sp =>
                 new OjedaClientBuilder("https://localhost:5001").Build()
             );
+            
+            builder.Services.AddBlazoredToast();
 
             await builder.Build().RunAsync();
         }

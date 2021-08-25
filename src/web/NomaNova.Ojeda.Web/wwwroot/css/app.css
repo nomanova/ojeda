@@ -22,3 +22,11 @@
 .validation-message {
     color: red;
 }
+
+.blazored-toast-body .blazored-toast-header h5 {
+    font-size: 1rem;
+}
+
+.blazored-toast-body .blazored-toast-header .blazored-toast-close {
+    font-size: 1rem;
+}

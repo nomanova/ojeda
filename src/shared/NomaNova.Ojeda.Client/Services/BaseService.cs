@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -43,7 +45,20 @@ namespace NomaNova.Ojeda.Client.Services
             var request = new HttpRequestMessage(method, uri);
             TryAddPayload(request, payload);
 
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.SendAsync(request, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                return OjedaResult.ForFailure(HttpStatusCode.ServiceUnavailable, new ErrorDto
+                {
+                    Code = (int) HttpStatusCode.ServiceUnavailable,
+                    Message = ex.Message
+                });
+            }
+
             return await ParseResponseAsync(response);
         }
 
@@ -57,7 +72,20 @@ namespace NomaNova.Ojeda.Client.Services
             var request = new HttpRequestMessage(method, uri);
             TryAddPayload(request, payload);
 
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.SendAsync(request, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                return OjedaDataResult<T>.ForFailure(HttpStatusCode.ServiceUnavailable, new ErrorDto
+                {
+                    Code = (int) HttpStatusCode.ServiceUnavailable,
+                    Message = ex.Message
+                });
+            }
+            
             return await ParseDataResponseAsync<T>(response);
         }
 
