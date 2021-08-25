@@ -1,6 +1,5 @@
 using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -46,10 +45,17 @@ namespace NomaNova.Ojeda.Api
             AddMvc(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            DatabaseContext databaseContext)
         {
             app.UseFileServer();
-            
+
+            if (_appOptions.Database.RunSeeders)
+            {
+                databaseContext.EnsureSeeded();
+            }
+
             UseSwagger(app);
             
             app.UseRouting();

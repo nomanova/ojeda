@@ -1,6 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using NomaNova.Ojeda.Core.Helpers;
 using NomaNova.Ojeda.Data.Options;
 using MsOptions = Microsoft.Extensions.Options;
 
@@ -48,9 +49,10 @@ namespace NomaNova.Ojeda.Data.Context
         public DatabaseContext CreateDbContext(string[] args)
         {
             var contextBuilder = CreateContextBuilder();
+            var timeKeeper = new TimeKeeper();
             var contextOptions = new DbContextOptionsBuilder<DatabaseContext>();
             
-            return new DatabaseContext(contextBuilder, contextOptions.Options);
+            return new DatabaseContext(timeKeeper, contextBuilder, contextOptions.Options);
         }
     }
 }

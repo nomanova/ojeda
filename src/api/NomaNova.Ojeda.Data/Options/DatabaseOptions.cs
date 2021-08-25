@@ -9,5 +9,7 @@ namespace NomaNova.Ojeda.Data.Options
         
         [Required]
         public string ConnectionString { get; set; }
+
+        public bool RunSeeders { get; set; }
     }
 }

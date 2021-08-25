@@ -22,9 +22,9 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         }
 
         public async Task<OjedaDataResult<PaginatedListDto<FieldDto>>> GetAsync(
-            string query = null,
-            string orderBy = null, bool orderAsc = true,
-            int pageNumber = 1, int pageSize = 20, 
+            string query,
+            string orderBy, bool orderAsc,
+            int pageNumber, int pageSize, 
             CancellationToken cancellationToken = default)
         {
             var path = $"{BasePath}?query={query}&orderBy={orderBy}&orderAsc={orderAsc}&pageNumber={pageNumber}&pageSize={pageSize}";
