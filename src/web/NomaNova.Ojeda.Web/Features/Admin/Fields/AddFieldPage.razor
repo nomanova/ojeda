@@ -4,24 +4,23 @@
 @inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item"><a href="/admin/fields">Fields</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Add</li>
-    </ol>
-</nav>
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Fields", "/admin/fields"},
+        {"Add", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
 
 <div class="d-flex justify-content-between w-50">
     <h3>Add Field</h3>
 </div>
 
-
-<FieldForm @ref="_fieldForm" OnSubmit="OnSubmitNewField"></FieldForm>
+<FieldForm OnSubmit="OnSubmitNewField"></FieldForm>
 
 @code {
-
-    private FieldForm _fieldForm;
 
     private async Task OnSubmitNewField(FieldDto field)
     {

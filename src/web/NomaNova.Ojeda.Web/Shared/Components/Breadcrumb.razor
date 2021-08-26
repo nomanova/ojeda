@@ -1,0 +1,25 @@
+@if (Paths.Count > 0)
+{
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+    @foreach (var (name, url) in Paths)
+    {
+        if (string.IsNullOrEmpty(url))
+        {
+            <li class="breadcrumb-item active" aria-current="page">@name</li>
+        }
+        else
+        {
+            <li class="breadcrumb-item"><a href="@url">@name</a></li>
+        }
+    }
+    </ol>
+</nav>
+}
+
+@code {
+
+    [Parameter]
+    public Dictionary<string, string> Paths { get; set; }
+
+}

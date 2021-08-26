@@ -4,13 +4,15 @@
 @inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item"><a href="/admin/fields">Fields</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit</li>
-    </ol>
-</nav>
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Fields", "/admin/fields"},
+        {"Edit", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
 
 <h3>Edit Field</h3>
 

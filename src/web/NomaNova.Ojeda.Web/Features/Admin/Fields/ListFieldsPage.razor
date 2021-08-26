@@ -8,12 +8,14 @@
 @inject IToastService ToastService
 @inject OjedaClient Ojeda
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Fields</li>
-    </ol>
-</nav>
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Fields", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
 
 <h3>Fields</h3>
 
