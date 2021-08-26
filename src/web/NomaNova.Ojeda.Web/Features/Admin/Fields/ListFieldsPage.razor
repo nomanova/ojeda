@@ -1,6 +1,9 @@
 @page "/admin/fields"
 @layout AdminLayout
 
+@using Blazored.LocalStorage
+
+@inject ILocalStorageService LocalStorageService
 @inject NavigationManager NavManager
 @inject IToastService ToastService
 @inject OjedaClient Ojeda
@@ -77,12 +80,19 @@ else
     </table>
     
     <div class="my-4">
-        <Pager PageCount="@_pageCount" CurrentPage="@_currentPage" OnPageChanged="@OnPageChanged"></Pager>    
+        <Pager
+            PageCount="@_pageCount"
+            CurrentPage="@_currentPage"
+            PageSize="@_pageSize"
+            OnPageChanged="@OnPageChanged"
+            OnPageSizeChanged="@OnPageSizeChanged" />
     </div>
 }
 
 @code {
-
+        
+    private const string KeyPageSize = "key-pager-page-size";
+    
     private bool _isLoading;
     
     private const int SearchMinInputChars = 1;
@@ -93,16 +103,21 @@ else
 
     private int _pageCount;
     private int _currentPage;
+    private int _pageSize;
     
     protected override async Task OnInitializedAsync()
     {
-        await GetFieldsAsync();
+        // Fetch page size from local storage
+        var storedPageSize = await LocalStorageService.GetItemAsync<int>(KeyPageSize);
+        var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
+
+        await GetFieldsAsync(null, 1, pageSize);
     }
 
     private async Task OnSearchAsync(string query)
     {
         _searchQuery = query;
-        await GetFieldsAsync(query);
+        await GetFieldsAsync(query, 1, _pageSize);
     }
 
     private void OnAdd()
@@ -137,7 +152,7 @@ else
 
         if (!_fields.Any() && _currentPage > 1)
         {
-            await GetFieldsAsync(_searchQuery, _currentPage - 1);
+            await GetFieldsAsync(_searchQuery, _currentPage - 1, _pageSize);
         }
         else
         {
@@ -148,15 +163,23 @@ else
 
     private async Task OnPageChanged(int pageNumber)
     {
-        await GetFieldsAsync(_searchQuery, pageNumber);
+        await GetFieldsAsync(_searchQuery, pageNumber, _pageSize);
     }
 
-    private async Task GetFieldsAsync(string query = null, int pageNumber = 1)
+    private async Task OnPageSizeChanged(int pageSize)
+    {
+        // Store page size to local storage
+        await LocalStorageService.SetItemAsync(KeyPageSize, pageSize);
+
+        await GetFieldsAsync(_searchQuery, 1, pageSize);
+    }
+
+    private async Task GetFieldsAsync(string query = null, int pageNumber = 1, int pageSize = 25)
     {
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber);
+        var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber, pageSize);
         
         if (result.Success)
         {
@@ -165,6 +188,7 @@ else
             _fields = paginatedData.Items;
             _pageCount = paginatedData.TotalPages;
             _currentPage = paginatedData.PageNumber;
+            _pageSize = pageSize;
         }
         else
         {

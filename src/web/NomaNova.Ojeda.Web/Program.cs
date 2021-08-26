@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Blazored.Toast;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ namespace NomaNova.Ojeda.Web
             );
             
             builder.Services.AddBlazoredToast();
+            builder.Services.AddBlazoredLocalStorage();
 
             await builder.Build().RunAsync();
         }

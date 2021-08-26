@@ -1,75 +1,117 @@
-<nav>
-  <ul class="pagination">
+@using Blazored.LocalStorage
 
-@if (PageCount >= 1)
-{
-  var hasPrevious = CurrentPage > 1 && PageCount > 1;
-  var hasNext = CurrentPage < PageCount;
-
-  <!-- Previous -->
-  @if (hasPrevious)
+<div class="d-flex justify-content-between">
+  
+  <nav>
+    <ul class="pagination">
+  
+  @if (PageCount >= 1)
+  {
+    var hasPrevious = CurrentPage > 1 && PageCount > 1;
+    var hasNext = CurrentPage < PageCount;
+  
+    <!-- Previous -->
+    @if (hasPrevious)
+      {
+        <li class="page-item">
+        <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage - 1))">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+    </li>
+      }
+      else
+      {
+        <li class="page-item disabled">
+          <a class="page-link" role="button">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      }
+  
+    <!-- Pages -->
+    for (var i = 1; i <= PageCount; i++)
+    {
+      var currentIndex = i;
+      
+      if (i == CurrentPage)
+      {
+        <li class="page-item active"><a class="page-link" role="button">@i</a></li>
+      }
+      else
+      {
+        <li class="page-item"><a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(currentIndex))">@i</a></li>
+      }
+    }
+  
+    <!-- Next -->
+    @if (hasNext)
     {
       <li class="page-item">
-      <a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(CurrentPage - 1))">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-  </li>
+        <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage + 1))">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
     }
     else
     {
       <li class="page-item disabled">
         <a class="page-link" role="button">
-          <span aria-hidden="true">&laquo;</span>
+          <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
     }
+  }
+      
+    </ul>
+  </nav>
+  
+  <div class="d-flex align-items-center">
+    <div class="me-2 text-muted"><span>Rows per page</span></div>
+    <div>
+      <select class="form-select" value="@PageSize" @onchange="@OnPageSizeSelected">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      </div>
+  </div>
 
-  <!-- Pages -->
-  for (var i = 1; i <= PageCount; i++)
-  {
-    var currentIndex = i;
-    
-    if (i == CurrentPage)
-    {
-      <li class="page-item active"><a class="page-link" role="button">@i</a></li>
-    }
-    else
-    {
-      <li class="page-item"><a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(currentIndex))">@i</a></li>
-    }
-  }
-
-  <!-- Next -->
-  @if (hasNext)
-  {
-    <li class="page-item">
-      <a class="page-link" role="button" @onclick="@(() => PagerButtonClicked(CurrentPage + 1))">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  }
-  else
-  {
-    <li class="page-item disabled">
-      <a class="page-link" role="button">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  }
-}
-    
-  </ul>
-</nav>
+</div>
 
 @code {
-  [Parameter] public int PageCount { get; set; }
 
-  [Parameter] public int CurrentPage { get; set; }
+  [Parameter] 
+  public int PageCount { get; set; }
 
-  [Parameter] public Func<int, Task> OnPageChanged { get; set; }
-  
-  private void PagerButtonClicked(int page)
+  [Parameter] 
+  public int CurrentPage { get; set; }
+
+  [Parameter]
+  public int PageSize { get; set; }
+
+  [Parameter] 
+  public Func<int, Task> OnPageChanged { get; set; }
+
+  [Parameter] 
+  public Func<int, Task> OnPageSizeChanged { get; set; }
+
+  private void OnPagerButtonClicked(int page)
   {
     OnPageChanged?.Invoke(page);
   }
+
+  private void OnPageSizeSelected(ChangeEventArgs args)
+  {
+    var value = args.Value?.ToString();
+
+    if (value == null)
+    {
+      return;
+    }
+    
+    var pageSize = int.Parse(value);
+    OnPageSizeChanged?.Invoke(pageSize);
+  }
+
 }
