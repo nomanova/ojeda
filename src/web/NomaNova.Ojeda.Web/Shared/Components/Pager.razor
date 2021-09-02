@@ -1,13 +1,20 @@
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between align-items-center">
   
-  <nav>
-    <ul class="pagination">
+  <nav class="me-3">
+    <ul class="pagination m-0">
   
   @if (PageCount >= 1)
   {
     var hasPrevious = CurrentPage > 1 && PageCount > 1;
     var hasNext = CurrentPage < PageCount;
-  
+
+    var visiblePages = Math.Floor(VisiblePages / 2.0f);
+    
+    var lowerBound = Math.Max(1, CurrentPage - visiblePages);
+    var upperBound = Math.Min(PageCount, CurrentPage + visiblePages);
+
+    var isShowingDots = false;
+    
     <!-- Previous -->
     @if (hasPrevious)
       {
@@ -30,7 +37,27 @@
     for (var i = 1; i <= PageCount; i++)
     {
       var currentIndex = i;
+
+      // draw ellipsis
+      if(i > 1 && i < lowerBound || i > upperBound && i < PageCount)
+      {
+        if(!isShowingDots)
+        {
+          <li class="page-item disabled">
+            <a class="page-link" role="button">
+              <span aria-hidden="true">&#8230;</span>
+            </a>
+          </li>
+
+          isShowingDots = true;
+        }
+
+        continue;
+      }
+
+      isShowingDots = false;
       
+      // draw numbers
       if (i == CurrentPage)
       {
         <li class="page-item active"><a class="page-link" role="button">@i</a></li>
@@ -88,6 +115,9 @@
   [Parameter]
   public int PageSize { get; set; }
 
+  [Parameter]
+  public int VisiblePages { get; set; } = 5;
+  
   [Parameter] 
   public Func<int, Task> OnPageChanged { get; set; }
 
@@ -111,5 +141,4 @@
     var pageSize = int.Parse(value);
     OnPageSizeChanged?.Invoke(pageSize);
   }
-
 }
