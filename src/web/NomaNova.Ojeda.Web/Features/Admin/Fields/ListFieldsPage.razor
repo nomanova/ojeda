@@ -86,6 +86,7 @@ else
             PageCount="@_pageCount"
             CurrentPage="@_currentPage"
             PageSize="@_pageSize"
+            TotalCount="@_totalCount"
             OnPageChanged="@OnPageChanged"
             OnPageSizeChanged="@OnPageSizeChanged" />
     </div>
@@ -106,6 +107,7 @@ else
     private int _pageCount;
     private int _currentPage;
     private int _pageSize;
+    private int _totalCount;
     
     protected override async Task OnInitializedAsync()
     {
@@ -191,6 +193,7 @@ else
             _pageCount = paginatedData.TotalPages;
             _currentPage = paginatedData.PageNumber;
             _pageSize = pageSize;
+            _totalCount = paginatedData.TotalCount;
         }
         else
         {

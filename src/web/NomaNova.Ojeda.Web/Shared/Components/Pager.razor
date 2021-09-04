@@ -1,96 +1,105 @@
 <div class="d-flex justify-content-between align-items-center">
   
-  <nav class="me-3">
-    <ul class="pagination m-0">
+  <div class="d-flex align-items-center me-3">
   
-  @if (PageCount >= 1)
-  {
-    var hasPrevious = CurrentPage > 1 && PageCount > 1;
-    var hasNext = CurrentPage < PageCount;
-
-    var visiblePages = Math.Floor(VisiblePages / 2.0f);
-    
-    var lowerBound = Math.Max(1, CurrentPage - visiblePages);
-    var upperBound = Math.Min(PageCount, CurrentPage + visiblePages);
-
-    var isShowingDots = false;
-    
-    <!-- Previous -->
-    @if (hasPrevious)
-      {
-        <li class="page-item">
-        <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage - 1))">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-    </li>
-      }
-      else
-      {
-        <li class="page-item disabled">
-          <a class="page-link" role="button">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-      }
+    <nav class="me-2">
+      <ul class="pagination m-0">
   
-    <!-- Pages -->
-    for (var i = 1; i <= PageCount; i++)
-    {
-      var currentIndex = i;
-
-      // draw ellipsis
-      if(i > 1 && i < lowerBound || i > upperBound && i < PageCount)
-      {
-        if(!isShowingDots)
+        @if (PageCount >= 1)
         {
-          <li class="page-item disabled">
-            <a class="page-link" role="button">
-              <span aria-hidden="true">&#8230;</span>
-            </a>
-          </li>
+          var hasPrevious = CurrentPage > 1 && PageCount > 1;
+          var hasNext = CurrentPage < PageCount;
 
-          isShowingDots = true;
+          var visiblePages = Math.Floor(VisiblePages / 2.0f);
+    
+          var lowerBound = Math.Max(1, CurrentPage - visiblePages);
+          var upperBound = Math.Min(PageCount, CurrentPage + visiblePages);
+
+          var isShowingDots = false;
+    
+          <!-- Previous -->
+          @if (hasPrevious)
+          {
+            <li class="page-item">
+              <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage - 1))">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          }
+          else
+          {
+            <li class="page-item disabled">
+              <a class="page-link" role="button">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          }
+  
+          <!-- Pages -->
+          for (var i = 1; i <= PageCount; i++)
+          {
+            var currentIndex = i;
+
+            // draw ellipsis
+            if(i > 1 && i < lowerBound || i > upperBound && i < PageCount)
+            {
+              if(!isShowingDots)
+              {
+                <li class="page-item disabled">
+                  <a class="page-link" role="button">
+                    <span aria-hidden="true">&#8230;</span>
+                  </a>
+                </li>
+
+                isShowingDots = true;
+              }
+
+              continue;
+            }
+
+            isShowingDots = false;
+      
+            // draw numbers
+            if (i == CurrentPage)
+            {
+              <li class="page-item active"><a class="page-link" role="button">@i</a></li>
+            }
+            else
+            {
+              <li class="page-item"><a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(currentIndex))">@i</a></li>
+            }
+          }
+  
+          <!-- Next -->
+          @if (hasNext)
+          {
+            <li class="page-item">
+              <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage + 1))">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          }
+          else
+          {
+            <li class="page-item disabled">
+              <a class="page-link" role="button">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          }
         }
-
-        continue;
-      }
-
-      isShowingDots = false;
       
-      // draw numbers
-      if (i == CurrentPage)
-      {
-        <li class="page-item active"><a class="page-link" role="button">@i</a></li>
-      }
-      else
-      {
-        <li class="page-item"><a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(currentIndex))">@i</a></li>
-      }
-    }
-  
-    <!-- Next -->
-    @if (hasNext)
+      </ul>
+    </nav>
+    
+    @if (TotalCount > 0)
     {
-      <li class="page-item">
-        <a class="page-link" role="button" @onclick="@(() => OnPagerButtonClicked(CurrentPage + 1))">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
+      <div class="me-2 text-muted"><span>Total items: @TotalCount</span></div> 
     }
-    else
-    {
-      <li class="page-item disabled">
-        <a class="page-link" role="button">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    }
-  }
-      
-    </ul>
-  </nav>
+  </div>
+    
   
-  <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center">
     <div class="me-2 text-muted"><span>Rows per page</span></div>
     <div>
       <select class="form-select" value="@PageSize" @onchange="@OnPageSizeSelected">
@@ -117,6 +126,9 @@
 
   [Parameter]
   public int VisiblePages { get; set; } = 5;
+  
+  [Parameter] 
+  public int TotalCount { get; set; }
   
   [Parameter] 
   public Func<int, Task> OnPageChanged { get; set; }
