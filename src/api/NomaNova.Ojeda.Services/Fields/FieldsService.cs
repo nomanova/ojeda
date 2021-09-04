@@ -37,15 +37,15 @@ namespace NomaNova.Ojeda.Services.Fields
         }
 
         public async Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
-            string query, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken)
+            string searchQuery, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(orderBy))
             {
                 orderBy = nameof(Field.Name);
             }
 
-            var paginatedFields = 
-                    await _fieldsRepository.GetAsync(query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+            var paginatedFields = await _fieldsRepository.GetAllPaginatedAsync(
+                searchQuery, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
             var paginatedFieldsDto = _mapper.Map<PaginatedListDto<FieldDto>>(paginatedFields);
             paginatedFieldsDto.Items = paginatedFields.Select(f => _mapper.Map<FieldDto>(f)).ToList();
@@ -55,7 +55,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
         public async Task<FieldDto> CreateFieldAsync(FieldDto fieldDto, CancellationToken cancellationToken)
         {
-            await Validate(new FieldDtoValidator(), fieldDto, cancellationToken);
+            await Validate(null, fieldDto, cancellationToken);
 
             var field = _mapper.Map<Field>(fieldDto);
             field.Id = Guid.NewGuid().ToString();
@@ -68,14 +68,14 @@ namespace NomaNova.Ojeda.Services.Fields
         public async Task<FieldDto> UpdateFieldAsync(string id, FieldDto fieldDto,
             CancellationToken cancellationToken)
         {
-            await Validate(new FieldDtoValidator(), fieldDto, cancellationToken);
-            
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
             if (field == null)
             {
                 throw new NotFoundException();
             }
+
+            await Validate(id, fieldDto, cancellationToken);
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;
@@ -94,6 +94,14 @@ namespace NomaNova.Ojeda.Services.Fields
             }
 
             await _fieldsRepository.DeleteAsync(field, cancellationToken);
+        }
+
+        private async Task Validate(string id, FieldDto fieldDto, CancellationToken cancellationToken)
+        {
+            fieldDto.Id = id;
+
+            await Validate(new FieldDtoFieldValidator(), fieldDto, cancellationToken);
+            await Validate(new FieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
         }
     }
 }

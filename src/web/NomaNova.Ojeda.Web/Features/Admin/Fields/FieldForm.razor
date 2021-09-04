@@ -1,21 +1,26 @@
 @using System.Reflection
+@using NomaNova.Ojeda.Client.Results
+@using System.Net
+
 @inject NavigationManager NavManager
+@inject IToastService ToastService
 
 <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
     
     <FluentValidationValidator></FluentValidationValidator>
+    <ServerValidation @ref="_serverValidation" />
     
     <div class="mb-3 w-50">
         <label for="fieldName" class="form-label">Name*</label>
         <InputText @bind-Value="_field.Name" class="form-control" id="fieldName" disabled="@_isLoading"></InputText>
-        <div id="fieldNameHelp" class="form-text">The field name must be unique.</div>
+        <!-- <div id="fieldNameHelp" class="form-text">The field name must be unique.</div> -->
         <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
     </div>
     
     <div class="mb-3 w-50">
         <label for="fieldDescription" class="form-label">Description</label>
         <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription" disabled="@_isLoading"></InputText>
-        <div id="fieldDescriptionHelp" class="form-text">Optional, will be used as hint for the field input.</div>
+        <div id="fieldDescriptionHelp" class="form-text">Optional, will be used as hint for the field input control.</div>
         <ValidationMessage For="@(() => _field.Description)"></ValidationMessage>
     </div>
     
@@ -49,13 +54,15 @@
     private FieldDto _field;
     private EditContext _editContext;
     
+    private ServerValidation _serverValidation;
+    
     private bool _isLoading;
 
     [Parameter]
     public FieldDto Field { get; set; }
 
     [Parameter] 
-    public Func<FieldDto, Task> OnSubmit { get; set; }
+    public Func<FieldDto, Task<OjedaDataResult<FieldDto>>> OnSubmit { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -100,9 +107,24 @@
     private async Task OnSubmitForm()
     {
         _isLoading = true;
+        _serverValidation.ClearErrors();
         Init(_field);
 
-        await OnSubmit(_field);
+        var result = await OnSubmit(_field);
+        
+        
+        if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
+        {
+            _serverValidation.DisplayErrors(result.Error.ValidationErrors);
+        }
+        else if (!result.Success)
+        {
+            ToastService.ShowError($"Could not submit field. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+        else
+        {
+            NavManager.NavigateTo("/admin/fields");
+        }
 
         _isLoading = false;
     }
@@ -110,7 +132,7 @@
     private void Init(FieldDto field = null)
     {
         _field = field ?? new FieldDto();
-
+        
         _editContext = new EditContext(_field);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }

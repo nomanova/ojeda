@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NomaNova.Ojeda.Core;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
@@ -30,8 +33,18 @@ namespace NomaNova.Ojeda.Data.Repositories
             return await _context.Set<TEntity>().FindAsync(new object[] {id}, cancellationToken);
         }
 
-        public async Task<PaginatedList<TEntity>> GetAsync(
-            string query,
+        public async Task<List<TEntity>> GetAllAsync(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func, CancellationToken cancellationToken)
+        {
+            var queryable = _context.Set<TEntity>().AsQueryable();
+            
+            queryable = func != null ? func(queryable) : queryable;
+
+            return await queryable.ToListAsync(cancellationToken);
+        }
+
+        public async Task<PaginatedList<TEntity>> GetAllPaginatedAsync(
+            string searchQuery,
             string orderBy, bool orderAsc,
             int pageNumber, int pageSize,
             CancellationToken cancellationToken)
@@ -39,7 +52,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             var queryable = _context.Set<TEntity>().AsQueryable();
 
             queryable = queryable
-                .ExecuteQueryFilter(query, _options.Type)
+                .ExecuteSearchQueryFilter(searchQuery, _options.Type)
                 .ExecuteOrderBy(orderBy, orderAsc);
             
             return await PaginatedList<TEntity>.CreateAsync(queryable, pageNumber, pageSize, cancellationToken);

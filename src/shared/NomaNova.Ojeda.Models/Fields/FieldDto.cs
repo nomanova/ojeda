@@ -13,9 +13,9 @@ namespace NomaNova.Ojeda.Models.Fields
         public FieldTypeDto Type { get; set; }
     }
     
-    public class FieldDtoValidator : AbstractValidator<FieldDto>
+    public class FieldDtoFieldValidator : AbstractValidator<FieldDto>
     {
-        public FieldDtoValidator()
+        public FieldDtoFieldValidator()
         {
             RuleFor(dto =>  dto.Name).NotEmpty();
         }

@@ -1,4 +1,6 @@
 @page "/admin/fields/add"
+
+@using NomaNova.Ojeda.Client.Results
 @layout AdminLayout
 
 @inject NavigationManager NavManager
@@ -21,14 +23,9 @@
 <FieldForm OnSubmit="OnSubmitNewField"></FieldForm>
 
 @code {
-
-    private async Task OnSubmitNewField(FieldDto field)
+    
+    private async Task<OjedaDataResult<FieldDto>> OnSubmitNewField(FieldDto field)
     {
-        var result = await Ojeda.FieldsService.CreateAsync(field);
-
-        if (result.Success)
-        {
-            NavManager.NavigateTo("/admin/fields");
-        }
+        return await Ojeda.FieldsService.CreateAsync(field);
     }
 }

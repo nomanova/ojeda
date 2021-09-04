@@ -5,16 +5,19 @@ namespace NomaNova.Ojeda.Core.Exceptions
 {
     public class ValidationException : Exception
     {
-        public IEnumerable<ValidationError> Errors { get; }
+        public Dictionary<string, List<string>> ValidationErrors { get; }
 
-        public ValidationException(ValidationError error)
+        public ValidationException(string field, List<string> messages)
         {
-            Errors = new List<ValidationError>{error};
+            ValidationErrors = new Dictionary<string, List<string>>
+            {
+                {field, messages}
+            };
         }
         
-        public ValidationException(IEnumerable<ValidationError> errors)
+        public ValidationException(Dictionary<string, List<string>> validationErrors)
         {
-            Errors = errors;
+            ValidationErrors = validationErrors;
         }
     }
 }

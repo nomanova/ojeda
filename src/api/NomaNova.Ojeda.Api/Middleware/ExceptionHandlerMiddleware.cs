@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -8,10 +7,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NomaNova.Ojeda.Api.Exceptions;
-using NomaNova.Ojeda.Core;
 using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
-using NomaNova.Ojeda.Models.Errors;
+using NomaNova.Ojeda.Models;
 
 namespace NomaNova.Ojeda.Api.Middleware
 {
@@ -51,7 +49,7 @@ namespace NomaNova.Ojeda.Api.Middleware
                 }
                 catch (ValidationException ex)
                 {
-                    await BadRequestResponse(context, ex.Errors);
+                    await BadRequestResponse(context, ex.ValidationErrors);
                 }
                 catch (ForbiddenException)
                 {
@@ -73,17 +71,13 @@ namespace NomaNova.Ojeda.Api.Middleware
                 context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
             }
 
-            private async Task BadRequestResponse(HttpContext context, IEnumerable<ValidationError> errors)
+            private async Task BadRequestResponse(HttpContext context, Dictionary<string, List<string>> validationErrors)
             {
                 var errorDto = new ErrorDto
                 {
                     Code = (int) HttpStatusCode.BadRequest,
                     Message = "Invalid request",
-                    Errors = errors.Select(validationError => new ValidationErrorDto
-                    {
-                        Field = validationError.Field,
-                        Message = validationError.Message
-                    }).ToList()
+                    ValidationErrors = validationErrors
                 };
 
                 var json = _serializer.Serialize(errorDto);

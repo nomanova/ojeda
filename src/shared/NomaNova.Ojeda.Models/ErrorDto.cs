@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NomaNova.Ojeda.Models.Errors
+namespace NomaNova.Ojeda.Models
 {
     public class ErrorDto
     {
@@ -8,6 +8,6 @@ namespace NomaNova.Ojeda.Models.Errors
 
         public string Message { get; set; }
 
-        public IEnumerable<ValidationErrorDto> Errors { get; set; }
+        public Dictionary<string, List<string>> ValidationErrors { get; set; }
     }
 }

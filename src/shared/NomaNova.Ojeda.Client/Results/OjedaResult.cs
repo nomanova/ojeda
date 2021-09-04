@@ -1,5 +1,5 @@
 using System.Net;
-using NomaNova.Ojeda.Models.Errors;
+using NomaNova.Ojeda.Models;
 
 namespace NomaNova.Ojeda.Client.Results
 {

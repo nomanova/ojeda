@@ -11,7 +11,7 @@ namespace NomaNova.Ojeda.Data
 {
     public static class QueryableExtensions
     {
-        public static IQueryable<TEntity> ExecuteQueryFilter<TEntity>(
+        public static IQueryable<TEntity> ExecuteSearchQueryFilter<TEntity>(
             this IQueryable<TEntity> queryable, string query, DatabaseType databaseType = DatabaseType.Postgresql)
             where TEntity : BaseEntity
         {

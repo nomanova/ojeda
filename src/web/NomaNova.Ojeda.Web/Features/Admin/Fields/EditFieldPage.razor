@@ -1,7 +1,9 @@
 @page "/admin/fields/edit/{FieldId}"
+@using NomaNova.Ojeda.Client.Results
 @layout AdminLayout
 
 @inject NavigationManager NavManager
+@inject IToastService ToastService
 @inject OjedaClient Ojeda
 
 @{
@@ -28,7 +30,7 @@ else
 @code {
     
     private bool _isLoading;
-    private FieldDto _field = new FieldDto();
+    private readonly FieldDto _field = new();
     
     [Parameter]
     public string FieldId { get; set; }
@@ -48,17 +50,17 @@ else
             _field.Description = fieldDto.Description;
             _field.Type = fieldDto.Type;
         }
+        else
+        {
+            ToastService.ShowError($"Could not load field. {result.Error?.Message} ({result.Error?.Code}).");
+            NavManager.NavigateTo("/admin/fields");
+        }
 
         _isLoading = false;
     }
 
-    private async Task OnSubmitEditField(FieldDto field)
+    private async Task<OjedaDataResult<FieldDto>> OnSubmitEditField(FieldDto field)
     {
-        var result = await Ojeda.FieldsService.UpdateAsync(field.Id, field);
-
-        if (result.Success)
-        {
-            NavManager.NavigateTo("/admin/fields");
-        }
+        return await Ojeda.FieldsService.UpdateAsync(field.Id, field);
     }
 }

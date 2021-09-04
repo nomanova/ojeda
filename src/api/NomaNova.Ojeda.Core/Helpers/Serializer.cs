@@ -16,7 +16,13 @@ namespace NomaNova.Ojeda.Core.Helpers
         {
             JsonSettings = new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ContractResolver = new CamelCasePropertyNamesContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy
+                    {
+                        ProcessDictionaryKeys = false
+                    }
+                },
                 Culture = new System.Globalization.CultureInfo(DefaultCulture),
                 DateFormatString = DefaultDateTimeFormat,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore

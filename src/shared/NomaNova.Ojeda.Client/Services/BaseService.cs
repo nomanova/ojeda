@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NomaNova.Ojeda.Client.Results;
-using NomaNova.Ojeda.Models.Errors;
+using NomaNova.Ojeda.Models;
 
 namespace NomaNova.Ojeda.Client.Services
 {
@@ -21,7 +21,13 @@ namespace NomaNova.Ojeda.Client.Services
         {
             JsonSettings = new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ContractResolver = new CamelCasePropertyNamesContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy
+                    {
+                        ProcessDictionaryKeys = false
+                    }
+                },
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
