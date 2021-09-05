@@ -1,8 +1,6 @@
 @page "/admin/fields"
 @layout AdminLayout
 
-@using Blazored.LocalStorage
-
 @inject ILocalStorageService LocalStorageService
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -23,8 +21,8 @@
 
     <div class="d-flex">
           <DebounceInput id="inp-search" class="form-control" style="width: 350px;" type="search" placeholder="Search..." autocomplete="off"
-            DebounceTime="SearchDebounceMs"
-            MinLength="SearchMinInputChars"
+            DebounceTime="Constants.SearchDebounceMs"
+            MinLength="Constants.SearchMinInputChars"
             OnValueChanged="OnSearchAsync" />
               
           <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>  
@@ -41,13 +39,13 @@
 
 @if (_fields == null)
 {
-    <p>Loading fields...</p>   
+    <p>Loading...</p>   
 }
 else if (!_fields.Any())
 {
     if (string.IsNullOrEmpty(_searchQuery))
     {
-        <p>No fields available.</p>
+        <p>No items available.</p>
     }
     else
     {
@@ -70,7 +68,7 @@ else
         {
             <tr>
                 <td class="pb-2 pr-3">@field.Name</td>
-                <td class="pb-2 pr-3">@field.Description</td>
+                <td class="pb-2 pr-3">@field.Description.Truncate(Constants.DefaultTruncateLarge)</td>
                 <td class="pb-2 pr-3">@field.Type</td>
                 <td class="pb-2 pr-3">
                     <a class="btn-link" role="button" @onclick="@(() => OnEdit(field.Id))">Edit</a> |
@@ -93,13 +91,8 @@ else
 }
 
 @code {
-        
-    private const string KeyPageSize = "key-pager-page-size";
-    
+
     private bool _isLoading;
-    
-    private const int SearchMinInputChars = 1;
-    private const int SearchDebounceMs = 400;
 
     private string _searchQuery = "";
     private ICollection<FieldDto> _fields;
@@ -112,7 +105,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         // Fetch page size from local storage
-        var storedPageSize = await LocalStorageService.GetItemAsync<int>(KeyPageSize);
+        var storedPageSize = await LocalStorageService.GetItemAsync<int>(Constants.StorageKeyPageSize);
         var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
 
         await GetFieldsAsync(null, 1, pageSize);
@@ -173,7 +166,7 @@ else
     private async Task OnPageSizeChanged(int pageSize)
     {
         // Store page size to local storage
-        await LocalStorageService.SetItemAsync(KeyPageSize, pageSize);
+        await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
 
         await GetFieldsAsync(_searchQuery, 1, pageSize);
     }

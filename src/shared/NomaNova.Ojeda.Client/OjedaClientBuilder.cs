@@ -4,7 +4,7 @@ namespace NomaNova.Ojeda.Client
 {
     public class OjedaClientBuilder
     {
-        private readonly OjedaClientOptions _clientOptions = new OjedaClientOptions();
+        private readonly OjedaClientOptions _clientOptions = new();
         
         private readonly string _apiEndpoint;
         

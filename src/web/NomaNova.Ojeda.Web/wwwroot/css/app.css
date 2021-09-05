@@ -30,3 +30,15 @@
 .blazored-toast-body .blazored-toast-header .blazored-toast-close {
     font-size: 1rem;
 }
+
+.blazored-modal-add-field {
+    min-width: 400px;
+}
+
+.blazored-modal-header {
+    padding-bottom: 1rem;
+}
+
+.blazored-modal-content {
+    min-width: 600px;
+}

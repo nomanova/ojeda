@@ -12,6 +12,11 @@ namespace NomaNova.Ojeda.Data.Repositories
         Task<TEntity> GetByIdAsync(
             string id, CancellationToken cancellationToken = default);
 
+        Task<TEntity> GetByIdAsync(
+            string id,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func,
+            CancellationToken cancellationToken);
+        
         Task<List<TEntity>> GetAllAsync(
             Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
             CancellationToken cancellationToken = default);
@@ -20,8 +25,15 @@ namespace NomaNova.Ojeda.Data.Repositories
             string searchQuery,
             string orderBy, bool orderAsc,
             int pageNumber, int pageSize,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken = default);
 
+        Task<PaginatedList<TEntity>> GetAllPaginatedAsync(
+            string searchQuery,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func,
+            string orderBy, bool orderAsc,
+            int pageNumber, int pageSize,
+            CancellationToken cancellationToken = default);
+        
         Task<TEntity> InsertAsync(
             TEntity entity, CancellationToken cancellationToken = default);
 

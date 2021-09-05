@@ -1,0 +1,24 @@
+@page "/admin/fieldsets/edit/{FieldSetId}"
+@layout AdminLayout
+
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Field Sets", "/admin/fieldsets"},
+        {"Edit", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
+
+<div class="d-flex justify-content-between w-50">
+    <h3>Edit Field Set</h3>
+</div>
+
+<!-- TODO -->
+
+@code {
+    
+    [Parameter]
+    public string FieldSetId { get; set; }
+}

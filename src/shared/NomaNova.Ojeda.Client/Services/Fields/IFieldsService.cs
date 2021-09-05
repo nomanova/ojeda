@@ -8,7 +8,8 @@ namespace NomaNova.Ojeda.Client.Services.Fields
 {
     public interface IFieldsService
     {
-        Task<OjedaDataResult<FieldDto>> GetByIdAsync(string id, CancellationToken cancellationToken = default);
+        Task<OjedaDataResult<FieldDto>> GetByIdAsync(
+            string id, CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<PaginatedListDto<FieldDto>>> GetAsync(
             string query = null,
@@ -22,6 +23,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, FieldDto field,
             CancellationToken cancellationToken = default);
 
-        Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);
+        Task<OjedaResult> DeleteAsync(
+            string id, CancellationToken cancellationToken = default);
     }
 }

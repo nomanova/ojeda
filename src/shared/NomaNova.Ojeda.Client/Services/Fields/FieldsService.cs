@@ -25,7 +25,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
             string query,
             string orderBy, bool orderAsc,
             int pageNumber, int pageSize, 
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken)
         {
             var path = $"{BasePath}?query={query}&orderBy={orderBy}&orderAsc={orderAsc}&pageNumber={pageNumber}&pageSize={pageSize}";
             return await SendForDataAsync<PaginatedListDto<FieldDto>>(HttpMethod.Get, path, null, cancellationToken);

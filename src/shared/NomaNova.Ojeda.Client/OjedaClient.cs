@@ -1,5 +1,6 @@
 using System;
 using NomaNova.Ojeda.Client.Services.Fields;
+using NomaNova.Ojeda.Client.Services.FieldSets;
 
 namespace NomaNova.Ojeda.Client
 {
@@ -25,9 +26,12 @@ namespace NomaNova.Ojeda.Client
             _httpClient = OjedaHttpClient.Create(baseAddress, _options.RequestTimeout);
 
             FieldsService = new FieldsService(_httpClient);
+            FieldSetService = new FieldSetsService(_httpClient);
         }
 
         public IFieldsService FieldsService { get; private set; }
+        
+        public IFieldSetsService FieldSetService { get; private set; }
 
         public void Dispose()
         {

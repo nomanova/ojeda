@@ -11,6 +11,7 @@ using NomaNova.Ojeda.Api.Options.Application;
 using NomaNova.Ojeda.Api.Options.Framework;
 using NomaNova.Ojeda.Api.Utils;
 using NomaNova.Ojeda.Core.Domain.Fields;
+using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Helpers;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Context;
@@ -18,6 +19,7 @@ using NomaNova.Ojeda.Data.Context.Interfaces;
 using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Services.Fields;
+using NomaNova.Ojeda.Services.FieldSets;
 
 namespace NomaNova.Ojeda.Api
 {
@@ -90,11 +92,13 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ISerializer, Serializer>();
             
             services.TryAddScoped<IFieldsService, FieldsService>();
+            services.TryAddScoped<IFieldSetsService, FieldSetsService>();
         }
 
         private static void AddRepositories(IServiceCollection services)
         {
             services.TryAddScoped<IRepository<Field>, EntityRepository<Field>>();
+            services.TryAddScoped<IRepository<FieldSet>, EntityRepository<FieldSet>>();
         }
 
         private void AddFileStore(IServiceCollection services)

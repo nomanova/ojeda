@@ -6,9 +6,12 @@ namespace NomaNova.Ojeda.Api
         
         public const string CompanyName = "nomanova";
         public const string CompanyEmail = "hello@nomanova.com";
+
+        public const string AspNetCoreEnvironmentVar = "ASPNETCORE_ENVIRONMENT";
         
-        public const string EnvProduction = "Production";
-        public const string EnvDevelopment = "Development";
+        public const string EnvDevelopment = "Development"; // Local
+        public const string EnvTest = "Test"; // Unit Testing
+        public const string EnvProduction = "Production"; // Hosted
         
         public const int ExitOk = 0;
         public const int ExitError = 1;

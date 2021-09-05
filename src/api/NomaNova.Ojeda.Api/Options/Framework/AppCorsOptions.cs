@@ -7,13 +7,16 @@ namespace NomaNova.Ojeda.Api.Options.Framework
     {
         public static void Apply(CorsOptions options, SecurityOptions securityOptions)
         {
-            options.AddPolicy(Constants.CorsPolicy,
-                builder =>
-                {
-                    builder.WithOrigins(securityOptions.AllowedOrigins.ToArray())
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
+            if (securityOptions != null)
+            {
+                options.AddPolicy(Constants.CorsPolicy,
+                    builder =>
+                    {
+                        builder.WithOrigins(securityOptions.AllowedOrigins.ToArray())
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });                
+            }
         }
     }
 }

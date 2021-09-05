@@ -6,7 +6,7 @@ Prerequisites:
 
 ```
 $ dotnet tool install --global dotnet-ef
-$ cd src/NomaNova.Ojeda.Data
+$ cd src/api/NomaNova.Ojeda.Data
 $ export OJEDA_DATABASE_TYPE="Postgresql"
 $ export OJEDA_DATABASE_CONNECTION_STRING="User ID=ojeda;Password=ojeda;Host=localhost;Port=5432;Database=ojeda;"
 ```

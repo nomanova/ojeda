@@ -1,0 +1,174 @@
+@page "/admin/fieldsets"
+@layout AdminLayout
+
+@inject ILocalStorageService LocalStorageService
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+@inject OjedaClient Ojeda
+
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Field Sets", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
+
+<h3>Field Sets</h3>
+
+<div class="d-flex justify-content-between my-3">
+
+        <div class="d-flex">
+              <DebounceInput id="inp-search" class="form-control" style="width: 350px;" type="search" placeholder="Search..." autocomplete="off"
+                DebounceTime="Constants.SearchDebounceMs"
+                MinLength="Constants.SearchMinInputChars"
+                OnValueChanged="OnSearchAsync" />
+                  
+              <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field Set</button>  
+        </div>
+        
+        @if (_isLoading)
+        {
+            <div class="spinner-border text-primary" style="width: 38px; height: 38px;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+    
+</div>
+
+@if (_fieldSets == null)
+{
+    <p>Loading...</p>   
+}
+else if (!_fieldSets.Any())
+{
+    if (string.IsNullOrEmpty(_searchQuery))
+    {
+        <p>No items available.</p>
+    }
+    else
+    {
+        <p>No search results.</p>
+    }
+}
+else
+{
+    <table class="table table-striped w-100">
+        <thead>
+        <tr>
+            <th class="py-2">Name</th>
+            <th class="py-2">Description</th>
+            <th class="py-2">Fields</th>
+            <th class="py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var fieldSet in _fieldSets)
+        {
+            <tr>
+                <td class="pb-2 pr-3">@fieldSet.Name</td>
+                <td class="pb-2 pr-3">@fieldSet.Description</td>
+                <td class="pb-2 pr-3">@fieldSet.Fields.Count</td>
+                <td class="pb-2 pr-3">
+                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(fieldSet.Id))">Edit</a> |
+                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(fieldSet.Id))">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    
+    <div class="my-4">
+        <Pager
+            PageCount="@_pageCount"
+            CurrentPage="@_currentPage"
+            PageSize="@_pageSize"
+            TotalCount="@_totalCount"
+            OnPageChanged="@OnPageChanged"
+            OnPageSizeChanged="@OnPageSizeChanged" />
+    </div>
+}
+
+@code {
+    
+    private bool _isLoading;
+    
+    private string _searchQuery = "";
+    private ICollection<FieldSetDto> _fieldSets;
+
+    private int _pageCount;
+    private int _currentPage;
+    private int _pageSize;
+    private int _totalCount;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch page size from local storage
+        var storedPageSize = await LocalStorageService.GetItemAsync<int>(Constants.StorageKeyPageSize);
+        var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
+        
+        await GetFieldSetsAsync(null, 1, pageSize);
+    }
+
+    private async Task OnSearchAsync(string query)
+    {
+        _searchQuery = query;
+        await GetFieldSetsAsync(query, 1, _pageSize);
+    }
+    
+    private void OnAdd()
+    {
+        NavManager.NavigateTo("/admin/fieldsets/add");
+    }
+
+    private void OnEdit(string id)
+    {
+        NavManager.NavigateTo($"/admin/fieldsets/edit/{id}");
+    }
+
+    private async Task OnDelete(string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task OnPageChanged(int pageNumber)
+    {
+        await GetFieldSetsAsync(_searchQuery, pageNumber, _pageSize);
+    }
+
+    private async Task OnPageSizeChanged(int pageSize)
+    {
+        // Store page size to local storage
+        await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
+
+        await GetFieldSetsAsync(_searchQuery, 1, pageSize);
+    }
+    
+    private async Task GetFieldSetsAsync(string query = null, int pageNumber = 1, int pageSize = 25)
+    {
+        _isLoading = true;
+        StateHasChanged();
+        
+        var result = await Ojeda.FieldSetService.GetAsync(query, null, true, pageNumber, pageSize);
+
+        if (result.Success)
+        {
+            var paginatedData = result.Data;
+        
+            _fieldSets = paginatedData.Items;
+            _pageCount = paginatedData.TotalPages;
+            _currentPage = paginatedData.PageNumber;
+            _pageSize = pageSize;
+            _totalCount = paginatedData.TotalCount;
+        }
+        else
+        {
+            _fieldSets = new List<FieldSetDto>();
+            ToastService.ShowError($"Could not load field sets. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+        
+        _isLoading = false;
+        StateHasChanged();
+    }
+}
