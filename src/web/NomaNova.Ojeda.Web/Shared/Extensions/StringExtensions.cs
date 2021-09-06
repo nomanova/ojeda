@@ -2,7 +2,7 @@ namespace NomaNova.Ojeda.Web.Shared.Extensions
 {
     public static class StringExtensions
     {
-        public static string Truncate(this string value, int maxChars)
+        public static string Truncate(this string value, int maxChars = Constants.DefaultTruncateSmall)
         {
             if (string.IsNullOrEmpty(value))
             {

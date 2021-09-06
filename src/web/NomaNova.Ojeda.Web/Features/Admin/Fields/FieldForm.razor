@@ -10,6 +10,7 @@
     <FluentValidationValidator></FluentValidationValidator>
     <ServerValidation @ref="_serverValidation" />
     
+    <!-- Name -->
     <div class="mb-3 w-50">
         <label for="fieldName" class="form-label">Name*</label>
         <InputText @bind-Value="_field.Name" class="form-control" id="fieldName" disabled="@_isLoading"></InputText>
@@ -17,6 +18,7 @@
         <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
     </div>
     
+    <!-- Description -->
     <div class="mb-3 w-50">
         <label for="fieldDescription" class="form-label">Description</label>
         <InputText @bind-Value="_field.Description" class="form-control" id="fieldDescription" disabled="@_isLoading"></InputText>
@@ -24,6 +26,7 @@
         <ValidationMessage For="@(() => _field.Description)"></ValidationMessage>
     </div>
     
+    <!-- Type -->
     <div class="mb-3 w-50">
         <label for="fieldType" class="form-label">Type*</label>
         <InputSelect @bind-Value="_field.Type" class="form-control" id="fieldType" disabled="@_isLoading">
@@ -35,7 +38,8 @@
         <ValidationMessage For="@(() => _field.Type)"></ValidationMessage>
     </div>
 
-    <div class="my-4">
+    <!-- Footer -->
+    <div class="my-5">
         <button class="btn btn-primary" type="submit" disabled="@_isLoading">
             @if (_isLoading)
             {
@@ -51,6 +55,7 @@
 </EditForm>
 
 @code {
+
     private FieldDto _field;
     private EditContext _editContext;
     
@@ -111,8 +116,7 @@
         Init(_field);
 
         var result = await OnSubmit(_field);
-        
-        
+
         if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
         {
             _serverValidation.DisplayErrors(result.Error.ValidationErrors);

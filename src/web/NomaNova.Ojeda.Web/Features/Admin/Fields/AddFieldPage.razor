@@ -1,7 +1,6 @@
 @page "/admin/fields/add"
 @layout AdminLayout
 
-@inject NavigationManager NavManager
 @inject OjedaClient Ojeda
 
 @{
@@ -18,7 +17,7 @@
     <h3>Add Field</h3>
 </div>
 
-<FieldForm OnSubmit="OnSubmitNewField"></FieldForm>
+<FieldForm OnSubmit="@OnSubmitNewField"></FieldForm>
 
 @code {
     

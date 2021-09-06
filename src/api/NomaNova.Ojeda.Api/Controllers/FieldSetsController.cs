@@ -69,10 +69,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(typeof(FieldSetDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
-            [FromBody] UpsertFieldSetDto upsertFieldSetDto, 
+            [FromBody] FieldSetDto fieldSetDto, 
             CancellationToken cancellationToken = default)
         {
-            var fieldSetDto = await _fieldSetsService.CreateFieldSetAsync(upsertFieldSetDto, cancellationToken);
+            fieldSetDto = await _fieldSetsService.CreateFieldSetAsync(fieldSetDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = fieldSetDto.Id }, fieldSetDto);
         }
 
@@ -87,10 +87,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,
-            [FromBody] UpsertFieldSetDto upsertFieldSetDto,
+            [FromBody] FieldSetDto fieldSetDto,
             CancellationToken cancellationToken = default)
         {
-            var fieldSetDto = await _fieldSetsService.UpdateFieldSetAsync(id, upsertFieldSetDto, cancellationToken);
+            fieldSetDto = await _fieldSetsService.UpdateFieldSetAsync(id, fieldSetDto, cancellationToken);
             return Ok(fieldSetDto);
         }
         

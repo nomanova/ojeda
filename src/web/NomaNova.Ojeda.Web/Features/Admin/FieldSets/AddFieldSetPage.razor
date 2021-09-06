@@ -1,6 +1,8 @@
 @page "/admin/fieldsets/add"
 @layout AdminLayout
 
+@inject OjedaClient Ojeda
+
 @{
     var paths = new Dictionary<string, string>()
     {
@@ -15,30 +17,13 @@
     <h3>Add Field Set</h3>
 </div>
 
-<!-- TODO -->
-
-<button @onclick="@AddField" class="btn btn-primary">Add Field</button>
+<FieldSetForm OnSubmit="@OnSubmitNewFieldSet"></FieldSetForm>
 
 @code {
     
-    [CascadingParameter] 
-    public IModalService Modal { get; set; }
-
-    private async Task AddField()
+    private async Task<OjedaDataResult<FieldSetDto>> OnSubmitNewFieldSet(FieldSetDto fieldSet)
     {
-        var options = new ModalOptions
-        { 
-            Animation = ModalAnimation.FadeInOut(0.15)
-        };
-        
-        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", options);
-        var result = await selectFieldModal.Result;
-
-        if (!result.Cancelled)
-        {
-            // TODO
-            Console.WriteLine(result.Data);
-        }
+        return await Ojeda.FieldSetService.CreateAsync(fieldSet);
     }
 
 }

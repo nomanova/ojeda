@@ -15,10 +15,10 @@ namespace NomaNova.Ojeda.Services.FieldSets
             CancellationToken cancellationToken = default);
         
         Task<FieldSetDto> CreateFieldSetAsync(
-            UpsertFieldSetDto upsertFieldSetDto, CancellationToken cancellationToken = default);
+            FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
 
         Task<FieldSetDto> UpdateFieldSetAsync(
-            string id, UpsertFieldSetDto upsertFieldSetDto, CancellationToken cancellationToken = default);
+            string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
         
         Task DeleteFieldSetAsync(string id, CancellationToken cancellationToken = default);
     }

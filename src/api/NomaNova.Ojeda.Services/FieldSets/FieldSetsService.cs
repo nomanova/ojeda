@@ -66,14 +66,14 @@ namespace NomaNova.Ojeda.Services.FieldSets
         }
 
         public async Task<FieldSetDto> CreateFieldSetAsync(
-            UpsertFieldSetDto upsertFieldSetDto, CancellationToken cancellationToken)
+            FieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             // TODO
             throw new NotImplementedException();
         }
 
         public async Task<FieldSetDto> UpdateFieldSetAsync(
-            string id, UpsertFieldSetDto upsertFieldSetDto, CancellationToken cancellationToken)
+            string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             // TODO
             throw new NotImplementedException();

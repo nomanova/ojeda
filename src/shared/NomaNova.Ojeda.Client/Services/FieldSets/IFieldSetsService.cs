@@ -16,5 +16,16 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             string orderBy, bool orderAsc,
             int pageNumber, int pageSize,
             CancellationToken cancellationToken = default);
+
+        Task<OjedaDataResult<FieldSetDto>> CreateAsync(
+            FieldSetDto fieldSet,
+            CancellationToken cancellationToken = default);
+
+        Task<OjedaDataResult<FieldSetDto>> UpdateAsync(
+            string id, 
+            FieldSetDto fieldSet,
+            CancellationToken cancellationToken = default);
+
+        Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);
     }
 }

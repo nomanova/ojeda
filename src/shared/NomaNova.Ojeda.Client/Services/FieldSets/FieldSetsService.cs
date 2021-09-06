@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,26 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
         {
             var path = $"{BasePath}?query={query}&orderBy={orderBy}&orderAsc={orderAsc}&pageNumber={pageNumber}&pageSize={pageSize}";
             return await SendForDataAsync<PaginatedListDto<FieldSetDto>>(HttpMethod.Get, path, null, cancellationToken);
+        }
+        
+        public async Task<OjedaDataResult<FieldSetDto>> CreateAsync(FieldSetDto fieldSet, CancellationToken cancellationToken)
+        {
+            Console.WriteLine(fieldSet);
+            
+            var path = $"{BasePath}";
+            return await SendForDataAsync<FieldSetDto>(HttpMethod.Post, path, fieldSet, cancellationToken);
+        }
+        
+        public async Task<OjedaDataResult<FieldSetDto>> UpdateAsync(string id, FieldSetDto fieldSet, CancellationToken cancellationToken)
+        {
+            var path = $"{BasePath}/{id}";
+            return await SendForDataAsync<FieldSetDto>(HttpMethod.Put, path, fieldSet, cancellationToken);
+        }
+        
+        public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken)
+        {
+            var path = $"{BasePath}/{id}";
+            return await SendAsync(HttpMethod.Delete, path, null, cancellationToken);
         }
     }
 }
