@@ -7,7 +7,7 @@
 @inject OjedaClient Ojeda
 
 @{
-    var paths = new Dictionary<string, string>()
+    var paths = new Dictionary<string, string>
     {
         {"Admin", "/admin"},
         {"Fields", null}
@@ -28,12 +28,7 @@
           <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>  
     </div>
     
-    @if (_isLoading)
-    {
-        <div class="spinner-border text-primary" style="width: 38px; height: 38px;" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    }
+    <Spinner IsLoading="@_isLoading" />
 
 </div>
 

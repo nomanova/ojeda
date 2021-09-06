@@ -65,12 +65,7 @@ else
                 OnPageChanged="@OnPageChanged"/>
             </div>
             
-            @if (_isLoading)
-            {
-                <div class="spinner-border text-primary" style="width: 32px; height: 32px;" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            }
+            <Spinner IsLoading="@_isLoading" />
         </div>
 
             <button class="btn btn-secondary" @onclick="OnCancel">Cancel</button>
