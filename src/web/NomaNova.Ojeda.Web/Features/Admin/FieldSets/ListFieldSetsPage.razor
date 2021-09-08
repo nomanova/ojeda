@@ -54,7 +54,7 @@ else
         <tr>
             <th class="py-2">Name</th>
             <th class="py-2">Description</th>
-            <th class="py-2">Fields</th>
+            <th class="py-2">Field Count</th>
             <th class="py-2">Actions</th>
         </tr>
         </thead>
@@ -124,8 +124,34 @@ else
 
     private async Task OnDelete(string id)
     {
-        // TODO
-        throw new NotImplementedException();
+        _isLoading = true;
+        StateHasChanged();
+        
+        var result = await Ojeda.FieldSetsService.DeleteAsync(id);
+
+        if (result.Success)
+        {
+            var toRemove = _fieldSets.FirstOrDefault(f => f.Id.Equals(id));
+            if (toRemove != null)
+            {
+                _fieldSets.Remove(toRemove);
+                _totalCount--;
+            }
+        }
+        else
+        {
+            ToastService.ShowError($"Could not delete field set. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+
+        if (!_fieldSets.Any() && _currentPage > 1)
+        {
+            await GetFieldSetsAsync(_searchQuery, _currentPage - 1, _pageSize);
+        }
+        else
+        {
+            _isLoading = false;
+            StateHasChanged();   
+        }
     }
 
     private async Task OnPageChanged(int pageNumber)
@@ -146,7 +172,7 @@ else
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldSetService.GetAsync(query, null, true, pageNumber, pageSize);
+        var result = await Ojeda.FieldSetsService.GetAsync(query, null, true, pageNumber, pageSize);
 
         if (result.Success)
         {

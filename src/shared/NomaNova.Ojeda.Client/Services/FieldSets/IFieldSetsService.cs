@@ -13,8 +13,10 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
 
         Task<OjedaDataResult<PaginatedListDto<FieldSetDto>>> GetAsync(
             string query,
-            string orderBy, bool orderAsc,
-            int pageNumber, int pageSize,
+            string orderBy, 
+            bool orderAsc,
+            int pageNumber, 
+            int pageSize,
             CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<FieldSetDto>> CreateAsync(

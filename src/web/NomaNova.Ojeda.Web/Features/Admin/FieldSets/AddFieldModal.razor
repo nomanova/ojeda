@@ -77,6 +77,9 @@ else
     [CascadingParameter] 
     BlazoredModalInstance ModalInstance { get; set; }
     
+    [Parameter] 
+    public IList<string> ExcludedIds { get; set; }
+    
     private bool _isLoading;
 
     private string _error;
@@ -122,7 +125,8 @@ else
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber, pageSize);
+        var result = await Ojeda.FieldsService.GetAsync(
+            query, null, true, ExcludedIds, pageNumber, pageSize);
         
         if (result.Success)
         {

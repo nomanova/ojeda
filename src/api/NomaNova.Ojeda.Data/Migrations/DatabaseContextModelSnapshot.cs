@@ -49,14 +49,8 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Property<string>("FieldSetId")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<long>("Order")
+                        .HasColumnType("bigint");
 
                     b.HasKey("FieldId", "FieldSetId");
 

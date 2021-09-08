@@ -10,11 +10,15 @@ namespace NomaNova.Ojeda.Services.Fields
     {
         public FieldDtoBusinessValidator(IRepository<Field> fieldsRepository)
         {
-            RuleFor(dto => new {dto.Name, dto.Id}).MustAsync(async (dto, cancellation) =>
+            // Field validation
+            Include(new FieldDtoValidator());
+            
+            // Business rule: ensure unique name
+            RuleFor(_ => new {_.Name, _.Id}).MustAsync(async (_, cancellation) =>
             {
                 var field = (await fieldsRepository.GetAllAsync(query =>
                 {
-                    return query.Where(f => f.Name.Equals(dto.Name));
+                    return query.Where(f => f.Name.Equals(_.Name));
                 }, cancellation)).FirstOrDefault();
 
                 if (field == null)
@@ -22,9 +26,9 @@ namespace NomaNova.Ojeda.Services.Fields
                     return true;
                 }
 
-                return dto.Id != null && dto.Id.Equals(field.Id);
+                return _.Id != null && _.Id.Equals(field.Id);
 
-            }).OverridePropertyName(dto => dto.Name).WithMessage(dto => $"'{dto.Name}' is already in use.");
+            }).OverridePropertyName(dto => dto.Name).WithMessage(dto => $"The name '{dto.Name}' is already in use.");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,13 @@ namespace NomaNova.Ojeda.Services.Fields
         }
 
         public async Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
-            string searchQuery, string orderBy, bool orderAsc, int pageNumber, int pageSize, CancellationToken cancellationToken)
+            string searchQuery, 
+            string orderBy, 
+            bool orderAsc, 
+            IList<string> excludedIds, 
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(orderBy))
             {
@@ -45,7 +52,7 @@ namespace NomaNova.Ojeda.Services.Fields
             }
 
             var paginatedFields = await _fieldsRepository.GetAllPaginatedAsync(
-                searchQuery, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+                searchQuery, orderBy, orderAsc, excludedIds, pageNumber, pageSize, cancellationToken);
 
             var paginatedFieldsDto = _mapper.Map<PaginatedListDto<FieldDto>>(paginatedFields);
             paginatedFieldsDto.Items = paginatedFields.Select(f => _mapper.Map<FieldDto>(f)).ToList();
@@ -79,6 +86,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;
+            
             field = await _fieldsRepository.UpdateAsync(field, cancellationToken);
 
             return _mapper.Map<FieldDto>(field);
@@ -99,8 +107,6 @@ namespace NomaNova.Ojeda.Services.Fields
         private async Task Validate(string id, FieldDto fieldDto, CancellationToken cancellationToken)
         {
             fieldDto.Id = id;
-
-            await Validate(new FieldDtoFieldValidator(), fieldDto, cancellationToken);
             await Validate(new FieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
         }
     }

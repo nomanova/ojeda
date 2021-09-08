@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,9 +40,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <summary>
         /// Get all fields
         /// </summary>
-        /// <param name="query">Optional search query filtering results based on the searchable fields.</param>
+        /// <param name="query">Optional search query, filtering results based on the searchable fields.</param>
         /// <param name="orderBy">Optional field name on which to order the results.</param>
         /// <param name="orderAsc">Optional ordering direction indication, default is ascending order.</param>
+        /// <param name="excludedIds">Optional list of field id's which must be excluded from the result set.</param>
         /// <param name="pageNumber">Optional result page number.</param>
         /// <param name="pageSize">Optional result page size.</param>
         [HttpGet]
@@ -51,12 +53,13 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromQuery] string query  = null,
             [FromQuery] string orderBy  = null,
             [FromQuery] bool orderAsc  = true,
+            [FromQuery(Name = "excludedId")] IList<string> excludedIds = null,
             [FromQuery] int pageNumber = Constants.DefaultQueryPageNumber,
             [FromQuery] int pageSize = Constants.DefaultQueryPageSize,
             CancellationToken cancellationToken = default)
         {
-            var paginatedFieldsDto = 
-                await _fieldsService.GetFieldsAsync(query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+            var paginatedFieldsDto = await _fieldsService.GetFieldsAsync(
+                query, orderBy, orderAsc, excludedIds, pageNumber, pageSize, cancellationToken);
             return Ok(paginatedFieldsDto);
         }
 

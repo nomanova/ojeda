@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Models;
@@ -11,7 +12,12 @@ namespace NomaNova.Ojeda.Services.FieldSets
             string id, CancellationToken cancellationToken = default);
 
         Task<PaginatedListDto<FieldSetDto>> GetFieldSetsAsync(
-            string searchQuery, string orderBy, bool orderAsc, int pageNumber, int pageSize,
+            string searchQuery, 
+            string orderBy, 
+            bool orderAsc,
+            IList<string> excludedIds,
+            int pageNumber, 
+            int pageSize,
             CancellationToken cancellationToken = default);
         
         Task<FieldSetDto> CreateFieldSetAsync(

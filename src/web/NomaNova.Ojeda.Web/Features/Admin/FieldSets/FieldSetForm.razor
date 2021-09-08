@@ -5,8 +5,8 @@
 
 <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
     
-    <FluentValidationValidator></FluentValidationValidator>
-    <ServerValidation @ref="_serverValidation" />
+    <FluentValidationValidator />
+    <ServerSideFluentValidation @ref="_serverValidation" />
     
     <!-- Name -->
     <div class="mb-3 w-50">
@@ -26,7 +26,7 @@
     <div class="mb-3 w-50">
         <div class="d-flex justify-content-between">
             <label class="form-label">Fields*</label>
-            <a class="btn-link" role="button" @onclick="@AddField">Add Field</a>
+            <a class="btn-link @(_isLoading ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
         </div>
 
         <div>
@@ -50,7 +50,7 @@
                             <td class="pb-2 pr-0">
                                 @if (fieldSetField.Order != 1 && _fieldSet.Fields.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveUp(fieldSetField))">
+                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldUp(fieldSetField))">
                                         <i class="fs-6 bi-arrow-up-circle"></i>
                                     </a>
                                 }
@@ -58,7 +58,7 @@
                             <td class="pb-2 pr-0">
                                 @if (fieldSetField.Order != _fieldSet.Fields.Count && _fieldSet.Fields.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveDown(fieldSetField))">
+                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldDown(fieldSetField))">
                                         <i class="fs-6 bi-arrow-down-circle"></i>
                                     </a>
                                 }
@@ -67,11 +67,13 @@
                             <td class="pb-2 pr-3">@fieldSetField.Field.Description.Truncate()</td>
                             <td class="pb-2 pr-3">@fieldSetField.Field.Type</td>
                             <td class="pb-2 pr-3">
-                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemove(fieldSetField))">
+                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(fieldSetField))">
                                     <i class="fs-6 bi-x-circle"></i>
                                 </a>
                             </td>
                         </tr>
+                        <tr>
+                    </tr>
                     }
                     </tbody>
                 </table>
@@ -80,6 +82,7 @@
             {
                 <p class="text-muted">Use the link on the right to start adding fields.</p>
             }
+            <ValidationMessage For="@(() => _fieldSet.Fields)"></ValidationMessage>
         </div>
     </div>
 
@@ -104,7 +107,7 @@
     private FieldSetDto _fieldSet;
     private EditContext _editContext;
     
-    private ServerValidation _serverValidation;
+    private ServerSideFluentValidation _serverValidation;
     
     private bool _isLoading;
     
@@ -121,10 +124,16 @@
     {
         base.OnParametersSet();
 
+        Console.WriteLine("On Parameters Set");
+        
         Init();
         
         if (FieldSet != null)
         {
+            Console.WriteLine("On Parameters Set: not null");
+            
+            Console.WriteLine(FieldSet.Fields.Count);
+            
             _fieldSet.Id = FieldSet.Id;
             _fieldSet.Name = FieldSet.Name;
             _fieldSet.Description = FieldSet.Description;
@@ -149,14 +158,24 @@
         Init();
     }
     
-    private async Task AddField()
+    private async Task OnAddField()
     {
+        if (_isLoading)
+        {
+            return;
+        }
+
         var options = new ModalOptions
         { 
             Animation = ModalAnimation.FadeInOut(0.15)
         };
         
-        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", options);
+        var parameters = new ModalParameters();
+        
+        var excludedIds = _fieldSet.Fields.Select(_ => _.Field.Id).ToList();
+        parameters.Add("ExcludedIds", excludedIds);
+        
+        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", parameters, options);
         var result = await selectFieldModal.Result;
 
         if (!result.Cancelled)
@@ -191,8 +210,13 @@
         NavManager.NavigateTo("/admin/fieldsets");
     }
 
-    private void OnMoveUp(FieldSetFieldDto fieldSetFieldDto)
+    private void OnMoveFieldUp(FieldSetFieldDto fieldSetFieldDto)
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         var index = _fieldSet.Fields.IndexOf(fieldSetFieldDto);
         
         _fieldSet.Fields.RemoveAt(index);
@@ -201,8 +225,13 @@
         UpdateOrder();
     }
 
-    private void OnMoveDown(FieldSetFieldDto fieldSetFieldDto)
+    private void OnMoveFieldDown(FieldSetFieldDto fieldSetFieldDto)
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         var index = _fieldSet.Fields.IndexOf(fieldSetFieldDto);
         
         _fieldSet.Fields.RemoveAt(index);
@@ -211,14 +240,24 @@
         UpdateOrder();
     }
     
-    private void OnRemove(FieldSetFieldDto fieldSetFieldDto)
+    private void OnRemoveField(FieldSetFieldDto fieldSetFieldDto)
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         _fieldSet.Fields.Remove(fieldSetFieldDto);
         UpdateOrder();
     }
     
     private async Task OnSubmitForm()
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         _isLoading = true;
         _serverValidation.ClearErrors();
         Init(_fieldSet);

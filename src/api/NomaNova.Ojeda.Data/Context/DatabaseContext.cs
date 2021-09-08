@@ -50,19 +50,31 @@ namespace NomaNova.Ojeda.Data.Context
         {
             // Field
             builder.Entity<Field>()
-                .HasKey(f => f.Id);
+                .HasKey(_ => _.Id);
             
             builder.Entity<Field>()
-                .Property(f => f.Type)
+                .Property(_ => _.Type)
                 .HasConversion(fieldType => fieldType.ToString(), s => Enum.Parse<FieldType>(s));
             
             // FieldSet
             builder.Entity<FieldSet>()
-                .HasKey(s => s.Id);
+                .HasKey(_ => _.Id);
             
             // FieldSetField
             builder.Entity<FieldSetField>()
-                .HasKey(q => new {q.FieldId, q.FieldSetId});
+                .HasKey(_ => new {_.FieldId, _.FieldSetId});
+
+            builder.Entity<FieldSetField>()
+                .HasOne(_ => _.Field)
+                .WithMany(_ => _.FieldSetFields)
+                .HasForeignKey(_ => _.FieldId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<FieldSetField>()
+                .HasOne(_ => _.FieldSet)
+                .WithMany(_ => _.FieldSetFields)
+                .HasForeignKey(_ => _.FieldSetId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

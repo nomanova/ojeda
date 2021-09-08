@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NomaNova.Ojeda.Core;
+using NomaNova.Ojeda.Core.Extensions;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Data.Options;
@@ -57,11 +59,19 @@ namespace NomaNova.Ojeda.Data.Repositories
 
         public async Task<PaginatedList<TEntity>> GetAllPaginatedAsync(
             string searchQuery,
-            string orderBy, bool orderAsc,
-            int pageNumber, int pageSize,
+            string orderBy, 
+            bool orderAsc,
+            IList<string> excludedIds,
+            int pageNumber, 
+            int pageSize,
             CancellationToken cancellationToken)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
+
+            if (excludedIds.HasElements())
+            {
+                queryable = queryable.Where(e => !excludedIds.Contains(e.Id));
+            }
 
             queryable = queryable
                 .ExecuteSearchQueryFilter(searchQuery, _options.Type)

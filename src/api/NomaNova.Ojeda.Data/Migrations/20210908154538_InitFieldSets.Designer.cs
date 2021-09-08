@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NomaNova.Ojeda.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210904193613_FieldSets")]
-    partial class FieldSets
+    [Migration("20210908154538_InitFieldSets")]
+    partial class InitFieldSets
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,11 +51,8 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Property<string>("FieldSetId")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<long>("Order")
+                        .HasColumnType("bigint");
 
                     b.HasKey("FieldId", "FieldSetId");
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NomaNova.Ojeda.Data.Migrations
 {
-    public partial class FieldSets : Migration
+    public partial class InitFieldSets : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -28,8 +28,7 @@ namespace NomaNova.Ojeda.Data.Migrations
                 {
                     FieldId = table.Column<string>(type: "text", nullable: false),
                     FieldSetId = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    Order = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

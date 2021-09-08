@@ -3,8 +3,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
+using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
 using NomaNova.Ojeda.Models.FieldSets;
 
 namespace NomaNova.Ojeda.Client.Services.FieldSets
@@ -25,11 +25,22 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
         
         public async Task<OjedaDataResult<PaginatedListDto<FieldSetDto>>> GetAsync(
             string query,
-            string orderBy, bool orderAsc,
-            int pageNumber, int pageSize, 
+            string orderBy, 
+            bool orderAsc,
+            int pageNumber, 
+            int pageSize, 
             CancellationToken cancellationToken = default)
         {
-            var path = $"{BasePath}?query={query}&orderBy={orderBy}&orderAsc={orderAsc}&pageNumber={pageNumber}&pageSize={pageSize}";
+            var qsb = QueryStringBuilder.New();
+            
+            qsb.Add("query" , query);
+            qsb.Add("orderBy" , orderBy);
+            qsb.Add("orderAsc" , orderAsc);
+            qsb.Add("pageNumber" , pageNumber);
+            qsb.Add("pageSize" , pageSize);
+
+            var path = $"{BasePath}{qsb.Build()}";
+            
             return await SendForDataAsync<PaginatedListDto<FieldSetDto>>(HttpMethod.Get, path, null, cancellationToken);
         }
         

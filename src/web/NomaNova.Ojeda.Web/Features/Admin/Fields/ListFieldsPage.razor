@@ -172,7 +172,8 @@ else
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldsService.GetAsync(query, null, true, pageNumber, pageSize);
+        var result = await Ojeda.FieldsService.GetAsync(
+            query, null, true, null, pageNumber, pageSize);
         
         if (result.Success)
         {

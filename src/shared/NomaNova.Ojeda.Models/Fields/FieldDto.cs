@@ -2,6 +2,11 @@ using FluentValidation;
 
 namespace NomaNova.Ojeda.Models.Fields
 {
+    public enum FieldTypeDto
+    {
+        Text
+    }
+    
     public class FieldDto
     {
         public string Id { get; set; }
@@ -13,11 +18,13 @@ namespace NomaNova.Ojeda.Models.Fields
         public FieldTypeDto Type { get; set; }
     }
     
-    public class FieldDtoFieldValidator : AbstractValidator<FieldDto>
+    public class FieldDtoValidator : AbstractValidator<FieldDto>
     {
-        public FieldDtoFieldValidator()
+        public FieldDtoValidator()
         {
-            RuleFor(dto =>  dto.Name).NotEmpty();
+            RuleFor(_ =>  _.Name).NotEmpty().WithMessage("Please provide a name.");
+            RuleFor(_ =>  _.Name).MaximumLength(40);
+            RuleFor(_ =>  _.Description).MaximumLength(250);
         }
     }
 }

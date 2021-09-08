@@ -10,9 +10,11 @@ namespace NomaNova.Ojeda.Services.Fields
     {
         public FieldProfile()
         {
+            // Domain -> Dto
             CreateMap<Field, FieldDto>();
             CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>();
 
+            // Dto -> Domain
             CreateMap<FieldDto, Field>();
         }
     }

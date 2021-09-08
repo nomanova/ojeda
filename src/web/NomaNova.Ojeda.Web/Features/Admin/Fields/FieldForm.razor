@@ -7,14 +7,13 @@
 
 <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
     
-    <FluentValidationValidator></FluentValidationValidator>
-    <ServerValidation @ref="_serverValidation" />
+    <FluentValidationValidator />
+    <ServerSideFluentValidation @ref="_serverValidation" />
     
     <!-- Name -->
     <div class="mb-3 w-50">
         <label for="fieldName" class="form-label">Name*</label>
         <InputText @bind-Value="_field.Name" class="form-control" id="fieldName" disabled="@_isLoading"></InputText>
-        <!-- <div id="fieldNameHelp" class="form-text">The field name must be unique.</div> -->
         <ValidationMessage For="@(() => _field.Name)"></ValidationMessage>
     </div>
     
@@ -59,7 +58,7 @@
     private FieldDto _field;
     private EditContext _editContext;
     
-    private ServerValidation _serverValidation;
+    private ServerSideFluentValidation _serverValidation;
     
     private bool _isLoading;
 
@@ -111,6 +110,11 @@
 
     private async Task OnSubmitForm()
     {
+        if (_isLoading)
+        {
+            return;
+        }
+        
         _isLoading = true;
         _serverValidation.ClearErrors();
         Init(_field);

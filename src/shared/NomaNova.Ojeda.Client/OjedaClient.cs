@@ -26,12 +26,12 @@ namespace NomaNova.Ojeda.Client
             _httpClient = OjedaHttpClient.Create(baseAddress, _options.RequestTimeout);
 
             FieldsService = new FieldsService(_httpClient);
-            FieldSetService = new FieldSetsService(_httpClient);
+            FieldSetsService = new FieldSetsService(_httpClient);
         }
 
         public IFieldsService FieldsService { get; private set; }
         
-        public IFieldSetsService FieldSetService { get; private set; }
+        public IFieldSetsService FieldSetsService { get; private set; }
 
         public void Dispose()
         {

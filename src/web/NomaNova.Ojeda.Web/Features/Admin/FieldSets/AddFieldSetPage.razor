@@ -23,7 +23,7 @@
     
     private async Task<OjedaDataResult<FieldSetDto>> OnSubmitNewFieldSet(FieldSetDto fieldSet)
     {
-        return await Ojeda.FieldSetService.CreateAsync(fieldSet);
+        return await Ojeda.FieldSetsService.CreateAsync(fieldSet);
     }
 
 }
