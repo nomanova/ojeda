@@ -43,7 +43,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <param name="query">Optional search query filtering results based on the searchable fields.</param>
         /// <param name="orderBy">Optional field name on which to order the results.</param>
         /// <param name="orderAsc">Optional ordering direction indication, default is ascending order.</param>
-        /// <param name="excludedIds">Optional list of field id's which must be excluded from the result set.</param>
+        /// <param name="excludedIds">Optional list of field set id's which must be excluded from the result set.</param>
         /// <param name="pageNumber">Optional result page number.</param>
         /// <param name="pageSize">Optional result page size.</param>
         [HttpGet]

@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - src/api/*
+      - src/shared/*
+      - test/api/*
+      - azure-pipelines-api.yml
+      - Api.Dockerfile
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+steps:
+  # Docker image
+  - task: Docker@2
+    displayName: 'Build Image'
+    inputs:
+      command: build
+      Dockerfile: 'Api.Dockerfile'

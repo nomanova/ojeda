@@ -1,0 +1,23 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - src/web/*
+      - src/shared/*
+      - azure-pipelines-web.yml
+      - Web.Dockerfile
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+steps:
+  # Docker image
+  - task: Docker@2
+    displayName: 'Build Image'
+    inputs:
+      command: build
+      Dockerfile: 'Web.Dockerfile'
