@@ -1,30 +1,28 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.AssetClasses;
 
-namespace NomaNova.Ojeda.Client.Services.Fields
+namespace NomaNova.Ojeda.Client.Services.AssetClasses
 {
-    public interface IFieldsService
+    public interface IAssetClassesService
     {
-        Task<OjedaDataResult<FieldDto>> GetByIdAsync(
+        Task<OjedaDataResult<AssetClassDto>> GetByIdAsync(
             string id, CancellationToken cancellationToken = default);
-
-        Task<OjedaDataResult<PaginatedListDto<FieldDto>>> GetAsync(
+        
+        Task<OjedaDataResult<PaginatedListDto<AssetClassDto>>> GetAsync(
             string query = null,
             string orderBy = null, 
             bool orderAsc = true,
-            IEnumerable<string> excludedIds = null,
             int pageNumber = 1, 
             int pageSize = 10, 
             CancellationToken cancellationToken = default);
         
-        Task<OjedaDataResult<FieldDto>> CreateAsync(FieldDto field,
+        Task<OjedaDataResult<AssetClassDto>> CreateAsync(AssetClassDto assetClass,
             CancellationToken cancellationToken = default);
-
-        Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, FieldDto field,
+        
+        Task<OjedaDataResult<AssetClassDto>> UpdateAsync(string id, AssetClassDto assetClass,
             CancellationToken cancellationToken = default);
 
         Task<OjedaResult> DeleteAsync(

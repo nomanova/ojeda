@@ -27,7 +27,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
             string query,
             string orderBy, 
             bool orderAsc,
-            IList<string> excludedIds,
+            IEnumerable<string> excludedIds,
             int pageNumber, 
             int pageSize, 
             CancellationToken cancellationToken)

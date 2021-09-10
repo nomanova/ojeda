@@ -1,4 +1,4 @@
-@page "/admin/fields"
+@page "/admin/asset-classes"
 @layout AdminLayout
 
 @inject ILocalStorageService LocalStorageService
@@ -10,31 +10,30 @@
     var paths = new Dictionary<string, string>
     {
         {"Admin", "/admin"},
-        {"Fields", null}
+        {"Asset Classes", null}
     };
 }
 <Breadcrumb Paths="@paths" />
 
-<h3>Fields</h3>
+<h3>Asset Classes</h3>
 
 <div class="d-flex justify-content-between my-3">
 
     <div class="d-flex">
         <div style="width: 350px;">
             <Search OnValueChanged="@OnSearchAsync"></Search>
-            </div>
-        <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>
+        </div>
+        <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset Class</button>
     </div>
     
     <Spinner IsLoading="@_isLoading" />
-
 </div>
 
-@if (_fields == null)
+@if (_assetClasses == null)
 {
     <p>Loading...</p>   
 }
-else if (!_fields.Any())
+else if (!_assetClasses.Any())
 {
     if (string.IsNullOrEmpty(_searchQuery))
     {
@@ -52,20 +51,20 @@ else
         <tr>
             <th class="py-2">Name</th>
             <th class="py-2">Description</th>
-            <th class="py-2">Type</th>
+            <th class="py-2"># Field Sets</th>
             <th class="py-2">Actions</th>
         </tr>
         </thead>
         <tbody>
-        @foreach (var field in _fields)
+        @foreach (var assetClass in _assetClasses)
         {
             <tr>
-                <td class="pb-2 pr-3">@field.Name</td>
-                <td class="pb-2 pr-3">@field.Description.Truncate(Constants.DefaultTruncateLarge)</td>
-                <td class="pb-2 pr-3">@field.Type</td>
+                <td class="pb-2 pr-3">@assetClass.Name</td>
+                <td class="pb-2 pr-3">@assetClass.Description</td>
+                <td class="pb-2 pr-3">@assetClass.FieldSets.Count</td>
                 <td class="pb-2 pr-3">
-                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(field.Id))">Edit</a> |
-                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(field.Id))">Delete</a>
+                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(assetClass.Id))">Edit</a> |
+                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(assetClass.Id))">Delete</a>
                 </td>
             </tr>
         }
@@ -84,12 +83,12 @@ else
 }
 
 @code {
-
+    
     private bool _isLoading;
-
+    
     private string _searchQuery = "";
-    private ICollection<FieldDto> _fields;
-
+    private ICollection<AssetClassDto> _assetClasses;
+    
     private int _pageCount;
     private int _currentPage;
     private int _pageSize;
@@ -100,50 +99,50 @@ else
         // Fetch page size from local storage
         var storedPageSize = await LocalStorageService.GetItemAsync<int>(Constants.StorageKeyPageSize);
         var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
-
-        await GetFieldsAsync(null, 1, pageSize);
+        
+        await GetAssetClassesAsync(null, 1, pageSize);
     }
 
     private async Task OnSearchAsync(string query)
     {
         _searchQuery = query;
-        await GetFieldsAsync(query, 1, _pageSize);
+        await GetAssetClassesAsync(query, 1, _pageSize);
     }
-
+    
     private void OnAdd()
     {
-        NavManager.NavigateTo("/admin/fields/add");
+        NavManager.NavigateTo("/admin/asset-classes/add");
     }
-
+    
     private void OnEdit(string id)
     {
-        NavManager.NavigateTo($"/admin/fields/edit/{id}");
+        NavManager.NavigateTo($"/admin/asset-classes/edit/{id}");
     }
-
+    
     private async Task OnDelete(string id)
     {
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldsService.DeleteAsync(id);
+        var result = await Ojeda.AssetClassesService.DeleteAsync(id);
 
         if (result.Success)
         {
-            var toRemove = _fields.FirstOrDefault(f => f.Id.Equals(id));
+            var toRemove = _assetClasses.FirstOrDefault(f => f.Id.Equals(id));
             if (toRemove != null)
             {
-                _fields.Remove(toRemove);
+                _assetClasses.Remove(toRemove);
                 _totalCount--;
             }
         }
         else
         {
-            ToastService.ShowError($"Could not delete field. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError($"Could not delete field set. {result.Error?.Message} ({result.Error?.Code}).");
         }
 
-        if (!_fields.Any() && _currentPage > 1)
+        if (!_assetClasses.Any() && _currentPage > 1)
         {
-            await GetFieldsAsync(_searchQuery, _currentPage - 1, _pageSize);
+            await GetAssetClassesAsync(_searchQuery, _currentPage - 1, _pageSize);
         }
         else
         {
@@ -151,33 +150,32 @@ else
             StateHasChanged();   
         }
     }
-
+    
     private async Task OnPageChanged(int pageNumber)
     {
-        await GetFieldsAsync(_searchQuery, pageNumber, _pageSize);
+        await GetAssetClassesAsync(_searchQuery, pageNumber, _pageSize);
     }
-
+    
     private async Task OnPageSizeChanged(int pageSize)
     {
-        // Store page size to local storage
+    // Store page size to local storage
         await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
 
-        await GetFieldsAsync(_searchQuery, 1, pageSize);
+        await GetAssetClassesAsync(_searchQuery, 1, pageSize);
     }
-
-    private async Task GetFieldsAsync(string query = null, int pageNumber = 1, int pageSize = 25)
+    
+    private async Task GetAssetClassesAsync(string query = null, int pageNumber = 1, int pageSize = 25)
     {
         _isLoading = true;
         StateHasChanged();
         
-        var result = await Ojeda.FieldsService.GetAsync(
-            query, null, true, null, pageNumber, pageSize);
-        
+        var result = await Ojeda.AssetClassesService.GetAsync(query, null, true, pageNumber, pageSize);
+
         if (result.Success)
         {
             var paginatedData = result.Data;
         
-            _fields = paginatedData.Items;
+            _assetClasses = paginatedData.Items;
             _pageCount = paginatedData.TotalPages;
             _currentPage = paginatedData.PageNumber;
             _pageSize = pageSize;
@@ -185,8 +183,8 @@ else
         }
         else
         {
-            _fields = new List<FieldDto>();
-            ToastService.ShowError($"Could not load fields. {result.Error?.Message} ({result.Error?.Code}).");
+            _assetClasses = new List<AssetClassDto>();
+            ToastService.ShowError($"Could not load asset classes. {result.Error?.Message} ({result.Error?.Code}).");
         }
         
         _isLoading = false;

@@ -10,6 +10,7 @@ using NomaNova.Ojeda.Api.Options;
 using NomaNova.Ojeda.Api.Options.Application;
 using NomaNova.Ojeda.Api.Options.Framework;
 using NomaNova.Ojeda.Api.Utils;
+using NomaNova.Ojeda.Core.Domain.AssetClasses;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Helpers;
@@ -18,6 +19,7 @@ using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Data.Context.Interfaces;
 using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Services.AssetClasses;
 using NomaNova.Ojeda.Services.Fields;
 using NomaNova.Ojeda.Services.FieldSets;
 
@@ -93,12 +95,14 @@ namespace NomaNova.Ojeda.Api
             
             services.TryAddScoped<IFieldsService, FieldsService>();
             services.TryAddScoped<IFieldSetsService, FieldSetsService>();
+            services.TryAddScoped<IAssetClassesService, AssetClassesService>();
         }
 
         private static void AddRepositories(IServiceCollection services)
         {
             services.TryAddScoped<IRepository<Field>, EntityRepository<Field>>();
             services.TryAddScoped<IRepository<FieldSet>, EntityRepository<FieldSet>>();
+            services.TryAddScoped<IRepository<AssetClass>, EntityRepository<AssetClass>>();
         }
 
         private void AddFileStore(IServiceCollection services)
@@ -135,6 +139,7 @@ namespace NomaNova.Ojeda.Api
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc(Swagger.GetDoc(), Swagger.GetInfo());
+                options.EnableAnnotations();
                 options.IncludeXmlComments(Swagger.GetXmlPath(typeof(Startup).Assembly));
             });
 

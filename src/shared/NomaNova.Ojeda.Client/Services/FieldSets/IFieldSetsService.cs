@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
@@ -12,11 +13,12 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             string id, CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<PaginatedListDto<FieldSetDto>>> GetAsync(
-            string query,
-            string orderBy, 
-            bool orderAsc,
-            int pageNumber, 
-            int pageSize,
+            string query = null,
+            string orderBy = null, 
+            bool orderAsc = true,
+            IEnumerable<string> excludedIds = null,
+            int pageNumber = 1, 
+            int pageSize = 10,
             CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<FieldSetDto>> CreateAsync(

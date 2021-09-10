@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
 
-namespace NomaNova.Ojeda.Core.Domain.FieldSets
+namespace NomaNova.Ojeda.Core.Domain.AssetClasses
 {
-    public class FieldSet : BaseEntity, ITimestampedEntity
+    public class AssetClass : BaseEntity, ITimestampedEntity
     {
         public DateTime CreatedAt { get; set; }
         
@@ -15,8 +14,6 @@ namespace NomaNova.Ojeda.Core.Domain.FieldSets
 
         [Searchable]
         public string Description { get; set; }
-
-        public virtual ICollection<FieldSetField> FieldSetFields { get; set; }
         
         public virtual ICollection<AssetClassFieldSet> AssetClassFieldSets { get; set; }
     }

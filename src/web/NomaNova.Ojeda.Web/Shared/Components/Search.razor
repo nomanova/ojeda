@@ -1,0 +1,11 @@
+<DebounceInput id="inp-search" class="form-control" style="width: 100%" type="search" placeholder="Search..." autocomplete="off"
+    DebounceTime="Constants.SearchDebounceMs"
+    MinLength="Constants.SearchMinInputChars"
+    OnValueChanged="@OnValueChanged" />
+
+@code {
+
+    [Parameter] 
+    public Func<string, Task> OnValueChanged { get; set; }
+
+}

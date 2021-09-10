@@ -25,6 +25,7 @@
         <!-- Swagger -->
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
         <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.1.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.4" />
         <!-- Email -->
         <PackageReference Include="PreMailer.Net" Version="2.2.0" />
         <PackageReference Include="MailKit" Version="2.13.0" />

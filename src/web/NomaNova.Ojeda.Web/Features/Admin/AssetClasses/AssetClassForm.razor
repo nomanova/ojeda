@@ -4,33 +4,32 @@
 @inject IToastService ToastService
 
 <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
-    
+
     <FluentValidationValidator />
     <ServerSideFluentValidation @ref="_serverValidation" />
     
     <!-- Name -->
     <div class="mb-3 w-50">
-        <label for="fieldSetName" class="form-label">Name*</label>
-        <InputText @bind-Value="_fieldSet.Name" class="form-control" id="fieldSetName" disabled="@_isLoading"></InputText>
-        <ValidationMessage For="@(() => _fieldSet.Name)"></ValidationMessage>
+        <label for="assetClassName" class="form-label">Name*</label>
+        <InputText @bind-Value="_assetClass.Name" class="form-control" id="assetClassName" disabled="@_isLoading"></InputText>
+        <ValidationMessage For="@(() => _assetClass.Name)"></ValidationMessage>
     </div>
     
     <!-- Description -->
     <div class="mb-3 w-50">
-        <label for="fieldSetDescription" class="form-label">Description</label>
-        <InputText @bind-Value="_fieldSet.Description" class="form-control" id="fieldSetDescription" disabled="@_isLoading"></InputText>
-        <ValidationMessage For="@(() => _fieldSet.Description)"></ValidationMessage>
+        <label for="assetClassDescription" class="form-label">Description</label>
+        <InputText @bind-Value="_assetClass.Description" class="form-control" id="assetClassDescription" disabled="@_isLoading"></InputText>
+        <ValidationMessage For="@(() => _assetClass.Description)"></ValidationMessage>
     </div>
 
-    <!-- Fields -->
+    <!-- Field Sets -->
     <div class="mb-3 w-50">
         <div class="d-flex justify-content-between">
-            <label class="form-label">Fields*</label>
-            <a class="btn-link @(_isLoading ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
+            <label class="form-label">Field Sets*</label>
+            <a class="btn-link @(_isLoading ? "disabled" : "")" role="button" @onclick="@OnAddFieldSet">Add Field Set</a>
         </div>
-
         <div>
-            @if (_fieldSet.Fields?.Count > 0)
+            @if (_assetClass.FieldSets?.Count > 0)
             {
                 <table class="table">
                     <thead>
@@ -39,35 +38,33 @@
                         <th class="py-2"><!-- Move down --></th>
                         <th class="py-2">Name</th>
                         <th class="py-2">Description</th>
-                        <th class="py-2">Type</th>
                         <th class="py-2"><!-- Remove --></th>
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var fieldSetField in _fieldSet.Fields.OrderBy(f => f.Order))
+                    @foreach (var assetClassFieldSet in _assetClass.FieldSets.OrderBy(f => f.Order))
                     {
                         <tr>
                             <td class="pb-2 pr-0">
-                                @if (fieldSetField.Order != 1 && _fieldSet.Fields.Count > 1)
+                                @if (assetClassFieldSet.Order != 1 && _assetClass.FieldSets.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldUp(fieldSetField))">
+                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldSetUp(assetClassFieldSet))">
                                         <i class="fs-6 bi-arrow-up-circle"></i>
                                     </a>
                                 }
                             </td>
                             <td class="pb-2 pr-0">
-                                @if (fieldSetField.Order != _fieldSet.Fields.Count && _fieldSet.Fields.Count > 1)
+                                @if (assetClassFieldSet.Order != _assetClass.FieldSets.Count && _assetClass.FieldSets.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldDown(fieldSetField))">
+                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldSetDown(assetClassFieldSet))">
                                         <i class="fs-6 bi-arrow-down-circle"></i>
                                     </a>
                                 }
                             </td>
-                            <td class="pb-2 pr-3">@fieldSetField.Field.Name.Truncate()</td>
-                            <td class="pb-2 pr-3">@fieldSetField.Field.Description.Truncate()</td>
-                            <td class="pb-2 pr-3">@fieldSetField.Field.Type</td>
+                            <td class="pb-2 pr-3">@assetClassFieldSet.FieldSet.Name.Truncate()</td>
+                            <td class="pb-2 pr-3">@assetClassFieldSet.FieldSet.Description.Truncate()</td>
                             <td class="pb-2 pr-3">
-                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(fieldSetField))">
+                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(assetClassFieldSet))">
                                     <i class="fs-6 bi-x-circle"></i>
                                 </a>
                             </td>
@@ -78,9 +75,9 @@
             }
             else
             {
-                <p class="text-muted">Use the link on the right to start adding fields.</p>
+                <p class="text-muted">Use the link on the right to start adding field sets.</p>
             }
-            <ValidationMessage For="@(() => _fieldSet.Fields)"></ValidationMessage>
+            <ValidationMessage For="@(() => _assetClass.FieldSets)"></ValidationMessage>
         </div>
     </div>
 
@@ -97,12 +94,12 @@
         <button class="btn btn-secondary" type="button" @onclick="OnReset" disabled="@_isLoading">Reset</button>
         <button class="btn" type="button" @onclick="OnCancel" disabled="@_isLoading">Cancel</button>
     </div>
-    
+
 </EditForm>
 
 @code {
     
-    private FieldSetDto _fieldSet;
+    private AssetClassDto _assetClass;
     private EditContext _editContext;
     
     private ServerSideFluentValidation _serverValidation;
@@ -113,44 +110,43 @@
     public IModalService Modal { get; set; }
 
     [Parameter]
-    public FieldSetDto FieldSet { get; set; }
+    public AssetClassDto AssetClass { get; set; }
     
     [Parameter] 
-    public Func<FieldSetDto, Task<OjedaDataResult<FieldSetDto>>> OnSubmit { get; set; }
-    
+    public Func<AssetClassDto, Task<OjedaDataResult<AssetClassDto>>> OnSubmit { get; set; }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         
         Init();
-        
-        if (FieldSet != null)
+
+        if (AssetClass != null)
         {
-            _fieldSet.Id = FieldSet.Id;
-            _fieldSet.Name = FieldSet.Name;
-            _fieldSet.Description = FieldSet.Description;
+            _assetClass.Id = AssetClass.Id;
+            _assetClass.Name = AssetClass.Name;
+            _assetClass.Description = AssetClass.Description;
             
-            _fieldSet.Fields.Clear();
-            _fieldSet.Fields.AddRange(FieldSet.Fields.Select(_ => new FieldSetFieldDto
+            _assetClass.FieldSets.Clear();
+            _assetClass.FieldSets.AddRange(AssetClass.FieldSets.Select(_ => new AssetClassFieldSetDto
             {
                 Order = _.Order,
-                Field = new FieldDto
+                FieldSet = new FieldSetSummaryDto
                 {
-                    Id = _.Field.Id,
-                    Name = _.Field.Name,
-                    Description = _.Field.Description,
-                    Type = _.Field.Type
+                    Id = _.FieldSet.Id,
+                    Name = _.FieldSet.Name,
+                    Description = _.FieldSet.Description,
                 }
             }));
         }
     }
-    
+
     protected override void OnInitialized()
     {
         Init();
     }
     
-    private async Task OnAddField()
+    private async Task OnAddFieldSet()
     {
         if (_isLoading)
         {
@@ -164,24 +160,24 @@
         
         var parameters = new ModalParameters();
         
-        var excludedIds = _fieldSet.Fields.Select(_ => _.Field.Id).ToList();
+        var excludedIds = _assetClass.FieldSets.Select(_ => _.FieldSet.Id).ToList();
         parameters.Add("ExcludedIds", excludedIds);
         
-        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", parameters, options);
+        var selectFieldModal = Modal.Show<AddFieldSetModal>("Add Field Set", parameters, options);
         var result = await selectFieldModal.Result;
 
         if (!result.Cancelled)
         {
-            _fieldSet.Fields.Add(new FieldSetFieldDto
+            _assetClass.FieldSets.Add(new AssetClassFieldSetDto
             {
-                Order = _fieldSet.Fields.Count == 0 ? 1 : _fieldSet.Fields.Max(f => f.Order) + 1,
-                Field = (FieldDto) result.Data
+                Order = _assetClass.FieldSets.Count == 0 ? 1 : _assetClass.FieldSets.Max(f => f.Order) + 1,
+                FieldSet = (FieldSetSummaryDto) result.Data
             });
             
             StateHasChanged();
         }
     }
-
+    
     private void OnReset()
     {
         if (_isLoading)
@@ -199,47 +195,47 @@
             return;
         }
         
-        NavManager.NavigateTo("/admin/field-sets");
+        NavManager.NavigateTo("/admin/asset-classes");
     }
-
-    private void OnMoveFieldUp(FieldSetFieldDto fieldSetFieldDto)
+    
+    private void OnMoveFieldSetUp(AssetClassFieldSetDto assetClassFieldSetDto)
     {
         if (_isLoading)
         {
             return;
         }
         
-        var index = _fieldSet.Fields.IndexOf(fieldSetFieldDto);
+        var index = _assetClass.FieldSets.IndexOf(assetClassFieldSetDto);
         
-        _fieldSet.Fields.RemoveAt(index);
-        _fieldSet.Fields.Insert(index - 1, fieldSetFieldDto);
-        
-        UpdateOrder();
-    }
-
-    private void OnMoveFieldDown(FieldSetFieldDto fieldSetFieldDto)
-    {
-        if (_isLoading)
-        {
-            return;
-        }
-        
-        var index = _fieldSet.Fields.IndexOf(fieldSetFieldDto);
-        
-        _fieldSet.Fields.RemoveAt(index);
-        _fieldSet.Fields.Insert(index + 1, fieldSetFieldDto);
+        _assetClass.FieldSets.RemoveAt(index);
+        _assetClass.FieldSets.Insert(index - 1, assetClassFieldSetDto);
         
         UpdateOrder();
     }
     
-    private void OnRemoveField(FieldSetFieldDto fieldSetFieldDto)
+    private void OnMoveFieldSetDown(AssetClassFieldSetDto assetClassFieldSetDto)
     {
         if (_isLoading)
         {
             return;
         }
         
-        _fieldSet.Fields.Remove(fieldSetFieldDto);
+        var index = _assetClass.FieldSets.IndexOf(assetClassFieldSetDto);
+        
+        _assetClass.FieldSets.RemoveAt(index);
+        _assetClass.FieldSets.Insert(index + 1, assetClassFieldSetDto);
+        
+        UpdateOrder();
+    }
+    
+    private void OnRemoveField(AssetClassFieldSetDto assetClassFieldSetDto)
+    {
+        if (_isLoading)
+        {
+            return;
+        }
+        
+        _assetClass.FieldSets.Remove(assetClassFieldSetDto);
         UpdateOrder();
     }
     
@@ -252,9 +248,9 @@
         
         _isLoading = true;
         _serverValidation.ClearErrors();
-        Init(_fieldSet);
+        Init(_assetClass);
         
-        var result = await OnSubmit(_fieldSet);
+        var result = await OnSubmit(_assetClass);
         
         if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
         {
@@ -262,30 +258,30 @@
         }
         else if (!result.Success)
         {
-            ToastService.ShowError($"Could not submit field set. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError($"Could not submit asset class. {result.Error?.Message} ({result.Error?.Code}).");
         }
         else
         {
-            NavManager.NavigateTo("/admin/field-sets");
+            NavManager.NavigateTo("/admin/asset-classes");
         }
         
         _isLoading = false;
     }
-
-    private void Init(FieldSetDto fieldSet = null)
+    
+    private void Init(AssetClassDto assetClass = null)
     {
-        _fieldSet = fieldSet ?? new FieldSetDto();
+        _assetClass = assetClass ?? new AssetClassDto();
         
-        _editContext = new EditContext(_fieldSet);
+        _editContext = new EditContext(_assetClass);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
-
+    
     private void UpdateOrder()
     {
         var order = 1;
-        foreach (var fieldSetField in _fieldSet.Fields)
+        foreach (var assetClassFieldSet in _assetClass.FieldSets)
         {
-            fieldSetField.Order = order;
+            assetClassFieldSet.Order = order;
             order++;
         }
     }

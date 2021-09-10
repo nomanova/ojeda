@@ -1,4 +1,4 @@
-@page "/admin/fieldsets/edit/{FieldSetId}"
+@page "/admin/field-sets/edit/{FieldSetId}"
 @layout AdminLayout
 
 @inject NavigationManager NavManager
@@ -9,7 +9,7 @@
     var paths = new Dictionary<string, string>()
     {
         {"Admin", "/admin"},
-        {"Field Sets", "/admin/fieldsets"},
+        {"Field Sets", "/admin/field-sets"},
         {"Edit", null}
     };
 }
@@ -21,11 +21,11 @@
 
 @if (_isLoading)
 {
-    <p>Loading field set...</p>   
+    <p>Loading...</p>   
 }
 else
 {
-    <FieldSetForm FieldSet="@_fieldSet" OnSubmit="@OnSubmitEditFieldSet"></FieldSetForm>    
+    <FieldSetForm FieldSet="@_fieldSet" OnSubmit="@OnEdit"></FieldSetForm>    
 }
 
 @code {
@@ -66,13 +66,13 @@ else
         else
         {
             ToastService.ShowError($"Could not load field set. {result.Error?.Message} ({result.Error?.Code}).");
-            NavManager.NavigateTo("/admin/fieldsets");
+            NavManager.NavigateTo("/admin/field-sets");
         }
 
         _isLoading = false;
     }
 
-    private async Task<OjedaDataResult<FieldSetDto>> OnSubmitEditFieldSet(FieldSetDto fieldSet)
+    private async Task<OjedaDataResult<FieldSetDto>> OnEdit(FieldSetDto fieldSet)
     {
         return await Ojeda.FieldSetsService.UpdateAsync(fieldSet.Id, fieldSet);
     }

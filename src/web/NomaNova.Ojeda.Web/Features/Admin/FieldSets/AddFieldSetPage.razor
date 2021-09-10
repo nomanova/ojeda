@@ -1,13 +1,13 @@
-@page "/admin/fieldsets/add"
+@page "/admin/field-sets/add"
 @layout AdminLayout
 
 @inject OjedaClient Ojeda
 
 @{
-    var paths = new Dictionary<string, string>()
+    var paths = new Dictionary<string, string>
     {
         {"Admin", "/admin"},
-        {"Field Sets", "/admin/fieldsets"},
+        {"Field Sets", "/admin/field-sets"},
         {"Add", null}
     };
 }
@@ -17,11 +17,11 @@
     <h3>Add Field Set</h3>
 </div>
 
-<FieldSetForm OnSubmit="@OnSubmitNewFieldSet"></FieldSetForm>
+<FieldSetForm OnSubmit="@OnAdd"></FieldSetForm>
 
 @code {
     
-    private async Task<OjedaDataResult<FieldSetDto>> OnSubmitNewFieldSet(FieldSetDto fieldSet)
+    private async Task<OjedaDataResult<FieldSetDto>> OnAdd(FieldSetDto fieldSet)
     {
         return await Ojeda.FieldSetsService.CreateAsync(fieldSet);
     }

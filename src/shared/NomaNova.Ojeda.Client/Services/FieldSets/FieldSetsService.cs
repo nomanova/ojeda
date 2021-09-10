@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             string query,
             string orderBy, 
             bool orderAsc,
+            IEnumerable<string> excludedIds,
             int pageNumber, 
             int pageSize, 
             CancellationToken cancellationToken = default)
@@ -36,6 +38,7 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             qsb.Add("query" , query);
             qsb.Add("orderBy" , orderBy);
             qsb.Add("orderAsc" , orderAsc);
+            qsb.Add("excludedId" , excludedIds);
             qsb.Add("pageNumber" , pageNumber);
             qsb.Add("pageSize" , pageSize);
 
@@ -46,8 +49,6 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
         
         public async Task<OjedaDataResult<FieldSetDto>> CreateAsync(FieldSetDto fieldSet, CancellationToken cancellationToken)
         {
-            Console.WriteLine(fieldSet);
-            
             var path = $"{BasePath}";
             return await SendForDataAsync<FieldSetDto>(HttpMethod.Post, path, fieldSet, cancellationToken);
         }

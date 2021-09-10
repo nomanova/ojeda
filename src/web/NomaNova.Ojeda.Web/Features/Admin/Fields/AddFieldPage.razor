@@ -17,11 +17,11 @@
     <h3>Add Field</h3>
 </div>
 
-<FieldForm OnSubmit="@OnSubmitNewField"></FieldForm>
+<FieldForm OnSubmit="@OnAdd"></FieldForm>
 
 @code {
     
-    private async Task<OjedaDataResult<FieldDto>> OnSubmitNewField(FieldDto field)
+    private async Task<OjedaDataResult<FieldDto>> OnAdd(FieldDto field)
     {
         return await Ojeda.FieldsService.CreateAsync(field);
     }

@@ -1,0 +1,29 @@
+@page "/admin/asset-classes/add"
+@layout AdminLayout
+
+@inject OjedaClient Ojeda
+
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Asset Classes", "/admin/asset-classes"},
+        {"Add", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
+
+<div class="d-flex justify-content-between w-50">
+    <h3>Add Asset Class</h3>
+</div>
+
+<AssetClassForm OnSubmit="@OnAdd"></AssetClassForm>
+
+@code {
+    
+    private async Task<OjedaDataResult<AssetClassDto>> OnAdd(AssetClassDto assetClass)
+    {
+        return await Ojeda.AssetClassesService.CreateAsync(assetClass);
+    }
+
+}

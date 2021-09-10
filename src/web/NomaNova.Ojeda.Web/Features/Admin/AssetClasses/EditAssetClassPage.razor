@@ -1,0 +1,78 @@
+@page "/admin/asset-classes/edit/{AssetClassId}"
+@layout AdminLayout
+
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+@inject OjedaClient Ojeda
+
+@{
+    var paths = new Dictionary<string, string>()
+    {
+        {"Admin", "/admin"},
+        {"Asset Classes", "/admin/asset-classes"},
+        {"Edit", null}
+    };
+}
+<Breadcrumb Paths="@paths" />
+
+<div class="d-flex justify-content-between w-50">
+    <h3>Edit Asset Class</h3>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>   
+}
+else
+{
+    <AssetClassForm AssetClass="@_assetClass" OnSubmit="@OnEdit"></AssetClassForm>    
+}
+
+@code {
+    
+    private bool _isLoading;
+    private readonly AssetClassDto _assetClass = new();
+    
+    [Parameter]
+    public string AssetClassId { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        var result = await Ojeda.AssetClassesService.GetByIdAsync(AssetClassId);
+
+        if (result.Success)
+        {
+            var assetClassDto = result.Data;
+            
+            _assetClass.Id = assetClassDto.Id;
+            _assetClass.Name = assetClassDto.Name;
+            _assetClass.Description = assetClassDto.Description;
+            
+            _assetClass.FieldSets.Clear();
+            _assetClass.FieldSets.AddRange(assetClassDto.FieldSets.Select(_ => new AssetClassFieldSetDto
+            {
+                Order = _.Order,
+                FieldSet = new FieldSetSummaryDto
+                {
+                    Id = _.FieldSet.Id,
+                    Name = _.FieldSet.Name,
+                    Description = _.FieldSet.Description
+                }
+            }));
+        }
+        else
+        {
+            ToastService.ShowError($"Could not load asset class. {result.Error?.Message} ({result.Error?.Code}).");
+            NavManager.NavigateTo("/admin/asset-classes");
+        }
+
+        _isLoading = false;
+    }
+    
+    private async Task<OjedaDataResult<AssetClassDto>> OnEdit(AssetClassDto assetClass)
+    {
+        return await Ojeda.AssetClassesService.UpdateAsync(assetClass.Id, assetClass);
+    }
+}

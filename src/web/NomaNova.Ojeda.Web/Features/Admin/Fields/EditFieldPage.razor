@@ -19,11 +19,11 @@
 
 @if (_isLoading)
 {
-    <p>Loading field...</p>   
+    <p>Loading...</p>   
 }
 else
 {
-    <FieldForm Field="_field" OnSubmit="OnSubmitEditField"></FieldForm>    
+    <FieldForm Field="_field" OnSubmit="OnEdit"></FieldForm>    
 }
 
 @code {
@@ -58,7 +58,7 @@ else
         _isLoading = false;
     }
 
-    private async Task<OjedaDataResult<FieldDto>> OnSubmitEditField(FieldDto field)
+    private async Task<OjedaDataResult<FieldDto>> OnEdit(FieldDto field)
     {
         return await Ojeda.FieldsService.UpdateAsync(field.Id, field);
     }

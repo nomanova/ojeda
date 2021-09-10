@@ -2,12 +2,9 @@
 
 <div class="d-flex flex-column justify-content-between">
 
-<div class="mb-3">
-    <DebounceInput id="inp-search" class="form-control" style="width: 100%;" type="search" placeholder="Search..." autocomplete="off"
-        DebounceTime="Constants.SearchDebounceMs"
-        MinLength="Constants.SearchMinInputChars"
-        OnValueChanged="OnSearchAsync" />
-</div>
+    <div class="mb-3">
+        <Search OnValueChanged="@OnSearchAsync" />
+    </div>
 
 <div class="mb-3" style="height: 350px; overflow-y: auto;">
 
