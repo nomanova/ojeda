@@ -33,7 +33,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
-            var fieldDto = await _fieldsService.GetFieldByIdAsync(id, cancellationToken);
+            var fieldDto = await _fieldsService.GetByIdAsync(id, cancellationToken);
             return Ok(fieldDto);
         }
 
@@ -58,7 +58,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromQuery] int pageSize = Constants.DefaultQueryPageSize,
             CancellationToken cancellationToken = default)
         {
-            var paginatedFieldsDto = await _fieldsService.GetFieldsAsync(
+            var paginatedFieldsDto = await _fieldsService.GetAsync(
                 query, orderBy, orderAsc, excludedIds, pageNumber, pageSize, cancellationToken);
             return Ok(paginatedFieldsDto);
         }
@@ -75,7 +75,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromBody] FieldDto fieldDto, 
             CancellationToken cancellationToken = default)
         {
-            fieldDto = await _fieldsService.CreateFieldAsync(fieldDto, cancellationToken);
+            fieldDto = await _fieldsService.CreateAsync(fieldDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = fieldDto.Id }, fieldDto);
         }
 
@@ -93,7 +93,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromBody] FieldDto fieldDto,
             CancellationToken cancellationToken = default)
         {
-            fieldDto = await _fieldsService.UpdateFieldAsync(id, fieldDto, cancellationToken);
+            fieldDto = await _fieldsService.UpdateAsync(id, fieldDto, cancellationToken);
             return Ok(fieldDto);
         }
 
@@ -105,7 +105,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
         {
-            await _fieldsService.DeleteFieldAsync(id, cancellationToken);
+            await _fieldsService.DeleteAsync(id, cancellationToken);
             return Ok();
         }
     }

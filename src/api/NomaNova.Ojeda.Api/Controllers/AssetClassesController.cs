@@ -36,7 +36,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
-            var assetClassDto = await _assetClassesService.GetAssetClassByIdAsync(id, cancellationToken);
+            var assetClassDto = await _assetClassesService.GetByIdAsync(id, cancellationToken);
             return Ok(assetClassDto);
         }
 
@@ -60,7 +60,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromQuery] int pageSize = Constants.DefaultQueryPageSize,
             CancellationToken cancellationToken = default)
         {
-            var paginatedAssetClassesDto = await _assetClassesService.GetAssetClassesAsync(
+            var paginatedAssetClassesDto = await _assetClassesService.GetAsync(
                 query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
             return Ok(paginatedAssetClassesDto);
         }
@@ -78,7 +78,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromBody] AssetClassDto assetClassDto,
             CancellationToken cancellationToken = default)
         {
-            assetClassDto = await _assetClassesService.CreateAssetClassAsync(assetClassDto, cancellationToken);
+            assetClassDto = await _assetClassesService.CreateAsync(assetClassDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new {id = assetClassDto.Id}, assetClassDto);
         }
 
@@ -97,7 +97,7 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromBody] AssetClassDto assetClassDto,
             CancellationToken cancellationToken = default)
         {
-            assetClassDto = await _assetClassesService.UpdateAssetClassAsync(id, assetClassDto, cancellationToken);
+            assetClassDto = await _assetClassesService.UpdateAsync(id, assetClassDto, cancellationToken);
             return Ok(assetClassDto);
         }
 
@@ -110,7 +110,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
         {
-            await _assetClassesService.DeleteAssetClassAsync(id, cancellationToken);
+            await _assetClassesService.DeleteAsync(id, cancellationToken);
             return Ok();
         }
     }

@@ -25,7 +25,7 @@ namespace NomaNova.Ojeda.Services.Fields
             _fieldsRepository = fieldsRepository;
         }
 
-        public async Task<FieldDto> GetFieldByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<FieldDto> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<PaginatedListDto<FieldDto>> GetFieldsAsync(
+        public async Task<PaginatedListDto<FieldDto>> GetAsync(
             string searchQuery, 
             string orderBy, 
             bool orderAsc, 
@@ -60,7 +60,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return paginatedFieldsDto;
         }
 
-        public async Task<FieldDto> CreateFieldAsync(FieldDto fieldDto, CancellationToken cancellationToken)
+        public async Task<FieldDto> CreateAsync(FieldDto fieldDto, CancellationToken cancellationToken)
         {
             await Validate(null, fieldDto, cancellationToken);
 
@@ -72,7 +72,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<FieldDto> UpdateFieldAsync(string id, FieldDto fieldDto,
+        public async Task<FieldDto> UpdateAsync(string id, FieldDto fieldDto,
             CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
@@ -92,7 +92,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task DeleteFieldAsync(string id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 

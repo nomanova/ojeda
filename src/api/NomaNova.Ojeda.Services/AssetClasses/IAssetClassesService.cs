@@ -7,10 +7,10 @@ namespace NomaNova.Ojeda.Services.AssetClasses
 {
     public interface IAssetClassesService
     {
-        Task<AssetClassDto> GetAssetClassByIdAsync(
+        Task<AssetClassDto> GetByIdAsync(
             string id, CancellationToken cancellationToken = default);
         
-        Task<PaginatedListDto<AssetClassDto>> GetAssetClassesAsync(
+        Task<PaginatedListDto<AssetClassDto>> GetAsync(
             string searchQuery, 
             string orderBy, 
             bool orderAsc,
@@ -18,12 +18,12 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             int pageSize,
             CancellationToken cancellationToken = default);
         
-        Task<AssetClassDto> CreateAssetClassAsync(
+        Task<AssetClassDto> CreateAsync(
             AssetClassDto assetClassDto, CancellationToken cancellationToken = default);
         
-        Task<AssetClassDto> UpdateAssetClassAsync(
+        Task<AssetClassDto> UpdateAsync(
             string id, AssetClassDto assetClassDto, CancellationToken cancellationToken = default);
         
-        Task DeleteAssetClassAsync(string id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     }
 }

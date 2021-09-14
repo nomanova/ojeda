@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,114 +5,119 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.FieldSets;
-using NomaNova.Ojeda.Services.FieldSets;
-using Swashbuckle.AspNetCore.Annotations;
+using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Services.Assets;
 
 namespace NomaNova.Ojeda.Api.Controllers
 {
     [ApiController]
-    [Route("api/fieldsets")]
-    public class FieldSetsController : ApiController
+    [Route("api/assets")]
+    public class AssetsController : ApiController
     {
-        private const string Tag = "Field Sets";
+        private readonly IAssetsService _assetsService;
         
-        private readonly IFieldSetsService _fieldSetsService;
-
-        public FieldSetsController(IFieldSetsService fieldSetsService)
+        public AssetsController(IAssetsService assetsService)
         {
-            _fieldSetsService = fieldSetsService;
+            _assetsService = assetsService;
         }
-
+        
         /// <summary>
-        /// Get field set by id
+        /// Get asset by id
         /// </summary>
         [HttpGet("{id}")]
-        [SwaggerOperation(Tags = new[] {Tag})]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(FieldSetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(
             [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
-            var fieldSetDto = await _fieldSetsService.GetByIdAsync(id, cancellationToken);
-            return Ok(fieldSetDto);
+            var assetDto = await _assetsService.GetByIdAsync(id, cancellationToken);
+            return Ok(assetDto);
         }
-
+        
         /// <summary>
-        /// Get all field sets
+        /// Get asset scaffold by asset class id
         /// </summary>
-        /// <param name="query">Optional search query filtering results based on the searchable fields.</param>
+        [HttpGet("new")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByAssetClass(
+            [FromQuery] string assetClassId,
+            CancellationToken cancellationToken = default)
+        {
+            var assetDto = await _assetsService.GetByAssetClassAsync(assetClassId, cancellationToken);
+            return Ok(assetDto);
+        }
+        
+        /// <summary>
+        /// Get all assets
+        /// </summary>
+        /// <param name="query">Optional search query, filtering results based on the searchable fields.</param>
         /// <param name="orderBy">Optional field name on which to order the results.</param>
         /// <param name="orderAsc">Optional ordering direction indication, default is ascending order.</param>
-        /// <param name="excludedIds">Optional list of field set id's which must be excluded from the result set.</param>
         /// <param name="pageNumber">Optional result page number.</param>
         /// <param name="pageSize">Optional result page size.</param>
         [HttpGet]
-        [SwaggerOperation(Tags = new[] {Tag})]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(PaginatedListDto<FieldSetDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaginatedListDto<AssetSummaryDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(
-            [FromQuery] string query = null,
-            [FromQuery] string orderBy = null,
-            [FromQuery] bool orderAsc = true,
-            [FromQuery(Name = "excludedId")] IList<string> excludedIds = null,
+            [FromQuery] string query  = null,
+            [FromQuery] string orderBy  = null,
+            [FromQuery] bool orderAsc  = true,
             [FromQuery] int pageNumber = Constants.DefaultQueryPageNumber,
             [FromQuery] int pageSize = Constants.DefaultQueryPageSize,
             CancellationToken cancellationToken = default)
         {
-            var paginatedFieldSetsDto = await _fieldSetsService.GetAsync(
-                query, orderBy, orderAsc, excludedIds, pageNumber, pageSize, cancellationToken);
-            return Ok(paginatedFieldSetsDto);
+            var paginatedAssetsDto = await _assetsService.GetAsync(
+                query, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+            return Ok(paginatedAssetsDto);
         }
         
         /// <summary>
-        /// Create field set
+        /// Create asset
         /// </summary>
         [HttpPost]
-        [SwaggerOperation(Tags = new[] {Tag})]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(FieldSetDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
-            [FromBody] FieldSetDto fieldSetDto, 
+            [FromBody] AssetDto assetDto, 
             CancellationToken cancellationToken = default)
         {
-            fieldSetDto = await _fieldSetsService.CreateAsync(fieldSetDto, cancellationToken);
-            return CreatedAtAction(nameof(GetById), new { id = fieldSetDto.Id }, fieldSetDto);
+            assetDto = await _assetsService.CreateAsync(assetDto, cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id = assetDto.Id }, assetDto);
         }
-
+        
         /// <summary>
-        /// Update field set
+        /// Update asset
         /// </summary>
         [HttpPut("{id}")]
-        [SwaggerOperation(Tags = new[] {Tag})]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(FieldSetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorDto),StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,
-            [FromBody] FieldSetDto fieldSetDto,
+            [FromBody] AssetDto assetDto,
             CancellationToken cancellationToken = default)
         {
-            fieldSetDto = await _fieldSetsService.UpdateAsync(id, fieldSetDto, cancellationToken);
-            return Ok(fieldSetDto);
+            assetDto = await _assetsService.UpdateAsync(id, assetDto, cancellationToken);
+            return Ok(assetDto);
         }
         
         /// <summary>
-        /// Delete field set
+        /// Delete asset
         /// </summary>
         [HttpDelete("{id}")]
-        [SwaggerOperation(Tags = new[] {Tag})]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
         {
-            await _fieldSetsService.DeleteAsync(id, cancellationToken);
+            await _assetsService.DeleteAsync(id, cancellationToken);
             return Ok();
         }
     }

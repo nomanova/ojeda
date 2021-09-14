@@ -31,7 +31,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             _fieldSetsRepository = fieldSetsRepository;
         }
         
-        public async Task<FieldSetDto> GetFieldSetByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<FieldSetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, query =>
             {
@@ -48,7 +48,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
-        public async Task<PaginatedListDto<FieldSetDto>> GetFieldSetsAsync(
+        public async Task<PaginatedListDto<FieldSetDto>> GetAsync(
             string searchQuery, 
             string orderBy, 
             bool orderAsc,
@@ -81,7 +81,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return paginatedFieldSetsDto;
         }
 
-        public async Task<FieldSetDto> CreateFieldSetAsync(
+        public async Task<FieldSetDto> CreateAsync(
             FieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             await Validate(null, fieldSetDto, cancellationToken);
@@ -102,7 +102,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
-        public async Task<FieldSetDto> UpdateFieldSetAsync(
+        public async Task<FieldSetDto> UpdateAsync(
             string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, query =>
@@ -128,7 +128,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
-        public async Task DeleteFieldSetAsync(string id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, cancellationToken);
 

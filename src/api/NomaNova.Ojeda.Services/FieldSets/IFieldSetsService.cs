@@ -8,10 +8,10 @@ namespace NomaNova.Ojeda.Services.FieldSets
 {
     public interface IFieldSetsService
     {
-        Task<FieldSetDto> GetFieldSetByIdAsync(
+        Task<FieldSetDto> GetByIdAsync(
             string id, CancellationToken cancellationToken = default);
 
-        Task<PaginatedListDto<FieldSetDto>> GetFieldSetsAsync(
+        Task<PaginatedListDto<FieldSetDto>> GetAsync(
             string searchQuery, 
             string orderBy, 
             bool orderAsc,
@@ -20,12 +20,12 @@ namespace NomaNova.Ojeda.Services.FieldSets
             int pageSize,
             CancellationToken cancellationToken = default);
         
-        Task<FieldSetDto> CreateFieldSetAsync(
+        Task<FieldSetDto> CreateAsync(
             FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
 
-        Task<FieldSetDto> UpdateFieldSetAsync(
+        Task<FieldSetDto> UpdateAsync(
             string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
         
-        Task DeleteFieldSetAsync(string id, CancellationToken cancellationToken = default);
+        Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     }
 }

@@ -29,7 +29,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             _assetClassesRepository = assetClassesRepository;
         }
 
-        public async Task<AssetClassDto> GetAssetClassByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<AssetClassDto> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             var assetClass = await _assetClassesRepository.GetByIdAsync(id, query =>
             {
@@ -46,7 +46,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             return _mapper.Map<AssetClassDto>(assetClass);
         }
 
-        public async Task<PaginatedListDto<AssetClassDto>> GetAssetClassesAsync(
+        public async Task<PaginatedListDto<AssetClassDto>> GetAsync(
             string searchQuery,
             string orderBy,
             bool orderAsc,
@@ -73,7 +73,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             return paginatedAssetClassesDto;
         }
         
-        public async Task<AssetClassDto> CreateAssetClassAsync(
+        public async Task<AssetClassDto> CreateAsync(
             AssetClassDto assetClassDto, CancellationToken cancellationToken)
         {
             await Validate(null, assetClassDto, cancellationToken);
@@ -94,7 +94,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             return _mapper.Map<AssetClassDto>(assetClass);
         }
         
-        public async Task<AssetClassDto> UpdateAssetClassAsync(
+        public async Task<AssetClassDto> UpdateAsync(
             string id, AssetClassDto assetClassDto, CancellationToken cancellationToken)
         {
             var assetClass = await _assetClassesRepository.GetByIdAsync(id, query =>
@@ -120,7 +120,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             return _mapper.Map<AssetClassDto>(assetClass);
         }
         
-        public async Task DeleteAssetClassAsync(string id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
         {
             var assetClass = await _assetClassesRepository.GetByIdAsync(id, cancellationToken);
 

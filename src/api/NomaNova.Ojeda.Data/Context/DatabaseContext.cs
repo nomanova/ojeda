@@ -1,6 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Core.Domain.AssetClasses;
+using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
@@ -20,7 +21,11 @@ namespace NomaNova.Ojeda.Data.Context
         public DbSet<AssetClass> AssetClasses { get; set; }
         
         public DbSet<AssetClassFieldSet> AssetClassFieldSets { get; set; }
+
+        public DbSet<Asset> Assets { get; set; }
         
+        public DbSet<FieldValue> FieldValues { get; set; }
+
         private readonly ITimeKeeper _timeKeeper;
         private readonly IDatabaseContextBuilder _databaseContextBuilder;
 
@@ -36,6 +41,15 @@ namespace NomaNova.Ojeda.Data.Context
 
         public void EnsureSeeded()
         {
+            // Migrate database
+            Database.Migrate();
+            
+            if (!this.AllMigrationsApplied())
+            {
+                throw new Exception("Could not apply all database migrations.");
+            }
+
+            // Run seeders
             FieldsSeeder.Seed(this, _timeKeeper).Wait();
         }
 
@@ -46,6 +60,7 @@ namespace NomaNova.Ojeda.Data.Context
             BuildForFields(builder);
             BuildForFieldSets(builder);
             BuildForAssetClasses(builder);
+            BuildForAssets(builder);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -108,6 +123,35 @@ namespace NomaNova.Ojeda.Data.Context
                 .WithMany(_ => _.AssetClassFieldSets)
                 .HasForeignKey(_ => _.AssetClassId)
                 .OnDelete(DeleteBehavior.Cascade);
+        }
+
+        private static void BuildForAssets(ModelBuilder builder)
+        {
+            // Asset
+            builder.Entity<Asset>()
+                .HasKey(_ => _.Id);
+
+            builder.Entity<Asset>()
+                .HasOne(_ => _.AssetClass)
+                .WithMany(_ => _.Assets)
+                .HasForeignKey(_ => _.AssetClassId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // FieldValue
+            builder.Entity<FieldValue>()
+                .HasKey(_ => _.Id);
+
+            builder.Entity<FieldValue>()
+                .HasOne(_ => _.Asset)
+                .WithMany(_ => _.FieldValues)
+                .HasForeignKey(_ => _.AssetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<FieldValue>()
+                .HasOne(_ => _.FieldSet);
+            
+            builder.Entity<FieldValue>()
+                .HasOne(_ => _.Field);
         }
     }
 }
