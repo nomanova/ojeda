@@ -1,7 +1,26 @@
 @page "/assets"
 
+@inject NavigationManager NavManager
+
 <h3>Assets</h3>
 
+<button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button>
+
 @code {
+    
+    [CascadingParameter] 
+    public IModalService Modal { get; set; }
+    
+    private async Task OnAdd()
+    {
+        var addAssetModal = Modal.Show<AddAssetModal>("Add Asset", Constants.DefaultModalOptions);
+        var result = await addAssetModal.Result;
+
+        if (!result.Cancelled)
+        {
+            var assetClass = (AssetClassDto) result.Data;
+            NavManager.NavigateTo($"/assets/add?assetClassId={assetClass.Id}");
+        }
+    }
     
 }

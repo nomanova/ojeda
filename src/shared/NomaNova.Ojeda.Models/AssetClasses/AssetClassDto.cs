@@ -5,14 +5,17 @@ using NomaNova.Ojeda.Models.FieldSets;
 
 namespace NomaNova.Ojeda.Models.AssetClasses
 {
-    public class AssetClassDto
+    public class AssetClassSummaryDto
     {
         public string Id { get; set; }
         
         public string Name { get; set; }
         
-        public string Description { get; set; }
+        public string Description { get; set; }   
+    }
 
+    public class AssetClassDto : AssetClassSummaryDto
+    {
         public List<AssetClassFieldSetDto> FieldSets { get; set; } = new();
     }
 

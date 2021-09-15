@@ -11,6 +11,7 @@ using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.AssetClasses;
 using NomaNova.Ojeda.Models.Assets;
 
 namespace NomaNova.Ojeda.Services.Assets
@@ -194,10 +195,10 @@ namespace NomaNova.Ojeda.Services.Assets
             var assetDto = new AssetDto
             {
                 Id = null,
-                AssetClassId = assetClass.Id
+                AssetClass = _mapper.Map<AssetClassSummaryDto>(assetClass)
             };
 
-            foreach (var assetClassFieldSet in assetClass.AssetClassFieldSets.OrderBy(_ => _.Order))
+            foreach (var assetClassFieldSet in assetClass.AssetClassFieldSets)
             {
                 var fieldSetId = assetClassFieldSet.FieldSetId;
                 var fieldSet = fieldSets.FirstOrDefault(_ => _.Id.Equals(fieldSetId));
@@ -210,7 +211,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 var fieldSetDto = _mapper.Map<AssetFieldSetDto>(fieldSet);
                 fieldSetDto.Order = assetClassFieldSet.Order;
 
-                foreach (var fieldSetField in fieldSet.FieldSetFields.OrderBy(_ => _.Order))
+                foreach (var fieldSetField in fieldSet.FieldSetFields)
                 {
                     var fieldId = fieldSetField.FieldId;
                     var field = fields.FirstOrDefault(_ => _.Id.Equals(fieldId));
@@ -231,10 +232,20 @@ namespace NomaNova.Ojeda.Services.Assets
 
                     fieldSetDto.Fields.Add(fieldDto);
                 }
+
+                fieldSetDto.Fields = fieldSetDto.Fields
+                    .OrderBy(_ => _.Order)
+                    .ThenBy(_ => _.Name)
+                    .ToList();
                 
                 assetDto.FieldSets.Add(fieldSetDto);
             }
 
+            assetDto.FieldSets = assetDto.FieldSets
+                .OrderBy(_ => _.Order)
+                .ThenBy(_ => _.Name)
+                .ToList();
+            
             return assetDto;
         }
     }

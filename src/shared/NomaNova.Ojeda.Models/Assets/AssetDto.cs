@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NomaNova.Ojeda.Models.AssetClasses;
 using NomaNova.Ojeda.Models.Fields;
 
 namespace NomaNova.Ojeda.Models.Assets
@@ -7,7 +8,7 @@ namespace NomaNova.Ojeda.Models.Assets
     {
         public string Id { get; set; }
 
-        public string AssetClassId { get; set; }
+        public AssetClassSummaryDto AssetClass { get; set; }
     }
 
     public class AssetDto : AssetSummaryDto

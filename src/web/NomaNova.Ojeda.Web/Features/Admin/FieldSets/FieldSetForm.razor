@@ -44,7 +44,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var fieldSetField in _fieldSet.Fields.OrderBy(f => f.Order))
+                    @foreach (var fieldSetField in _fieldSet.Fields)
                     {
                         <tr>
                             <td class="pb-2 pr-0">
@@ -64,7 +64,16 @@
                                 }
                             </td>
                             <td class="pb-2 pr-3">@fieldSetField.Field.Name.Truncate()</td>
-                            <td class="pb-2 pr-3">@fieldSetField.Field.Description.Truncate()</td>
+                            <td class="pb-2 pr-3">
+                                @if (string.IsNullOrEmpty(fieldSetField.Field.Description))
+                                {
+                                    <span class="text-muted fst-italic">No description</span>
+                                }
+                                else
+                                {
+                                    @fieldSetField.Field.Description.Truncate()    
+                                }
+                            </td>
                             <td class="pb-2 pr-3">@fieldSetField.Field.Type</td>
                             <td class="pb-2 pr-3">
                                 <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(fieldSetField))">
@@ -78,7 +87,7 @@
             }
             else
             {
-                <p class="text-muted">Use the link on the right to start adding fields.</p>
+                <p class="text-muted fst-italic">Use the link on the right to start adding fields.</p>
             }
             <ValidationMessage For="@(() => _fieldSet.Fields)"></ValidationMessage>
         </div>
@@ -156,18 +165,13 @@
         {
             return;
         }
-
-        var options = new ModalOptions
-        { 
-            Animation = ModalAnimation.FadeInOut(0.15)
-        };
         
         var parameters = new ModalParameters();
         
         var excludedIds = _fieldSet.Fields.Select(_ => _.Field.Id).ToList();
         parameters.Add("ExcludedIds", excludedIds);
         
-        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", parameters, options);
+        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", parameters, Constants.DefaultModalOptions);
         var result = await selectFieldModal.Result;
 
         if (!result.Cancelled)
@@ -225,6 +229,8 @@
         }
         
         var index = _fieldSet.Fields.IndexOf(fieldSetFieldDto);
+        
+        Console.WriteLine($"Index: {index}");
         
         _fieldSet.Fields.RemoveAt(index);
         _fieldSet.Fields.Insert(index + 1, fieldSetFieldDto);

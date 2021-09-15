@@ -45,7 +45,14 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 throw new NotFoundException();
             }
 
-            return _mapper.Map<FieldSetDto>(fieldSet);
+            var fieldSetDto = _mapper.Map<FieldSetDto>(fieldSet);
+            
+            fieldSetDto.Fields = fieldSetDto.Fields
+                .OrderBy(_ => _.Order)
+                .ThenBy(_ => _.Field.Name)
+                .ToList();
+
+            return fieldSetDto;
         }
 
         public async Task<PaginatedListDto<FieldSetDto>> GetAsync(

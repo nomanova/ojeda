@@ -1,0 +1,153 @@
+@inject OjedaClient Ojeda
+
+<div class="d-flex flex-column justify-content-between">
+
+    <p>Select the <strong>asset class</strong> of the asset to add below.</p>
+    
+    <div class="mb-3">
+        <Search OnValueChanged="@OnSearchAsync" />
+    </div>
+    
+<div class="mb-3" style="height: 350px; overflow-y: auto;">
+    
+    @if (_error != null)
+    {
+        <p class="text-danger fst-italic">@_error</p>
+    }
+    else if (_assetClasses == null || _isLoading)
+    {
+        <p class="text-muted fst-italic">Loading...</p>
+    }
+    else if (!_assetClasses.Any())
+    {
+        if (string.IsNullOrEmpty(_searchQuery))
+        {
+            <p class="text-muted fst-italic">No items available.</p>
+        }
+        else
+        {
+            <p class="text-muted fst-italic">No search results.</p>
+        }
+    }
+    else
+    {
+        <table class="table table-hover w-100">
+            <thead>
+            <tr>
+                <th class="py-2">Name</th>
+                <th class="py-2">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var assetClass in _assetClasses)
+            {
+                <tr @onclick="() => OnAssetClassSelected(assetClass)" style="cursor: pointer;">
+                    <td class="pb-2 pr-3">@assetClass.Name.Truncate()</td>
+                    <td class="pb-2 pr-3">
+                        @if (string.IsNullOrEmpty(assetClass.Description))
+                        {
+                            <span class="text-muted fst-italic">No description</span>
+                        }
+                        else
+                        {
+                            @assetClass.Description.Truncate()
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    
+</div>
+
+    <div class="d-flex justify-content-between align-items-center">
+     <div class="d-flex align-items-center">
+                <div class="me-2">
+                <SlimPager
+                    PageCount="@_pageCount"
+                    CurrentPage="@_currentPage"
+                    OnPageChanged="@OnPageChanged"/>
+                </div>
+                
+                <Spinner IsLoading="@_isLoading" />
+            </div>
+    
+                <button class="btn btn-secondary" @onclick="OnCancel">Cancel</button>
+            </div>
+</div>
+
+
+@code {
+
+    [CascadingParameter] 
+    BlazoredModalInstance ModalInstance { get; set; }
+    
+    private bool _isLoading;
+    private string _error;
+    
+    private string _searchQuery = "";
+    private ICollection<AssetClassDto> _assetClasses;
+    
+    private int _pageCount;
+    private int _currentPage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAssetClassesAsync(null, 1, Constants.DefaultPageSize);
+    }
+    
+    private async Task OnSearchAsync(string query)
+    {
+        if (query.Equals(_searchQuery))
+        {
+            return;
+        }
+
+        _searchQuery = query;
+        await GetAssetClassesAsync(query, 1, Constants.DefaultPageSize);
+    }
+
+    private async Task OnPageChanged(int pageNumber)
+    {
+        await GetAssetClassesAsync(_searchQuery, pageNumber, Constants.DefaultPageSize);
+    }
+    
+    private void OnCancel()
+    {
+        ModalInstance.CancelAsync();
+    }
+    
+    private void OnAssetClassSelected(AssetClassDto assetClass)
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok(assetClass));
+    }
+    
+    private async Task GetAssetClassesAsync(string query, int pageNumber, int pageSize)
+    {
+        _isLoading = true;
+        StateHasChanged();
+        
+        var result = await Ojeda.AssetClassesService.GetAsync(
+            query, null, true, pageNumber, pageSize);
+
+        if (result.Success)
+        {
+            _error = null;
+            
+            var paginatedData = result.Data;
+
+            _assetClasses = paginatedData.Items;
+            _pageCount = paginatedData.TotalPages;
+            _currentPage = paginatedData.PageNumber;
+        }
+        else
+        {
+            _assetClasses = null;
+            _error = $"Could not load asset classes. {result.Error?.Message} ({result.Error?.Code}).";
+        }
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+}

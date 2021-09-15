@@ -1,3 +1,5 @@
+using Blazored.Modal;
+
 namespace NomaNova.Ojeda.Web
 {
     public static class Constants
@@ -9,6 +11,11 @@ namespace NomaNova.Ojeda.Web
         public const int DefaultTruncateLarge = 100;
 
         public const int DefaultPageSize = 25;
+        
+        public static readonly ModalOptions DefaultModalOptions = new ModalOptions
+        { 
+            Animation = ModalAnimation.FadeInOut(0.15)
+        };
         
         public const string StorageKeyPageSize = "key-pager-page-size";
     }

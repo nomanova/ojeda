@@ -43,7 +43,14 @@ namespace NomaNova.Ojeda.Services.AssetClasses
                 throw new NotFoundException();
             }
 
-            return _mapper.Map<AssetClassDto>(assetClass);
+            var assetClassDto = _mapper.Map<AssetClassDto>(assetClass);
+
+            assetClassDto.FieldSets = assetClassDto.FieldSets
+                .OrderBy(_ => _.Order)
+                .ThenBy(_ => _.FieldSet.Name)
+                .ToList();
+
+            return assetClassDto;
         }
 
         public async Task<PaginatedListDto<AssetClassDto>> GetAsync(

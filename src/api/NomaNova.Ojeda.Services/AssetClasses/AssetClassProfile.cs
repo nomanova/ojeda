@@ -11,6 +11,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
         public AssetClassProfile()
         {
             // Domain -> Dto
+            CreateMap<AssetClass, AssetClassSummaryDto>();
             CreateMap<AssetClass, AssetClassDto>()
                 .ForMember(dest => dest.FieldSets, opt => opt.MapFrom(src => src.AssetClassFieldSets));
             CreateMap<PaginatedList<AssetClass>, PaginatedListDto<AssetClassDto>>();

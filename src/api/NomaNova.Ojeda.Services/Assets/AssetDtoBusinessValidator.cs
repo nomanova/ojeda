@@ -9,7 +9,7 @@ namespace NomaNova.Ojeda.Services.Assets
     {
         public AssetDtoBusinessValidator(IRepository<AssetClass> assetClassesRepository)
         {
-            RuleFor(_ => _.AssetClassId).MustAsync(async (id, cancellation) =>
+            RuleFor(_ => _.AssetClass.Id).MustAsync(async (id, cancellation) =>
             {
                 var assetClass = await assetClassesRepository.GetByIdAsync(id, cancellation);
                 return assetClass != null;

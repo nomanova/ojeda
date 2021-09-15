@@ -1,0 +1,96 @@
+@page "/assets/add"
+@using System.Net
+@using NomaNova.Ojeda.Models.Assets
+
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+@inject OjedaClient Ojeda
+
+<h3>Add Asset</h3>
+
+@if (_error != null)
+{
+    <p class="text-danger fst-italic">@_error</p>
+    <a href="/assets">Return to Assets</a>
+}
+else if (_isLoading)
+{
+    <p class="text-muted fst-italic">Loading...</p>   
+}
+else
+{
+    <p>@_asset.AssetClass.Name</p>
+                              
+    <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
+        
+        <FluentValidationValidator />
+        <ServerSideFluentValidation @ref="_serverValidation" />
+        
+        @foreach (var fieldSet in _asset.FieldSets)
+        {
+            <FormSection Title="@fieldSet.Name" HelpText="@fieldSet.Description">
+                @foreach (var field in fieldSet.Fields)
+                {
+                    <p>@field.Name</p>
+                }
+            </FormSection>
+        }
+        
+    </EditForm>
+}
+
+@code {
+
+    private AssetDto _asset;
+    private EditContext _editContext;
+    
+    private ServerSideFluentValidation _serverValidation;
+
+    private bool _isLoading;
+    private string _error;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        NavManager.TryGetQueryString<string>("assetClassId", out var assetClassId);
+
+        await GetAssetClass(assetClassId);
+    }
+
+    private async Task OnSubmitForm()
+    {
+        // TODO
+    }
+
+    private async Task GetAssetClass(string assetClassId)
+    {
+        if (string.IsNullOrEmpty(assetClassId))
+        {
+            _error = "Cannot load asset: asset class id is missing.";
+            return;
+        }
+
+        _isLoading = true;
+        
+        var result = await Ojeda.AssetsService.GetByAssetClass(assetClassId);
+
+        if (result.Success)
+        {
+            _error = null;
+            _asset = result.Data;
+            
+            _editContext = new EditContext(_asset);
+            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+        }
+        else if (result.StatusCode == HttpStatusCode.NotFound)
+        {
+            _error = "Cannot load asset: asset class does not exist.";
+        }
+        else
+        {
+            ToastService.ShowError($"Could not load asset class. {result.Error?.Message} ({result.Error?.Code}).");
+            NavManager.NavigateTo("/assets");
+        }
+
+        _isLoading = false;
+    }
+}

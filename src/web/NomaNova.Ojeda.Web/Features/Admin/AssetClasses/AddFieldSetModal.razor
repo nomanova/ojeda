@@ -2,29 +2,31 @@
 
 <div class="d-flex flex-column justify-content-between">
 
-        <div class="mb-3">
+     <p>Select the <strong>field set</strong> to add below.</p>
+    
+    <div class="mb-3">
             <Search OnValueChanged="@OnSearchAsync" />
         </div>
 
     <div class="mb-3" style="height: 350px; overflow-y: auto;">
     
-        @if (_fieldSets == null)
+        @if (_error != null)
         {
-            <p>Type at least one character to start searching.</p>
+            <p class="text-danger fst-italic">@_error</p>
         }
-        else if (_error != null)
+        else if (_fieldSets == null || _isLoading)
         {
-            <p class="text-danger">@_error</p>
+            <p class="text-muted fst-italic">Loading...</p>
         }
         else if (!_fieldSets.Any())
         {
             if (string.IsNullOrEmpty(_searchQuery))
             {
-                <p>No items available.</p>
+                <p class="text-muted fst-italic">No items available.</p>
             }
             else
             {
-                <p>No search results.</p>
+                <p class="text-muted fst-italic">No search results.</p>
             }
         }
         else
@@ -40,8 +42,17 @@
                 @foreach (var fieldSet in _fieldSets)
                 {
                     <tr @onclick="() => OnFieldSetSelected(fieldSet)" style="cursor: pointer;">
-                        <td class="pb-2 pr-3">@fieldSet.Name.Truncate(Constants.DefaultTruncateSmall)</td>
-                        <td class="pb-2 pr-3">@fieldSet.Description.Truncate(Constants.DefaultTruncateSmall)</td>
+                        <td class="pb-2 pr-3">@fieldSet.Name.Truncate()</td>
+                        <td class="pb-2 pr-3">
+                            @if (string.IsNullOrEmpty(fieldSet.Description))
+                            {
+                                <span class="text-muted fst-italic">No description</span>
+                            }
+                            else
+                            {
+                                @fieldSet.Description.Truncate()
+                            }
+                        </td>
                     </tr>
                 }
                 </tbody>
@@ -86,14 +97,15 @@
     private int _pageCount;
     private int _currentPage;
     
+    protected override async Task OnInitializedAsync()
+    {
+        await GetFieldSetsAsync(null, 1, Constants.DefaultPageSize);
+    }
+    
     private async Task OnSearchAsync(string query)
     {
-        if (string.IsNullOrEmpty(query))
+        if (query.Equals(_searchQuery))
         {
-            _fieldSets = null;
-            _pageCount = 0;
-            _currentPage = 0;
-            
             return;
         }
 

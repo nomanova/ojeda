@@ -62,7 +62,16 @@
                                 }
                             </td>
                             <td class="pb-2 pr-3">@assetClassFieldSet.FieldSet.Name.Truncate()</td>
-                            <td class="pb-2 pr-3">@assetClassFieldSet.FieldSet.Description.Truncate()</td>
+                            <td class="pb-2 pr-3">
+                                @if (string.IsNullOrEmpty(assetClassFieldSet.FieldSet.Description))
+                                {
+                                    <span class="text-muted fst-italic">No description</span>
+                                }
+                                else
+                                {
+                                    @assetClassFieldSet.FieldSet.Description.Truncate()    
+                                }
+                            </td>
                             <td class="pb-2 pr-3">
                                 <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(assetClassFieldSet))">
                                     <i class="fs-6 bi-x-circle"></i>
@@ -75,7 +84,7 @@
             }
             else
             {
-                <p class="text-muted">Use the link on the right to start adding field sets.</p>
+                <p class="text-muted fst-italic">Use the link on the right to start adding field sets.</p>
             }
             <ValidationMessage For="@(() => _assetClass.FieldSets)"></ValidationMessage>
         </div>
@@ -152,18 +161,13 @@
         {
             return;
         }
-
-        var options = new ModalOptions
-        { 
-            Animation = ModalAnimation.FadeInOut(0.15)
-        };
         
         var parameters = new ModalParameters();
         
         var excludedIds = _assetClass.FieldSets.Select(_ => _.FieldSet.Id).ToList();
         parameters.Add("ExcludedIds", excludedIds);
         
-        var selectFieldModal = Modal.Show<AddFieldSetModal>("Add Field Set", parameters, options);
+        var selectFieldModal = Modal.Show<AddFieldSetModal>("Add Field Set", parameters, Constants.DefaultModalOptions);
         var result = await selectFieldModal.Result;
 
         if (!result.Cancelled)

@@ -32,17 +32,17 @@
 
 @if (_fieldSets == null)
 {
-    <p>Loading...</p>   
+    <p class="text-muted fst-italic">Loading...</p>   
 }
 else if (!_fieldSets.Any())
 {
     if (string.IsNullOrEmpty(_searchQuery))
     {
-        <p>No items available.</p>
+        <p class="text-muted fst-italic">No items available.</p>
     }
     else
     {
-        <p>No search results.</p>
+        <p class="text-muted fst-italic">No search results.</p>
     }
 }
 else
@@ -61,7 +61,16 @@ else
         {
             <tr>
                 <td class="pb-2 pr-3">@fieldSet.Name</td>
-                <td class="pb-2 pr-3">@fieldSet.Description</td>
+                <td class="pb-2 pr-3">
+                    @if (string.IsNullOrEmpty(fieldSet.Description))
+                    {
+                        <span class="text-muted fst-italic">No description</span>
+                    }
+                    else
+                    {
+                        @fieldSet.Description.Truncate(Constants.DefaultTruncateLarge)
+                    }
+                </td>
                 <td class="pb-2 pr-3">@fieldSet.Fields.Count</td>
                 <td class="pb-2 pr-3">
                     <a class="btn-link" role="button" @onclick="@(() => OnEdit(fieldSet.Id))">Edit</a> |
@@ -106,6 +115,11 @@ else
 
     private async Task OnSearchAsync(string query)
     {
+        if (query.Equals(_searchQuery))
+        {
+            return;
+        }
+
         _searchQuery = query;
         await GetFieldSetsAsync(query, 1, _pageSize);
     }

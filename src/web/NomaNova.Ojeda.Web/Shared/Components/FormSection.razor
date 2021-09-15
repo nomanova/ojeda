@@ -1,0 +1,26 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-4">
+                <h5>@Title</h5>
+                <p class="text-muted fst-italic">@HelpText</p>
+            </div>
+            <div class="col-8">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string HelpText { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+}
