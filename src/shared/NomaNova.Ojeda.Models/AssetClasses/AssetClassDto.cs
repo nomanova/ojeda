@@ -5,7 +5,7 @@ using NomaNova.Ojeda.Models.FieldSets;
 
 namespace NomaNova.Ojeda.Models.AssetClasses
 {
-    public class AssetClassSummaryDto
+    public class AssetClassSummaryDto : IIdentityDto, INamedDto
     {
         public string Id { get; set; }
         

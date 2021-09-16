@@ -10,9 +10,10 @@ namespace NomaNova.Ojeda.Web
         public const int DefaultTruncateSmall = 40;
         public const int DefaultTruncateLarge = 100;
 
+        public const int DefaultPageNumber = 1;
         public const int DefaultPageSize = 25;
         
-        public static readonly ModalOptions DefaultModalOptions = new ModalOptions
+        public static readonly ModalOptions DefaultModalOptions = new()
         { 
             Animation = ModalAnimation.FadeInOut(0.15)
         };

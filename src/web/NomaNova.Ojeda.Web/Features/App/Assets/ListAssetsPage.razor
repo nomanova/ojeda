@@ -13,7 +13,7 @@
     
     private async Task OnAdd()
     {
-        var addAssetModal = Modal.Show<AddAssetModal>("Add Asset", Constants.DefaultModalOptions);
+        var addAssetModal = Modal.Show<SelectAssetClassModal>("Add Asset", Constants.DefaultModalOptions);
         var result = await addAssetModal.Result;
 
         if (!result.Cancelled)

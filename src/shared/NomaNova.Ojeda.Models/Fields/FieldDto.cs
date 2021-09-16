@@ -7,7 +7,7 @@ namespace NomaNova.Ojeda.Models.Fields
         Text
     }
     
-    public class FieldDto
+    public class FieldDto : IIdentityDto, INamedDto
     {
         public string Id { get; set; }
         

@@ -171,7 +171,7 @@
         var excludedIds = _fieldSet.Fields.Select(_ => _.Field.Id).ToList();
         parameters.Add("ExcludedIds", excludedIds);
         
-        var selectFieldModal = Modal.Show<AddFieldModal>("Add Field", parameters, Constants.DefaultModalOptions);
+        var selectFieldModal = Modal.Show<SelectFieldModal>("Add Field", parameters, Constants.DefaultModalOptions);
         var result = await selectFieldModal.Result;
 
         if (!result.Cancelled)

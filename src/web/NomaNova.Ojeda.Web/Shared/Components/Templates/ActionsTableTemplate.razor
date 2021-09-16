@@ -1,0 +1,41 @@
+@typeparam TItem
+
+<table class="table table-striped w-100">
+    <thead>
+        <tr>
+            @TableHeader
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody> 
+        @foreach (var item in Items)
+        {
+            <tr>
+                @RowTemplate(item)
+                <td>
+                    <a class="btn-link" role="button" @onclick="@(() => EditItemCallBack.InvokeAsync(item))">Edit</a> |
+                    <a class="btn-link" role="button" @onclick="@(() => DeleteItemCallBack.InvokeAsync(item))">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    
+    [Parameter]
+    public RenderFragment TableHeader { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TItem> RowTemplate { get; set; }
+    
+    [Parameter]
+    public ICollection<TItem> Items { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> EditItemCallBack { get; set; }
+    
+    [Parameter]
+    public EventCallback<TItem> DeleteItemCallBack { get; set; }
+    
+}

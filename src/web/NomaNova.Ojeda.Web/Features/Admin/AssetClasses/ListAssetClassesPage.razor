@@ -1,9 +1,7 @@
 @page "/admin/asset-classes"
 @layout AdminLayout
+@inherits ListItemsPage<AssetClassDto>
 
-@inject ILocalStorageService LocalStorageService
-@inject NavigationManager NavManager
-@inject IToastService ToastService
 @inject OjedaClient Ojeda
 
 @{
@@ -26,16 +24,16 @@
         <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset Class</button>
     </div>
     
-    <Spinner IsLoading="@_isLoading" />
+    <Spinner IsLoading="@IsLoading" />
 </div>
 
-@if (_assetClasses == null)
+@if (Items == null)
 {
     <p class="text-muted fst-italic">Loading...</p>   
 }
-else if (!_assetClasses.Any())
+else if (!Items.Any())
 {
-    if (string.IsNullOrEmpty(_searchQuery))
+    if (string.IsNullOrEmpty(SearchQuery))
     {
         <p class="text-muted fst-italic">No items available.</p>
     }
@@ -46,46 +44,28 @@ else if (!_assetClasses.Any())
 }
 else
 {
-    <table class="table table-striped w-100">
-        <thead>
-        <tr>
-            <th class="py-2">Name</th>
-            <th class="py-2">Description</th>
-            <th class="py-2"># Field Sets</th>
-            <th class="py-2">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var assetClass in _assetClasses)
-        {
-            <tr>
-                <td class="pb-2 pr-3">@assetClass.Name</td>
-                <td class="pb-2 pr-3">
-                    @if (string.IsNullOrEmpty(assetClass.Description))
-                    {
-                        <span class="text-muted fst-italic">No description</span>
-                    }
-                    else
-                    {
-                        @assetClass.Description.Truncate(Constants.DefaultTruncateLarge)
-                    }
-                </td>
-                <td class="pb-2 pr-3">@assetClass.FieldSets.Count</td>
-                <td class="pb-2 pr-3">
-                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(assetClass.Id))">Edit</a> |
-                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(assetClass.Id))">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    
+    <ActionsTableTemplate TItem="AssetClassDto" 
+                          Items="@Items" 
+                          EditItemCallBack="@OnEdit"
+                          DeleteItemCallBack="@OnDelete">
+        <TableHeader>
+            <th>Name</th>
+            <th>Description</th>
+            <th># Field Sets</th>
+        </TableHeader>
+        <RowTemplate Context="assetClass">
+            <td>@assetClass.Name</td>
+            <td><Description Value="@assetClass.Description"/></td>
+            <td>@assetClass.FieldSets.Count</td>
+        </RowTemplate>
+    </ActionsTableTemplate>
+
     <div class="my-4">
         <Pager
-            PageCount="@_pageCount"
-            CurrentPage="@_currentPage"
-            PageSize="@_pageSize"
-            TotalCount="@_totalCount"
+            PageCount="@PageCount"
+            CurrentPage="@CurrentPage"
+            PageSize="@PageSize"
+            TotalCount="@TotalCount"
             OnPageChanged="@OnPageChanged"
             OnPageSizeChanged="@OnPageSizeChanged" />
     </div>
@@ -93,115 +73,17 @@ else
 
 @code {
     
-    private bool _isLoading;
-    
-    private string _searchQuery = "";
-    private ICollection<AssetClassDto> _assetClasses;
-    
-    private int _pageCount;
-    private int _currentPage;
-    private int _pageSize;
-    private int _totalCount;
-    
-    protected override async Task OnInitializedAsync()
+    protected override string Path => "/admin/asset-classes";
+
+    protected override async Task<OjedaResult> DeleteItemAsync(AssetClassDto item)
     {
-        // Fetch page size from local storage
-        var storedPageSize = await LocalStorageService.GetItemAsync<int>(Constants.StorageKeyPageSize);
-        var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
-        
-        await GetAssetClassesAsync(null, 1, pageSize);
+        return await Ojeda.AssetClassesService.DeleteAsync(item.Id);
     }
 
-    private async Task OnSearchAsync(string query)
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetClassDto>>> FetchItemsAsync(string query = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
     {
-        if (query.Equals(_searchQuery))
-        {
-            return;
-        }
-
-        _searchQuery = query;
-        await GetAssetClassesAsync(query, 1, _pageSize);
-    }
-    
-    private void OnAdd()
-    {
-        NavManager.NavigateTo("/admin/asset-classes/add");
-    }
-    
-    private void OnEdit(string id)
-    {
-        NavManager.NavigateTo($"/admin/asset-classes/edit/{id}");
-    }
-    
-    private async Task OnDelete(string id)
-    {
-        _isLoading = true;
-        StateHasChanged();
-        
-        var result = await Ojeda.AssetClassesService.DeleteAsync(id);
-
-        if (result.Success)
-        {
-            var toRemove = _assetClasses.FirstOrDefault(f => f.Id.Equals(id));
-            if (toRemove != null)
-            {
-                _assetClasses.Remove(toRemove);
-                _totalCount--;
-            }
-        }
-        else
-        {
-            ToastService.ShowError($"Could not delete field set. {result.Error?.Message} ({result.Error?.Code}).");
-        }
-
-        if (!_assetClasses.Any() && _currentPage > 1)
-        {
-            await GetAssetClassesAsync(_searchQuery, _currentPage - 1, _pageSize);
-        }
-        else
-        {
-            _isLoading = false;
-            StateHasChanged();   
-        }
-    }
-    
-    private async Task OnPageChanged(int pageNumber)
-    {
-        await GetAssetClassesAsync(_searchQuery, pageNumber, _pageSize);
-    }
-    
-    private async Task OnPageSizeChanged(int pageSize)
-    {
-    // Store page size to local storage
-        await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
-
-        await GetAssetClassesAsync(_searchQuery, 1, pageSize);
-    }
-    
-    private async Task GetAssetClassesAsync(string query = null, int pageNumber = 1, int pageSize = 25)
-    {
-        _isLoading = true;
-        StateHasChanged();
-        
-        var result = await Ojeda.AssetClassesService.GetAsync(query, null, true, pageNumber, pageSize);
-
-        if (result.Success)
-        {
-            var paginatedData = result.Data;
-        
-            _assetClasses = paginatedData.Items;
-            _pageCount = paginatedData.TotalPages;
-            _currentPage = paginatedData.PageNumber;
-            _pageSize = pageSize;
-            _totalCount = paginatedData.TotalCount;
-        }
-        else
-        {
-            _assetClasses = new List<AssetClassDto>();
-            ToastService.ShowError($"Could not load asset classes. {result.Error?.Message} ({result.Error?.Code}).");
-        }
-        
-        _isLoading = false;
-        StateHasChanged();
+        return await Ojeda.AssetClassesService.GetAsync(query, null, true, pageNumber, pageSize);
     }
 }

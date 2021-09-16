@@ -1,9 +1,7 @@
 @page "/admin/fields"
 @layout AdminLayout
+@inherits ListItemsPage<FieldDto>
 
-@inject ILocalStorageService LocalStorageService
-@inject NavigationManager NavManager
-@inject IToastService ToastService
 @inject OjedaClient Ojeda
 
 @{
@@ -26,17 +24,17 @@
         <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>
     </div>
     
-    <Spinner IsLoading="@_isLoading" />
+    <Spinner IsLoading="@IsLoading" />
 
 </div>
 
-@if (_fields == null)
+@if (Items == null)
 {
     <p class="text-muted fst-italic">Loading...</p>   
 }
-else if (!_fields.Any())
+else if (!Items.Any())
 {
-    if (string.IsNullOrEmpty(_searchQuery))
+    if (string.IsNullOrEmpty(SearchQuery))
     {
         <p class="text-muted fst-italic">No items available.</p>
     }
@@ -47,163 +45,46 @@ else if (!_fields.Any())
 }
 else
 {
-    <table class="table table-striped w-100">
-        <thead>
-        <tr>
-            <th class="py-2">Name</th>
-            <th class="py-2">Description</th>
-            <th class="py-2">Type</th>
-            <th class="py-2">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var field in _fields)
-        {
-            <tr>
-                <td class="pb-2 pr-3">@field.Name</td>
-                <td class="pb-2 pr-3">
-                    @if (string.IsNullOrEmpty(field.Description))
-                    {
-                        <span class="text-muted fst-italic">No description</span>
-                    }
-                    else
-                    {
-                        @field.Description.Truncate(Constants.DefaultTruncateLarge)
-                    }
-                </td>
-                <td class="pb-2 pr-3">@field.Type</td>
-                <td class="pb-2 pr-3">
-                    <a class="btn-link" role="button" @onclick="@(() => OnEdit(field.Id))">Edit</a> |
-                    <a class="btn-link" role="button" @onclick="@(() => OnDelete(field.Id))">Delete</a>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    
+    <ActionsTableTemplate TItem="FieldDto" 
+                          Items="@Items" 
+                          EditItemCallBack="@OnEdit"
+                          DeleteItemCallBack="@OnDelete">
+        <TableHeader>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Type</th>
+        </TableHeader>
+        <RowTemplate Context="field">
+            <td>@field.Name</td>
+            <td><Description Value="@field.Description"/></td>
+            <td>@field.Type</td>
+        </RowTemplate>
+    </ActionsTableTemplate>
+
     <div class="my-4">
         <Pager
-            PageCount="@_pageCount"
-            CurrentPage="@_currentPage"
-            PageSize="@_pageSize"
-            TotalCount="@_totalCount"
+            PageCount="@PageCount"
+            CurrentPage="@CurrentPage"
+            PageSize="@PageSize"
+            TotalCount="@TotalCount"
             OnPageChanged="@OnPageChanged"
             OnPageSizeChanged="@OnPageSizeChanged" />
     </div>
 }
 
 @code {
-
-    private bool _isLoading;
-
-    private string _searchQuery = "";
-    private ICollection<FieldDto> _fields;
-
-    private int _pageCount;
-    private int _currentPage;
-    private int _pageSize;
-    private int _totalCount;
     
-    protected override async Task OnInitializedAsync()
-    {
-        // Fetch page size from local storage
-        var storedPageSize = await LocalStorageService.GetItemAsync<int>(Constants.StorageKeyPageSize);
-        var pageSize = storedPageSize == 0 ? 10 : storedPageSize;
+    protected override string Path => "/admin/fields";
 
-        await GetFieldsAsync(null, 1, pageSize);
+    protected override async Task<OjedaResult> DeleteItemAsync(FieldDto item)
+    {
+        return await Ojeda.FieldsService.DeleteAsync(item.Id);
     }
 
-    private async Task OnSearchAsync(string query)
+    protected override async Task<OjedaDataResult<PaginatedListDto<FieldDto>>> FetchItemsAsync(string query = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
     {
-        if (query.Equals(_searchQuery))
-        {
-            return;
-        }
-
-        _searchQuery = query;
-        await GetFieldsAsync(query, 1, _pageSize);
-    }
-
-    private void OnAdd()
-    {
-        NavManager.NavigateTo("/admin/fields/add");
-    }
-
-    private void OnEdit(string id)
-    {
-        NavManager.NavigateTo($"/admin/fields/edit/{id}");
-    }
-
-    private async Task OnDelete(string id)
-    {
-        _isLoading = true;
-        StateHasChanged();
-        
-        var result = await Ojeda.FieldsService.DeleteAsync(id);
-
-        if (result.Success)
-        {
-            var toRemove = _fields.FirstOrDefault(f => f.Id.Equals(id));
-            if (toRemove != null)
-            {
-                _fields.Remove(toRemove);
-                _totalCount--;
-            }
-        }
-        else
-        {
-            ToastService.ShowError($"Could not delete field. {result.Error?.Message} ({result.Error?.Code}).");
-        }
-
-        if (!_fields.Any() && _currentPage > 1)
-        {
-            await GetFieldsAsync(_searchQuery, _currentPage - 1, _pageSize);
-        }
-        else
-        {
-            _isLoading = false;
-            StateHasChanged();   
-        }
-    }
-
-    private async Task OnPageChanged(int pageNumber)
-    {
-        await GetFieldsAsync(_searchQuery, pageNumber, _pageSize);
-    }
-
-    private async Task OnPageSizeChanged(int pageSize)
-    {
-        // Store page size to local storage
-        await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
-
-        await GetFieldsAsync(_searchQuery, 1, pageSize);
-    }
-
-    private async Task GetFieldsAsync(string query = null, int pageNumber = 1, int pageSize = 25)
-    {
-        _isLoading = true;
-        StateHasChanged();
-        
-        var result = await Ojeda.FieldsService.GetAsync(
-            query, null, true, null, pageNumber, pageSize);
-        
-        if (result.Success)
-        {
-            var paginatedData = result.Data;
-        
-            _fields = paginatedData.Items;
-            _pageCount = paginatedData.TotalPages;
-            _currentPage = paginatedData.PageNumber;
-            _pageSize = pageSize;
-            _totalCount = paginatedData.TotalCount;
-        }
-        else
-        {
-            _fields = new List<FieldDto>();
-            ToastService.ShowError($"Could not load fields. {result.Error?.Message} ({result.Error?.Code}).");
-        }
-        
-        _isLoading = false;
-        StateHasChanged();
+        return await Ojeda.FieldsService.GetAsync(query, null, true, null, pageNumber, pageSize);
     }
 }

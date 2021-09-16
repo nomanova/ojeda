@@ -1,0 +1,39 @@
+@inherits SelectItemModal<FieldSetDto>
+
+@inject OjedaClient Ojeda
+
+<SelectItemModalTemplate TItem="FieldSetDto"
+                         HelpText="Select the <strong>field set</strong> to add below."
+                         Error="@Error"
+                         IsLoading="@IsLoading"
+                         SearchQuery="@SearchQuery"
+                         PageCount="@PageCount"
+                         CurrentPage="@CurrentPage"
+                         Items="@Items"
+                         SearchCallback="@OnSearchAsync"
+                         SelectItemCallBack="@OnItemSelected"
+                         PageChangedCallback="@OnPageChanged"
+                         CancelCallBack="@OnCancel">
+    <TableHeader>
+        <th>Name</th>
+        <th>Description</th>
+    </TableHeader>
+    <RowTemplate Context="fieldSet">
+        <td class="pb-2">@fieldSet.Name.Truncate()</td>
+        <td class="pb-2"><Description Value="@fieldSet.Description" /></td>
+    </RowTemplate>
+</SelectItemModalTemplate>
+
+@code {
+
+    protected override async Task<OjedaDataResult<PaginatedListDto<FieldSetDto>>> FetchItemsAsync(
+        string query = null,
+        IList<string> excludedIds = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
+    {
+        return await Ojeda.FieldSetsService.GetAsync(
+            query, null, true, ExcludedIds, pageNumber, pageSize);
+    }
+
+}

@@ -1,0 +1,38 @@
+@inherits SelectItemModal<AssetClassDto>
+
+@inject OjedaClient Ojeda
+
+<SelectItemModalTemplate TItem="AssetClassDto"
+                         HelpText="Select the <strong>asset class</strong> of the asset to add below."
+                         Error="@Error"
+                         IsLoading="@IsLoading"
+                         SearchQuery="@SearchQuery"
+                         PageCount="@PageCount"
+                         CurrentPage="@CurrentPage"
+                         Items="@Items"
+                         SearchCallback="@OnSearchAsync"
+                         SelectItemCallBack="@OnItemSelected"
+                         PageChangedCallback="@OnPageChanged"
+                         CancelCallBack="@OnCancel">
+    <TableHeader>
+        <th>Name</th>
+        <th>Description</th>
+    </TableHeader>
+    <RowTemplate Context="assetClass">
+        <td class="pb-2">@assetClass.Name.Truncate()</td>
+        <td class="pb-2"><Description Value="@assetClass.Description" /></td>
+    </RowTemplate>
+</SelectItemModalTemplate>
+
+@code {
+    
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetClassDto>>> FetchItemsAsync(
+        string query = null,
+        IList<string> excludedIds = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
+    {
+        return await Ojeda.AssetClassesService.GetAsync(
+            query, null, true, pageNumber, pageSize);
+    }
+}

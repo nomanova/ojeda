@@ -1,0 +1,15 @@
+@if (string.IsNullOrEmpty(Value))
+{
+    <span class="text-muted fst-italic">No description</span>
+}
+else
+{
+    @Value.Truncate(Constants.DefaultTruncateLarge)
+}
+
+@code {
+
+    [Parameter]
+    public string Value { get; set; }
+
+}

@@ -4,7 +4,7 @@ using NomaNova.Ojeda.Models.Fields;
 
 namespace NomaNova.Ojeda.Models.Assets
 {
-    public class AssetSummaryDto
+    public class AssetSummaryDto : IIdentityDto
     {
         public string Id { get; set; }
 
