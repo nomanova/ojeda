@@ -3,6 +3,7 @@ using NomaNova.Ojeda.Core.Domain.AssetClasses;
 using NomaNova.Ojeda.Data;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.AssetClasses;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.AssetClasses
 {
@@ -20,6 +21,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
             
             // Dto -> Domain
             CreateMap<AssetClassDto, AssetClass>();
+            CreateMap<AssetClassSummaryDto, AssetClass>();
             
             CreateMap<AssetClassFieldSetDto, AssetClassFieldSet>()
                 .ForMember(dest => dest.AssetClass, opt => opt.Ignore())

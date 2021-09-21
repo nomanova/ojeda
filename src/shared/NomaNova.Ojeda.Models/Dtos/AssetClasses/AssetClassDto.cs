@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared.Interfaces;
 
 namespace NomaNova.Ojeda.Models.AssetClasses
 {

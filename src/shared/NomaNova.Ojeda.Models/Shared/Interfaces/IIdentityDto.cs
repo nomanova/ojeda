@@ -1,4 +1,4 @@
-namespace NomaNova.Ojeda.Models
+namespace NomaNova.Ojeda.Models.Shared.Interfaces
 {
     public interface IIdentityDto
     {

@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.FieldSets;
 using Swashbuckle.AspNetCore.Annotations;
 

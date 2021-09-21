@@ -1,23 +1,14 @@
 @page "/admin/asset-classes/edit/{AssetClassId}"
+@using NomaNova.Ojeda.Models.Dtos.FieldSets
 @layout AdminLayout
 
 @inject NavigationManager NavManager
 @inject IToastService ToastService
 @inject OjedaClient Ojeda
 
-@{
-    var paths = new Dictionary<string, string>()
-    {
-        {"Admin", "/admin"},
-        {"Asset Classes", "/admin/asset-classes"},
-        {"Edit", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
 
-<div class="d-flex justify-content-between w-50">
-    <h3>Edit Asset Class</h3>
-</div>
+<h3>Edit Asset Class</h3>
 
 @if (_isLoading)
 {
@@ -29,6 +20,13 @@ else
 }
 
 @code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Asset Classes", Url = "/admin/asset-classes"},
+        new () {Text = "Edit"}
+    };
     
     private bool _isLoading;
     private readonly AssetClassDto _assetClass = new();

@@ -1,28 +1,78 @@
 @page "/admin/fields/add"
 @layout AdminLayout
+@inherits FormPage<FieldDto>
 
-@inject OjedaClient Ojeda
+<OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-@{
-    var paths = new Dictionary<string, string>()
-    {
-        {"Admin", "/admin"},
-        {"Fields", "/admin/fields"},
-        {"Add", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<h3>Add Field</h3>
 
-<div class="d-flex justify-content-between w-50">
-    <h3>Add Field</h3>
-</div>
+<EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-<FieldForm OnSubmit="@OnAdd"></FieldForm>
+    <FluentValidationValidator/>
+    <ServerSideFluentValidation @ref="ServerValidation"/>
+
+    <div class="w-50 mb-4">
+
+        <!-- Name -->
+        <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createField.Name)">
+            <InputText @bind-Value="_createField.Name" class="form-control" id="field-name" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Description -->
+        <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _createField.Description)"
+                        HelpText="Optional, will be used as hint for the field input control.">
+            <InputText @bind-Value="_createField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Type -->
+        <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
+            <InputSelect @bind-Value="_createField.Type" class="form-control" id="field-type" disabled="@IsSubmitting">
+                @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
+                {
+                    <option value="@type">@type</option>
+                }
+            </InputSelect>
+        </OjedaFormField>
+
+    </div>
+
+    <OjedaFormFooter
+        IsSubmitting="@IsSubmitting"
+        OnCancel="@OnCancel"
+        OnReset="@OnReset"/>
+
+</EditForm>
+
 
 @code {
-    
-    private async Task<OjedaDataResult<FieldDto>> OnAdd(FieldDto field)
+
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        return await Ojeda.FieldsService.CreateAsync(field);
+        new() {Text = "Admin", Url = "/admin"},
+        new() {Text = "Fields", Url = "/admin/fields"},
+        new() {Text = "Add"}
+    };
+
+    protected override string ReturnPath => "/admin/fields";
+
+    private CreateFieldDto _createField;
+
+    protected override void OnInitialized()
+    {
+        Init();
     }
+
+    protected override async Task<OjedaDataResult<FieldDto>> OnSubmitEntity()
+    {
+        return await Ojeda.FieldsService.CreateAsync(_createField);
+    }
+
+    protected override void Init()
+    {
+        _createField = new CreateFieldDto();
+
+        EditContext = new EditContext(_createField);
+        EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
 }

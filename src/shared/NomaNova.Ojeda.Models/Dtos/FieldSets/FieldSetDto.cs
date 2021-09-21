@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentValidation;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Shared.Interfaces;
 
-namespace NomaNova.Ojeda.Models.FieldSets
+namespace NomaNova.Ojeda.Models.Dtos.FieldSets
 {
     public class FieldSetSummaryDto : IIdentityDto, INamedDto
     {
@@ -24,8 +24,8 @@ namespace NomaNova.Ojeda.Models.FieldSets
         public FieldSetDtoValidator()
         {
             RuleFor(_ =>  _.Name).NotEmpty();
-            RuleFor(_ =>  _.Name).MaximumLength(40);
-            RuleFor(_ =>  _.Description).MaximumLength(250);
+            RuleFor(_ =>  _.Name).MaximumLength(Constants.NameMaxLength);
+            RuleFor(_ =>  _.Description).MaximumLength(Constants.DescriptionMaxLength);
             RuleFor(_ => _.Fields).NotEmpty().WithMessage("At least one field is required.");
 
             RuleFor(_ => _.Fields).Must(fields =>
@@ -35,22 +35,6 @@ namespace NomaNova.Ojeda.Models.FieldSets
             }).WithMessage("A field must not be added more than once.");
             
             RuleForEach(_ => _.Fields).SetValidator(new FieldSetFieldDtoValidator());
-        }
-    }
-    
-    public class FieldSetFieldDto
-    {
-        public int Order { get; set; }
-
-        public FieldDto Field { get; set; }
-    }
-
-    public class FieldSetFieldDtoValidator : AbstractValidator<FieldSetFieldDto>
-    {
-        public FieldSetFieldDtoValidator()
-        {
-            RuleFor(_ => _.Order).GreaterThanOrEqualTo(0);
-            RuleFor(_ => _.Field.Id).NotEmpty().WithMessage("Field id is missing.");
         }
     }
 }

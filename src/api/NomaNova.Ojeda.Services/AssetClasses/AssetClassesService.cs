@@ -10,6 +10,7 @@ using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.AssetClasses;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.AssetClasses
 {

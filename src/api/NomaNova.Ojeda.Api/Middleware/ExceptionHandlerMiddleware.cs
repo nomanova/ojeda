@@ -10,6 +10,7 @@ using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Api.Middleware
 {

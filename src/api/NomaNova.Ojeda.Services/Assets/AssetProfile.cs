@@ -5,6 +5,7 @@ using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
@@ -26,7 +27,9 @@ namespace NomaNova.Ojeda.Services.Assets
             CreateMap<PaginatedList<Asset>, PaginatedListDto<AssetSummaryDto>>();
             
             // Dto -> Domain
-            CreateMap<AssetDto, Asset>();
+            CreateMap<AssetDto, Asset>()
+                .ForMember(dest => dest.AssetClass, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
         }
     }
 }

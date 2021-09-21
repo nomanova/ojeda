@@ -4,14 +4,7 @@
 
 @inject OjedaClient Ojeda
 
-@{
-    var paths = new Dictionary<string, string>
-    {
-        {"Admin", "/admin"},
-        {"Fields", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
 
 <h3>Fields</h3>
 
@@ -21,8 +14,12 @@
         <div style="width: 350px;">
             <Search OnValueChanged="@OnSearchAsync"></Search>
             </div>
-        <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field</button>
-    </div>
+
+        <div class="ms-2">
+            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Field" />
+        </div>
+        
+        </div>
     
     <Spinner IsLoading="@IsLoading" />
 
@@ -62,7 +59,7 @@ else
     </ActionsTableTemplate>
 
     <div class="my-4">
-        <Pager
+        <OjedaPager
             PageCount="@PageCount"
             CurrentPage="@CurrentPage"
             PageSize="@PageSize"
@@ -73,6 +70,12 @@ else
 }
 
 @code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Fields"}
+    };
     
     protected override string Path => "/admin/fields";
 

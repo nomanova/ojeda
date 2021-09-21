@@ -3,7 +3,7 @@ using FluentValidation;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {

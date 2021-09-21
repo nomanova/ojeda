@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NomaNova.Ojeda.Models
+namespace NomaNova.Ojeda.Models.Shared
 {
     public class PaginatedListDto<T>
     {

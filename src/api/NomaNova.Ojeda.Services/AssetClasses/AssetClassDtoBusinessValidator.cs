@@ -42,6 +42,7 @@ namespace NomaNova.Ojeda.Services.AssetClasses
         {
             public AssetClassFieldSetDtoBusinessValidator(IRepository<FieldSet> fieldSetsRepository)
             {
+                // Business rule: ensure field set exists
                 RuleFor(_ => _.FieldSet.Id).MustAsync(async (id, cancellation) =>
                 {
                     var fieldSet = await fieldSetsRepository.GetByIdAsync(id, cancellation);

@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services.Fields
 {
@@ -14,17 +15,17 @@ namespace NomaNova.Ojeda.Client.Services.Fields
 
         Task<OjedaDataResult<PaginatedListDto<FieldDto>>> GetAsync(
             string query = null,
-            string orderBy = null, 
+            string orderBy = null,
             bool orderAsc = true,
             IEnumerable<string> excludedIds = null,
-            int pageNumber = 1, 
-            int pageSize = 10, 
+            int pageNumber = 1,
+            int pageSize = 10,
             CancellationToken cancellationToken = default);
         
-        Task<OjedaDataResult<FieldDto>> CreateAsync(FieldDto field,
+        Task<OjedaDataResult<FieldDto>> CreateAsync(CreateFieldDto field,
             CancellationToken cancellationToken = default);
 
-        Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, FieldDto field,
+        Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, UpdateFieldDto field,
             CancellationToken cancellationToken = default);
 
         Task<OjedaResult> DeleteAsync(

@@ -1,0 +1,35 @@
+<div>
+    <!-- Submit -->
+    <OjedaButton
+        Style="@ButtonStyle.Primary"
+        Type="@ButtonType.Submit"
+        IsDisabled="IsSubmitting"
+        IsLoading="IsSubmitting"
+        Text="Submit"/>
+
+    <!-- Reset -->
+    <OjedaButton
+        Style="@ButtonStyle.Secondary"
+        OnClick="OnReset"
+        IsDisabled="IsSubmitting"
+        Text="Reset"/>
+
+    <!-- Cancel -->
+    <OjedaButton
+        OnClick="OnCancel"
+        IsDisabled="IsSubmitting"
+        Text="Cancel"/>
+</div>
+
+@code {
+    
+    [Parameter]
+    public bool IsSubmitting { get; set; }
+
+    [Parameter]
+    public EventCallback OnReset { get; set; }
+    
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    
+}

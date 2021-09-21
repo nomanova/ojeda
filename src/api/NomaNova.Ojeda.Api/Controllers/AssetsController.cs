@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Assets;
 
 namespace NomaNova.Ojeda.Api.Controllers

@@ -5,7 +5,8 @@ using Blazored.LocalStorage;
 using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
 using NomaNova.Ojeda.Client.Results;
-using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Models.Shared.Interfaces;
 
 namespace NomaNova.Ojeda.Web.Shared.Base
 {

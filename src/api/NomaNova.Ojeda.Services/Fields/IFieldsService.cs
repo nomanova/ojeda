@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
@@ -20,9 +21,9 @@ namespace NomaNova.Ojeda.Services.Fields
             int pageSize,
             CancellationToken cancellationToken = default);
         
-        Task<FieldDto> CreateAsync(FieldDto fieldDto, CancellationToken cancellationToken = default);
+        Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken = default);
 
-        Task<FieldDto> UpdateAsync(string id, FieldDto fieldDto, CancellationToken cancellationToken = default);
+        Task<FieldDto> UpdateAsync(string id, UpdateFieldDto fieldDto, CancellationToken cancellationToken = default);
 
         Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     }

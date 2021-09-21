@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NomaNova.Ojeda.Models.AssetClasses;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared.Interfaces;
 
 namespace NomaNova.Ojeda.Models.Assets
 {

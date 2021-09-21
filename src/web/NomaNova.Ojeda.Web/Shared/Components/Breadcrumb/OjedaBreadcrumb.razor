@@ -1,0 +1,27 @@
+@if (Data != null && Data.Count > 0)
+{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach (var item in Data)
+            {
+                if (string.IsNullOrEmpty(item.Url))
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@item.Text</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        <a href="@item.Url">@item.Text</a>
+                    </li>
+                }
+            }
+        </ol>
+    </nav>
+}
+
+@code {
+
+    [Parameter]
+    public ICollection<BreadcrumbItem> Data { get; set; }
+
+}

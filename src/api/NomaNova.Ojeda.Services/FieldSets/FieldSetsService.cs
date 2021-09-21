@@ -11,7 +11,8 @@ using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Extensions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {

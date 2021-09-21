@@ -8,7 +8,8 @@ using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
@@ -60,7 +61,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return paginatedFieldsDto;
         }
 
-        public async Task<FieldDto> CreateAsync(FieldDto fieldDto, CancellationToken cancellationToken)
+        public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken)
         {
             await Validate(null, fieldDto, cancellationToken);
 
@@ -72,7 +73,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<FieldDto> UpdateAsync(string id, FieldDto fieldDto,
+        public async Task<FieldDto> UpdateAsync(string id, UpdateFieldDto fieldDto,
             CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
@@ -104,10 +105,9 @@ namespace NomaNova.Ojeda.Services.Fields
             await _fieldsRepository.DeleteAsync(field, cancellationToken);
         }
 
-        private async Task Validate(string id, FieldDto fieldDto, CancellationToken cancellationToken)
+        private async Task Validate(string id, UpsertFieldDto fieldDto, CancellationToken cancellationToken)
         {
-            fieldDto.Id = id;
-            await Validate(new FieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
+            await Validate(new FieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
         }
     }
 }

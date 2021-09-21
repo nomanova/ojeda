@@ -4,14 +4,7 @@
 
 @inject OjedaClient Ojeda
 
-@{
-    var paths = new Dictionary<string, string>
-    {
-        {"Admin", "/admin"},
-        {"Asset Classes", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
 
 <h3>Asset Classes</h3>
 
@@ -61,7 +54,7 @@ else
     </ActionsTableTemplate>
 
     <div class="my-4">
-        <Pager
+        <OjedaPager
             PageCount="@PageCount"
             CurrentPage="@CurrentPage"
             PageSize="@PageSize"
@@ -72,6 +65,12 @@ else
 }
 
 @code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Asset Classes"}
+    };
     
     protected override string Path => "/admin/asset-classes";
 

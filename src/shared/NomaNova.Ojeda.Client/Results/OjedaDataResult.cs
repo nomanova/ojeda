@@ -1,5 +1,6 @@
 using System.Net;
 using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Results
 {

@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
 {

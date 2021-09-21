@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.AssetClasses;
 using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
@@ -23,19 +25,22 @@ namespace NomaNova.Ojeda.Services.Assets
         private readonly IRepository<AssetClass> _assetClassesRepository;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
+        private readonly IFieldValueConverter _fieldValueConverter;
 
         public AssetsService(
             IMapper mapper,
             IRepository<Asset> assetsRepository,
             IRepository<AssetClass> assetClassesRepository,
             IRepository<FieldSet> fieldSetsRepository,
-            IRepository<Field> fieldsRepository)
+            IRepository<Field> fieldsRepository,
+            IFieldValueConverter fieldValueConverter)
         {
             _mapper = mapper;
             _assetsRepository = assetsRepository;
             _assetClassesRepository = assetClassesRepository;
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
+            _fieldValueConverter = fieldValueConverter;
         }
 
         public async Task<AssetDto> GetByAssetClassAsync(string assetClassId, CancellationToken cancellationToken)
@@ -75,15 +80,14 @@ namespace NomaNova.Ojeda.Services.Assets
             var assetDto = await AssetClassToAssetDto(assetClass, (fieldSetId, fieldId, fieldType) =>
             {
                 var fieldValue = fieldValues.FirstOrDefault(_ => _.FieldSetId.Equals(fieldSetId) && _.FieldId.Equals(fieldId));
-
                 var byteValue = fieldValue?.Value;
 
                 if (byteValue == null || byteValue.Length == 0)
                 {
-                    return null;
+                    return string.Empty;
                 }
 
-                return Convert.ToBase64String(byteValue);
+                return _fieldValueConverter.FromBytes(byteValue, fieldType);
             }, cancellationToken);
             
             assetDto.Id = id;
@@ -115,13 +119,70 @@ namespace NomaNova.Ojeda.Services.Assets
         
         public async Task<AssetDto> CreateAsync(AssetDto assetDto, CancellationToken cancellationToken)
         {
+            // Step 1: fetch the asset class & ensure it exists
+            
+            // Step 2: fetch all field sets and fields which are part of the asset class
+            
+            // Step 3: validate the dto against the field sets and fields
+            
+            // Step 4: store the asset
+            
+            // Step 5: store the field values
+            
+            
             await Validate(null, assetDto, cancellationToken);
             
+            // Asset
             var asset = _mapper.Map<Asset>(assetDto);
             asset.Id = Guid.NewGuid().ToString();
 
             asset = await _assetsRepository.InsertAsync(asset, cancellationToken);
 
+            
+            
+            // Fetch field sets & fields
+            var fieldSetIds = assetDto.FieldSets.Select(_ => _.Id);
+
+            var fieldSets = _fieldSetsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => fieldSetIds.Contains(_.Id));
+            }, cancellationToken);
+
+            var fieldIds = assetDto.FieldSets.SelectMany(_ => _.Fields).Select(_ => _.Id).Distinct();
+
+            var fields = _fieldsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => fieldIds.Contains(_.Id));
+            }, cancellationToken);
+            
+
+            
+            
+            
+            
+            // TODO: fetch all fieldsets
+            // TODO: fetch all fields
+            
+            var fieldValues = new List<FieldValue>();
+
+            var fieldSetDtos = assetDto.FieldSets;
+
+            foreach (var fieldSetDto in assetDto.FieldSets)
+            {
+                foreach (var fieldDto in fieldSetDto.Fields)
+                {
+                    var fieldValue = new FieldValue
+                    {
+                        AssetId = asset.Id,
+                        FieldSetId = fieldSetDto.Id,
+                        FieldId = fieldDto.Id,
+                        //Value = _fieldValueConverter.ToBytes(fieldDto.Value, fie)
+                    };
+                }
+            }
+
+            // TODO: insert field values
+            
             return _mapper.Map<AssetDto>(asset);
         }
 
@@ -160,7 +221,11 @@ namespace NomaNova.Ojeda.Services.Assets
         private async Task Validate(string id, AssetDto assetDto, CancellationToken cancellationToken)
         {
             assetDto.Id = id;
-            await Validate(new AssetDtoBusinessValidator(_assetClassesRepository), assetDto, cancellationToken);
+            
+            await Validate(
+                new AssetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, _assetClassesRepository), 
+                assetDto, 
+                cancellationToken);
         }
         
         private async Task<AssetDto> AssetClassToAssetDto(

@@ -10,6 +10,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services
 {

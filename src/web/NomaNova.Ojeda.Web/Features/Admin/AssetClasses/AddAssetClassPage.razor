@@ -3,27 +3,23 @@
 
 @inject OjedaClient Ojeda
 
-@{
-    var paths = new Dictionary<string, string>()
-    {
-        {"Admin", "/admin"},
-        {"Asset Classes", "/admin/asset-classes"},
-        {"Add", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
 
-<div class="d-flex justify-content-between w-50">
-    <h3>Add Asset Class</h3>
-</div>
+<h3>Add Asset Class</h3>
 
 <AssetClassForm OnSubmit="@OnAdd"></AssetClassForm>
 
 @code {
     
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Asset Classes", Url = "/admin/asset-classes"},
+        new () {Text = "Add"}
+    };
+    
     private async Task<OjedaDataResult<AssetClassDto>> OnAdd(AssetClassDto assetClass)
     {
         return await Ojeda.AssetClassesService.CreateAsync(assetClass);
     }
-
 }

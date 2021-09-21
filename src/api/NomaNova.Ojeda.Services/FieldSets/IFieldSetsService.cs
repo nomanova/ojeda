@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {

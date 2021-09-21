@@ -5,6 +5,7 @@ using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.AssetClasses;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services.AssetClasses
 {

@@ -5,19 +5,9 @@
 @inject IToastService ToastService
 @inject OjedaClient Ojeda
 
-@{
-    var paths = new Dictionary<string, string>()
-    {
-        {"Admin", "/admin"},
-        {"Field Sets", "/admin/field-sets"},
-        {"Edit", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
 
-<div class="d-flex justify-content-between w-50">
-    <h3>Edit Field Set</h3>
-</div>
+<h3>Edit Field Set</h3>
 
 @if (_isLoading)
 {
@@ -29,6 +19,13 @@ else
 }
 
 @code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Field Sets", Url = "/admin/field-sets"},
+        new () {Text = "Edit"}
+    };
     
     private bool _isLoading;
     private readonly FieldSetDto _fieldSet = new();

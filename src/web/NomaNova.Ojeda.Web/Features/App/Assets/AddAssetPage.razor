@@ -19,7 +19,20 @@ else if (_isLoading)
 }
 else
 {
-    <p>@_asset.AssetClass.Name</p>
+    <!-- Class -->        
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4">
+                    <h5>Class</h5>
+                </div>
+                <div class="col-8">
+                    <p>@_asset.AssetClass.Name</p>
+                    <span class="text-muted fst-italic">@_asset.AssetClass.Description</span>
+                </div>
+            </div>
+        </div>
+    </div>
                               
     <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
         
@@ -31,10 +44,33 @@ else
             <FormSection Title="@fieldSet.Name" HelpText="@fieldSet.Description">
                 @foreach (var field in fieldSet.Fields)
                 {
-                    <p>@field.Name</p>
+                    var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
+                    
+                    <div class="mb-3">
+                        <label for="@hash" class="form-label">@field.Name</label>
+                        <InputText @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isLoading"></InputText>
+                        @if (!string.IsNullOrEmpty(field.Description))
+                        {
+                            <p class="text-muted fst-italic mt-1">@field.Description</p>
+                        }
+                    </div>
+
                 }
             </FormSection>
         }
+        
+        <!-- Footer -->
+        <div class="my-4">
+            <button class="btn btn-primary" type="submit" disabled="@_isLoading">
+                @if (_isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="visually-hidden">Loading...</span>   
+                }
+                Submit
+            </button>
+            <button class="btn" type="button" @onclick="OnCancel" disabled="@_isLoading">Cancel</button>
+        </div>
         
     </EditForm>
 }
@@ -58,9 +94,44 @@ else
 
     private async Task OnSubmitForm()
     {
-        // TODO
+        Console.WriteLine("here");
+        
+        if (_isLoading)
+        {
+            return;
+        }
+        
+        _isLoading = true;
+        _serverValidation.ClearErrors();
+
+        var result = await Ojeda.AssetsService.CreateAsync(_asset);
+        
+        if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
+        {
+            _serverValidation.DisplayErrors(result.Error.ValidationErrors);
+        }
+        else if (!result.Success)
+        {
+            ToastService.ShowError($"Could not submit asset. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+        else
+        {
+            NavManager.NavigateTo("/assets"); // TODO: replace with asset location
+        }
+        
+        _isLoading = false;
     }
 
+    private void OnCancel()
+    {
+        if (_isLoading)
+        {
+            return;
+        }
+        
+        NavManager.NavigateTo("/assets");
+    }
+    
     private async Task GetAssetClass(string assetClassId)
     {
         if (string.IsNullOrEmpty(assetClassId))

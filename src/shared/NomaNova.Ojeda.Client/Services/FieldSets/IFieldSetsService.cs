@@ -3,7 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.FieldSets;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services.FieldSets
 {

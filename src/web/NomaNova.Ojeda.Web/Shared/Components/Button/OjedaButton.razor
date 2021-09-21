@@ -1,0 +1,53 @@
+<button class="@(GetButtonClass())" type="@(GetButtonType())}" @onclick="OnClick" disabled="@IsDisabled">
+    @if (IsLoading)
+    {
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <span class="visually-hidden">Loading...</span>
+    }
+    @Text
+</button>
+
+@code {
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public ButtonStyle Style { get; set; } = ButtonStyle.NotSet;
+
+    [Parameter]
+    public ButtonType Type { get; set; } = ButtonType.NotSet;
+
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string GetButtonClass()
+    {
+        switch (Style)
+        {
+            case ButtonStyle.Primary:
+                return "btn btn-primary";
+            case ButtonStyle.Secondary:
+                return "btn btn-secondary";
+            default:
+                return "btn";
+        }
+    }
+
+    private string GetButtonType()
+    {
+        switch (Type)
+        {
+            case ButtonType.Submit:
+                return "submit";
+            default:
+                return "button";
+        }
+    }
+}

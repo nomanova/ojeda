@@ -1,0 +1,40 @@
+@using System.Linq.Expressions
+
+<div class="mb-3">
+    <label for="@ForId" class="form-label">@(GetLabel())</label>
+    @ChildContent
+    @if (!string.IsNullOrEmpty(HelpText))
+    {
+        <div class="form-text">@HelpText</div>
+    }
+    @if (ValidateFor != null)
+    {
+        <ValidationMessage For="ValidateFor"></ValidationMessage>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string ForId { get; set; }
+    
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string HelpText { get; set; }
+    
+    [Parameter]
+    public bool IsRequired { get; set; }
+
+    [Parameter]
+    public Expression<Func<object>> ValidateFor { get; set; }
+    
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    private string GetLabel()
+    {
+        return IsRequired ? $"{Label}*" : Label;
+    }
+}

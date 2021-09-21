@@ -2,7 +2,8 @@ using AutoMapper;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
@@ -15,7 +16,7 @@ namespace NomaNova.Ojeda.Services.Fields
             CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>();
 
             // Dto -> Domain
-            CreateMap<FieldDto, Field>();
+            CreateMap<UpsertFieldDto, Field>();
         }
     }
 }

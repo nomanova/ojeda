@@ -1,36 +1,69 @@
 @page "/admin/fields/edit/{FieldId}"
 @layout AdminLayout
+@inherits FormPage<FieldDto>
 
-@inject NavigationManager NavManager
-@inject IToastService ToastService
-@inject OjedaClient Ojeda
-
-@{
-    var paths = new Dictionary<string, string>()
-    {
-        {"Admin", "/admin"},
-        {"Fields", "/admin/fields"},
-        {"Edit", null}
-    };
-}
-<Breadcrumb Paths="@paths" />
+<OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
 <h3>Edit Field</h3>
 
-@if (_isLoading)
-{
-    <p>Loading...</p>   
-}
-else
-{
-    <FieldForm Field="_field" OnSubmit="OnEdit"></FieldForm>    
-}
+<OjedaLoader IsLoading="_isLoading">
+
+    <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
+
+        <FluentValidationValidator/>
+        <ServerSideFluentValidation @ref="ServerValidation"/>
+
+        <div class="w-50 mb-4">
+
+            <!-- Name -->
+            <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _updateField.Name)">
+                <InputText @bind-Value="_updateField.Name" class="form-control" id="field-name" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+
+            <!-- Description -->
+            <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _updateField.Description)"
+                            HelpText="Optional, will be used as hint for the field input control.">
+                <InputText @bind-Value="_updateField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+
+            <!-- Type -->
+            <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
+                <InputSelect @bind-Value="_updateField.Type" class="form-control" id="field-type" disabled="@IsSubmitting">
+                    @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </InputSelect>
+            </OjedaFormField>
+
+        </div>
+
+        <OjedaFormFooter
+            IsSubmitting="@IsSubmitting"
+            OnCancel="@OnCancel"
+            OnReset="@OnReset"/>
+
+    </EditForm>
+
+</OjedaLoader>
 
 @code {
-    
+
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new() {Text = "Admin", Url = "/admin"},
+        new() {Text = "Fields", Url = "/admin/fields"},
+        new() {Text = "Edit"}
+    };
+
+    protected override string ReturnPath => "/admin/fields";
+
     private bool _isLoading;
-    private readonly FieldDto _field = new();
-    
+
+    private readonly UpdateFieldDto _updateField = new();
+
+    private FieldDto _field;
+
     [Parameter]
     public string FieldId { get; set; }
 
@@ -42,12 +75,8 @@ else
 
         if (result.Success)
         {
-            var fieldDto = result.Data;
-
-            _field.Id = fieldDto.Id;
-            _field.Name = fieldDto.Name;
-            _field.Description = fieldDto.Description;
-            _field.Type = fieldDto.Type;
+            _field = result.Data;
+            Init();
         }
         else
         {
@@ -58,8 +87,19 @@ else
         _isLoading = false;
     }
 
-    private async Task<OjedaDataResult<FieldDto>> OnEdit(FieldDto field)
+    protected override async Task<OjedaDataResult<FieldDto>> OnSubmitEntity()
     {
-        return await Ojeda.FieldsService.UpdateAsync(field.Id, field);
+        return await Ojeda.FieldsService.UpdateAsync(_field.Id, _updateField);
     }
+
+    protected override void Init()
+    {
+        _updateField.Name = _field.Name;
+        _updateField.Description = _field.Description;
+        _updateField.Type = _field.Type;
+
+        EditContext = new EditContext(_updateField);
+        EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
 }

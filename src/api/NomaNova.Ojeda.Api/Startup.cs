@@ -95,6 +95,8 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ITimeKeeper, TimeKeeper>();
             services.TryAddSingleton<ISerializer, Serializer>();
             
+            services.TryAddSingleton<IFieldValueConverter, FieldValueConverter>();
+            
             services.TryAddScoped<IFieldsService, FieldsService>();
             services.TryAddScoped<IFieldSetsService, FieldSetsService>();
             services.TryAddScoped<IAssetClassesService, AssetClassesService>();

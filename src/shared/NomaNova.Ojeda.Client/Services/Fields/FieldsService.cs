@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Fields;
+using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services.Fields
 {
@@ -46,13 +47,13 @@ namespace NomaNova.Ojeda.Client.Services.Fields
             return await SendForDataAsync<PaginatedListDto<FieldDto>>(HttpMethod.Get, path, null, cancellationToken);
         }
 
-        public async Task<OjedaDataResult<FieldDto>> CreateAsync(FieldDto field, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<FieldDto>> CreateAsync(CreateFieldDto field, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}";
             return await SendForDataAsync<FieldDto>(HttpMethod.Post, path, field, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, FieldDto field, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, UpdateFieldDto field, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<FieldDto>(HttpMethod.Put, path, field, cancellationToken);
