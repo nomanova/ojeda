@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 
-namespace NomaNova.Ojeda.Services.FieldSets
+namespace NomaNova.Ojeda.Services.FieldSets.Interfaces
 {
     public interface IFieldSetsService
     {
@@ -22,10 +21,10 @@ namespace NomaNova.Ojeda.Services.FieldSets
             CancellationToken cancellationToken = default);
         
         Task<FieldSetDto> CreateAsync(
-            FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
+            CreateFieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
 
         Task<FieldSetDto> UpdateAsync(
-            string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
+            string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken = default);
         
         Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     }

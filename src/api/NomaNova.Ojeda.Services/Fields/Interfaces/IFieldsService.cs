@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
 
-namespace NomaNova.Ojeda.Services.Fields
+namespace NomaNova.Ojeda.Services.Fields.Interfaces
 {
     public interface IFieldsService
     {

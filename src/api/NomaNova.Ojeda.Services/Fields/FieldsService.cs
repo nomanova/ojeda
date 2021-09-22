@@ -10,6 +10,8 @@ using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Services.Fields.Interfaces;
+using NomaNova.Ojeda.Services.Fields.Validators;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
@@ -63,7 +65,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
         public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken)
         {
-            await Validate(null, fieldDto, cancellationToken);
+            await Validate(new CreateFieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
 
             var field = _mapper.Map<Field>(fieldDto);
             field.Id = Guid.NewGuid().ToString();
@@ -83,7 +85,7 @@ namespace NomaNova.Ojeda.Services.Fields
                 throw new NotFoundException();
             }
 
-            await Validate(id, fieldDto, cancellationToken);
+            await Validate(new UpdateFieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;
@@ -103,11 +105,6 @@ namespace NomaNova.Ojeda.Services.Fields
             }
 
             await _fieldsRepository.DeleteAsync(field, cancellationToken);
-        }
-
-        private async Task Validate(string id, UpsertFieldDto fieldDto, CancellationToken cancellationToken)
-        {
-            await Validate(new FieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
         }
     }
 }

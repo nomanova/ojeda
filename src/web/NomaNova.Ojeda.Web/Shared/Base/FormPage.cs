@@ -66,7 +66,7 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             }
             else if (!result.Success)
             {
-                ToastService.ShowError($"Submit failed. {result.Error?.Message} ({result.Error?.Code}).");
+                ToastService.ShowError($"Could not submit item. {result.Error?.Message} ({result.Error?.Code}).");
             }
             else
             {

@@ -31,7 +31,7 @@ namespace NomaNova.Ojeda.Models.Shared.Validation
             
             var errorsFromOtherValidators = _otherValidators.SelectMany(x => x.Validate(context).Errors);
             
-            var combinedErrors = mainErrors.Concat(errorsFromOtherValidators);
+            var combinedErrors = mainErrors.Concat(errorsFromOtherValidators).Distinct();
 
             return new ValidationResult(combinedErrors);
         }
@@ -50,7 +50,7 @@ namespace NomaNova.Ojeda.Models.Shared.Validation
                 .SelectMany(_ => _.Errors)
                 .ToList();
             
-            var combinedErrors = mainErrors.Concat(errorsFromOtherValidators);
+            var combinedErrors = mainErrors.Concat(errorsFromOtherValidators).Distinct();
             
             return new ValidationResult(combinedErrors);
         }

@@ -81,7 +81,7 @@
         else
         {
             ToastService.ShowError($"Could not load field. {result.Error?.Message} ({result.Error?.Code}).");
-            NavManager.NavigateTo("/admin/fields");
+            NavManager.NavigateTo(ReturnPath);
         }
 
         _isLoading = false;
@@ -101,5 +101,4 @@
         EditContext = new EditContext(_updateField);
         EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
-
 }

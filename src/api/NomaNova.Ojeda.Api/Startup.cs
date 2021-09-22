@@ -23,7 +23,9 @@ using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Services.AssetClasses;
 using NomaNova.Ojeda.Services.Assets;
 using NomaNova.Ojeda.Services.Fields;
+using NomaNova.Ojeda.Services.Fields.Interfaces;
 using NomaNova.Ojeda.Services.FieldSets;
+using NomaNova.Ojeda.Services.FieldSets.Interfaces;
 
 namespace NomaNova.Ojeda.Api
 {

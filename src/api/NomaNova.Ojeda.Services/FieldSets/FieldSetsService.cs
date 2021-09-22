@@ -10,9 +10,10 @@ using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Extensions;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Services.FieldSets.Interfaces;
+using NomaNova.Ojeda.Services.FieldSets.Validators;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {
@@ -90,9 +91,10 @@ namespace NomaNova.Ojeda.Services.FieldSets
         }
 
         public async Task<FieldSetDto> CreateAsync(
-            FieldSetDto fieldSetDto, CancellationToken cancellationToken)
+            CreateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
-            await Validate(null, fieldSetDto, cancellationToken);
+            await Validate(new CreateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository), 
+                fieldSetDto, cancellationToken);
 
             var fieldSetId = Guid.NewGuid().ToString();
 
@@ -111,7 +113,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
         }
 
         public async Task<FieldSetDto> UpdateAsync(
-            string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken)
+            string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, query =>
             {
@@ -123,8 +125,9 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 throw new NotFoundException();
             }
 
-            await Validate(id, fieldSetDto, cancellationToken);
-
+            await Validate(new UpdateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, id), 
+                fieldSetDto, cancellationToken);
+            
             fieldSet = _mapper.Map(fieldSetDto, fieldSet);
             fieldSet.Id = id;
 
@@ -146,12 +149,6 @@ namespace NomaNova.Ojeda.Services.FieldSets
             }
             
             await _fieldSetsRepository.DeleteAsync(fieldSet, cancellationToken);
-        }
-        
-        private async Task Validate(string id, FieldSetDto fieldSetDto, CancellationToken cancellationToken)
-        {
-            fieldSetDto.Id = id;
-            await Validate(new FieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository), fieldSetDto, cancellationToken);
         }
     }
 }

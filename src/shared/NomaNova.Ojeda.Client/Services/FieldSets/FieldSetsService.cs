@@ -48,13 +48,13 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             return await SendForDataAsync<PaginatedListDto<FieldSetDto>>(HttpMethod.Get, path, null, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<FieldSetDto>> CreateAsync(FieldSetDto fieldSet, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<FieldSetDto>> CreateAsync(CreateFieldSetDto fieldSet, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}";
             return await SendForDataAsync<FieldSetDto>(HttpMethod.Post, path, fieldSet, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<FieldSetDto>> UpdateAsync(string id, FieldSetDto fieldSet, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<FieldSetDto>> UpdateAsync(string id, UpdateFieldSetDto fieldSet, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<FieldSetDto>(HttpMethod.Put, path, fieldSet, cancellationToken);

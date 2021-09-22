@@ -1,20 +1,12 @@
-using System.Collections.Generic;
+using NomaNova.Ojeda.Models.Dtos.FieldSets.Base;
 
 namespace NomaNova.Ojeda.Models.Dtos.FieldSets
 {
-    public class CreateFieldSetDto
+    public class CreateFieldSetDto : UpsertFieldSetDto<CreateFieldSetFieldDto>
     {
-        public string Name { get; set; }
-        
-        public string Description { get; set; }
-        
-        public List<CreateFieldSetFieldDto> Fields { get; set; }
     }
-
-    public class CreateFieldSetFieldDto
+    
+    public class CreateFieldSetFieldDto : UpsertFieldSetFieldDto
     {
-        public string Id { get; set; }
-        
-        public int Order { get; set; }
     }
 }

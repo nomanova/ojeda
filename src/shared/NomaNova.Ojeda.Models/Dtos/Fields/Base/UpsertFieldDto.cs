@@ -1,16 +1,9 @@
 using NomaNova.Ojeda.Models.Shared.Interfaces;
 
-namespace NomaNova.Ojeda.Models.Dtos.Fields
+namespace NomaNova.Ojeda.Models.Dtos.Fields.Base
 {
-    public enum FieldTypeDto
+    public abstract class UpsertFieldDto : INamedDto
     {
-        Text
-    }
-    
-    public class FieldDto : IIdentityDto, INamedDto
-    {
-        public string Id { get; set; }
-        
         public string Name { get; set; }
         
         public string Description { get; set; }

@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.FieldSets;
+using NomaNova.Ojeda.Services.FieldSets.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers
@@ -79,10 +78,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(typeof(FieldSetDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
-            [FromBody] FieldSetDto fieldSetDto, 
+            [FromBody] CreateFieldSetDto createFieldSetDto, 
             CancellationToken cancellationToken = default)
         {
-            fieldSetDto = await _fieldSetsService.CreateAsync(fieldSetDto, cancellationToken);
+            var fieldSetDto = await _fieldSetsService.CreateAsync(createFieldSetDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = fieldSetDto.Id }, fieldSetDto);
         }
 
@@ -98,10 +97,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,
-            [FromBody] FieldSetDto fieldSetDto,
+            [FromBody] UpdateFieldSetDto updateFieldSetDto,
             CancellationToken cancellationToken = default)
         {
-            fieldSetDto = await _fieldSetsService.UpdateAsync(id, fieldSetDto, cancellationToken);
+            var fieldSetDto = await _fieldSetsService.UpdateAsync(id, updateFieldSetDto, cancellationToken);
             return Ok(fieldSetDto);
         }
         

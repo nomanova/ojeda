@@ -4,7 +4,7 @@
 
 @inject OjedaClient Ojeda
 
-<OjedaBreadcrumb Data="@_breadcrumbItems" />
+<OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
 <h3>Field Sets</h3>
 
@@ -13,17 +13,21 @@
     <div class="d-flex">
         <div style="width: 350px;">
             <Search OnValueChanged="@OnSearchAsync"></Search>
-            </div>
-        <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Field Set</button>
+        </div>
+
+        <div class="ms-2">
+            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Field Set"/>
+        </div>
+
     </div>
-        
-        <Spinner IsLoading="@IsLoading" />
-    
+
+    <Spinner IsLoading="@IsLoading"/>
+
 </div>
 
 @if (Items == null)
 {
-    <p class="text-muted fst-italic">Loading...</p>   
+    <p class="text-muted fst-italic">Loading...</p>
 }
 else if (!Items.Any())
 {
@@ -38,8 +42,8 @@ else if (!Items.Any())
 }
 else
 {
-    <ActionsTableTemplate TItem="FieldSetDto" 
-                          Items="@Items" 
+    <ActionsTableTemplate TItem="FieldSetDto"
+                          Items="@Items"
                           EditItemCallBack="@OnEdit"
                           DeleteItemCallBack="@OnDelete">
         <TableHeader>
@@ -49,7 +53,9 @@ else
         </TableHeader>
         <RowTemplate Context="fieldSet">
             <td>@fieldSet.Name</td>
-            <td><Description Value="@fieldSet.Description"/></td>
+            <td>
+                <Description Value="@fieldSet.Description"/>
+            </td>
             <td>@fieldSet.Fields.Count</td>
         </RowTemplate>
     </ActionsTableTemplate>
@@ -61,18 +67,18 @@ else
             PageSize="@PageSize"
             TotalCount="@TotalCount"
             OnPageChanged="@OnPageChanged"
-            OnPageSizeChanged="@OnPageSizeChanged" />
+            OnPageSizeChanged="@OnPageSizeChanged"/>
     </div>
 }
 
 @code {
-    
+
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new () {Text = "Admin", Url = "/admin"},
-        new () {Text = "Field Sets"}
+        new() {Text = "Admin", Url = "/admin"},
+        new() {Text = "Field Sets"}
     };
-    
+
     protected override string Path => "/admin/field-sets";
 
     protected override async Task<OjedaResult> DeleteItemAsync(FieldSetDto item)
@@ -86,4 +92,5 @@ else
     {
         return await Ojeda.FieldSetsService.GetAsync(query, null, true, null, pageNumber, pageSize);
     }
+
 }

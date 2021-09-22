@@ -23,12 +23,12 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<FieldSetDto>> CreateAsync(
-            FieldSetDto fieldSet,
+            CreateFieldSetDto fieldSet,
             CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<FieldSetDto>> UpdateAsync(
             string id, 
-            FieldSetDto fieldSet,
+            UpdateFieldSetDto fieldSet,
             CancellationToken cancellationToken = default);
 
         Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);

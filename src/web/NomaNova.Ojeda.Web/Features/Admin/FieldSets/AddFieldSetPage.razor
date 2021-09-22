@@ -1,26 +1,140 @@
 @page "/admin/field-sets/add"
 @layout AdminLayout
+@inherits FieldSetPage<CreateFieldSetDto, CreateFieldSetFieldDto>
 
-@inject OjedaClient Ojeda
-
-<OjedaBreadcrumb Data="@_breadcrumbItems" />
+<OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
 <h3>Add Field Set</h3>
 
-<FieldSetForm OnSubmit="@OnAdd"></FieldSetForm>
+<EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
+
+    <FluentValidationValidator/>
+    <ServerSideFluentValidation @ref="ServerValidation"/>
+
+    <div class="w-50 mb-4">
+
+        <!-- Name -->
+        <OjedaFormField ForId="fieldset-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertFieldSet.Name)">
+            <InputText @bind-Value="UpsertFieldSet.Name" class="form-control" id="fieldset-name" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Description -->
+        <OjedaFormField ForId="fieldset-description" Label="Description" ValidateFor="@(() => UpsertFieldSet.Description)">
+            <InputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Fields -->
+        <div class="mb-3">
+            <div class="d-flex justify-content-between">
+                <label class="form-label">Fields*</label>
+                <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
+            </div>
+
+            <div>
+                @if (UpsertFieldSet.Fields?.Count > 0)
+                {
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="py-2"><!-- Move up --></th>
+                            <th class="py-2"><!-- Move down --></th>
+                            <th class="py-2">Name</th>
+                            <th class="py-2">Description</th>
+                            <th class="py-2">Type</th>
+                            <th class="py-2"><!-- Remove --></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var fieldSetField in UpsertFieldSet.Fields)
+                        {
+                            <tr>
+                                <td class="pb-2 pr-0">
+                                    @if (fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)
+                                    {
+                                        <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldUp(fieldSetField))">
+                                            <i class="fs-6 bi-arrow-up-circle"></i>
+                                        </a>
+                                    }
+                                </td>
+                                <td class="pb-2 pr-0">
+                                    @if (fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)
+                                    {
+                                        <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldDown(fieldSetField))">
+                                            <i class="fs-6 bi-arrow-down-circle"></i>
+                                        </a>
+                                    }
+                                </td>
+                                <td class="pb-2 pr-3">@(GetFieldName(fieldSetField.Id))</td>
+                                <td class="pb-2 pr-3">
+                                    @if (string.IsNullOrEmpty(GetFieldDescription(fieldSetField.Id)))
+                                    {
+                                        <span class="text-muted fst-italic">No description</span>
+                                    }
+                                    else
+                                    {
+                                        @GetFieldDescription(fieldSetField.Id)
+                                    }
+                                </td>
+                                <td class="pb-2 pr-3">@(GetFieldType(fieldSetField.Id))</td>
+                                <td class="pb-2 pr-3">
+                                    <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(fieldSetField))">
+                                        <i class="fs-6 bi-x-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">Use the link on the right to start adding fields.</p>
+                }
+                <ValidationMessage For="@(() => UpsertFieldSet.Fields)"></ValidationMessage>
+            </div>
+        </div>
+
+    </div>
+
+    <OjedaFormFooter
+        IsSubmitting="@IsSubmitting"
+        OnCancel="@OnCancel"
+        OnReset="@OnReset"/>
+
+</EditForm>
+
 
 @code {
-    
+
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new () {Text = "Admin", Url = "/admin"},
-        new () {Text = "Field Sets", Url = "/admin/field-sets"},
-        new () {Text = "Add"}
+        new() {Text = "Admin", Url = "/admin"},
+        new() {Text = "Field Sets", Url = "/admin/field-sets"},
+        new() {Text = "Add"}
     };
-    
-    private async Task<OjedaDataResult<FieldSetDto>> OnAdd(FieldSetDto fieldSet)
+
+    protected override CreateFieldSetDto UpsertFieldSet { get; set; }
+
+    protected override void OnInitialized()
     {
-        return await Ojeda.FieldSetsService.CreateAsync(fieldSet);
+        Init();
+    }
+
+    protected override async Task<OjedaDataResult<FieldSetDto>> OnSubmitEntity()
+    {
+        return await Ojeda.FieldSetsService.CreateAsync(UpsertFieldSet);
+    }
+
+    protected override void Init()
+    {
+        UpsertFieldSet = new CreateFieldSetDto
+        {
+            Fields = new List<CreateFieldSetFieldDto>()
+        };
+        Fields = new List<FieldDto>();
+
+        EditContext = new EditContext(UpsertFieldSet);
+        EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
 
 }
