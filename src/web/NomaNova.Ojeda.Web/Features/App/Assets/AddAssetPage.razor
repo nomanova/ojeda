@@ -1,6 +1,4 @@
 @page "/assets/add"
-@using System.Net
-@using NomaNova.Ojeda.Models.Assets
 
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -27,8 +25,8 @@ else
                     <h5>Class</h5>
                 </div>
                 <div class="col-8">
-                    <p>@_asset.AssetClass.Name</p>
-                    <span class="text-muted fst-italic">@_asset.AssetClass.Description</span>
+                    <p>@_asset.AssetType.Name</p>
+                    <span class="text-muted fst-italic">@_asset.AssetType.Description</span>
                 </div>
             </div>
         </div>
@@ -87,9 +85,9 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        NavManager.TryGetQueryString<string>("assetClassId", out var assetClassId);
+        NavManager.TryGetQueryString<string>("assetTypeId", out var assetTypeId);
 
-        await GetAssetClass(assetClassId);
+        await GetAssetType(assetTypeId);
     }
 
     private async Task OnSubmitForm()
@@ -132,17 +130,17 @@ else
         NavManager.NavigateTo("/assets");
     }
     
-    private async Task GetAssetClass(string assetClassId)
+    private async Task GetAssetType(string assetTypeId)
     {
-        if (string.IsNullOrEmpty(assetClassId))
+        if (string.IsNullOrEmpty(assetTypeId))
         {
-            _error = "Cannot load asset: asset class id is missing.";
+            _error = "Cannot load asset: asset type id is missing.";
             return;
         }
 
         _isLoading = true;
         
-        var result = await Ojeda.AssetsService.GetByAssetClass(assetClassId);
+        var result = await Ojeda.AssetsService.GetByAssetType(assetTypeId);
 
         if (result.Success)
         {
@@ -154,11 +152,11 @@ else
         }
         else if (result.StatusCode == HttpStatusCode.NotFound)
         {
-            _error = "Cannot load asset: asset class does not exist.";
+            _error = "Cannot load asset: asset type does not exist.";
         }
         else
         {
-            ToastService.ShowError($"Could not load asset class. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError($"Could not load asset type. {result.Error?.Message} ({result.Error?.Code}).");
             NavManager.NavigateTo("/assets");
         }
 

@@ -3,10 +3,30 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace NomaNova.Ojeda.Data.Migrations
 {
-    public partial class InitFieldValues : Migration
+    public partial class InitAssets : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Assets",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    AssetTypeId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Assets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Assets_AssetTypes_AssetTypeId",
+                        column: x => x.AssetTypeId,
+                        principalTable: "AssetTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateTable(
                 name: "FieldValues",
                 columns: table => new
@@ -41,6 +61,11 @@ namespace NomaNova.Ojeda.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assets_AssetTypeId",
+                table: "Assets",
+                column: "AssetTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FieldValues_AssetId",
                 table: "FieldValues",
                 column: "AssetId");
@@ -60,6 +85,9 @@ namespace NomaNova.Ojeda.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "FieldValues");
+
+            migrationBuilder.DropTable(
+                name: "Assets");
         }
     }
 }

@@ -19,7 +19,7 @@ namespace NomaNova.Ojeda.Data.Migrations
                 .HasAnnotation("ProductVersion", "5.0.7")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClass", b =>
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -38,25 +38,25 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AssetClasses");
+                    b.ToTable("AssetTypes");
                 });
 
-            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClassFieldSet", b =>
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetTypeFieldSet", b =>
                 {
                     b.Property<string>("FieldSetId")
                         .HasColumnType("text");
 
-                    b.Property<string>("AssetClassId")
+                    b.Property<string>("AssetTypeId")
                         .HasColumnType("text");
 
                     b.Property<long>("Order")
                         .HasColumnType("bigint");
 
-                    b.HasKey("FieldSetId", "AssetClassId");
+                    b.HasKey("FieldSetId", "AssetTypeId");
 
-                    b.HasIndex("AssetClassId");
+                    b.HasIndex("AssetTypeId");
 
-                    b.ToTable("AssetClassFieldSets");
+                    b.ToTable("AssetTypeFieldSets");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
@@ -64,7 +64,7 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<string>("AssetClassId")
+                    b.Property<string>("AssetTypeId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
@@ -75,7 +75,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssetClassId");
+                    b.HasIndex("AssetTypeId");
 
                     b.ToTable("Assets");
                 });
@@ -174,33 +174,33 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.ToTable("Fields");
                 });
 
-            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClassFieldSet", b =>
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetTypeFieldSet", b =>
                 {
-                    b.HasOne("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClass", "AssetClass")
-                        .WithMany("AssetClassFieldSets")
-                        .HasForeignKey("AssetClassId")
+                    b.HasOne("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", "AssetType")
+                        .WithMany("AssetTypeFieldSets")
+                        .HasForeignKey("AssetTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NomaNova.Ojeda.Core.Domain.FieldSets.FieldSet", "FieldSet")
-                        .WithMany("AssetClassFieldSets")
+                        .WithMany("AssetTypeFieldSets")
                         .HasForeignKey("FieldSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssetClass");
+                    b.Navigation("AssetType");
 
                     b.Navigation("FieldSet");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
                 {
-                    b.HasOne("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClass", "AssetClass")
+                    b.HasOne("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", "AssetType")
                         .WithMany("Assets")
-                        .HasForeignKey("AssetClassId")
+                        .HasForeignKey("AssetTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("AssetClass");
+                    b.Navigation("AssetType");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.FieldValue", b =>
@@ -244,11 +244,11 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Navigation("FieldSet");
                 });
 
-            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetClasses.AssetClass", b =>
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", b =>
                 {
-                    b.Navigation("AssetClassFieldSets");
-
                     b.Navigation("Assets");
+
+                    b.Navigation("AssetTypeFieldSets");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
@@ -258,7 +258,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.FieldSets.FieldSet", b =>
                 {
-                    b.Navigation("AssetClassFieldSets");
+                    b.Navigation("AssetTypeFieldSets");
 
                     b.Navigation("FieldSetFields");
                 });

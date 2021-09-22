@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Assets;
 
@@ -38,17 +38,17 @@ namespace NomaNova.Ojeda.Api.Controllers
         }
         
         /// <summary>
-        /// Get asset scaffold by asset class id
+        /// Get asset scaffold by asset type id
         /// </summary>
         [HttpGet("new")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByAssetClass(
-            [FromQuery] string assetClassId,
+        public async Task<IActionResult> GetByAssetType(
+            [FromQuery] string assetTypeId,
             CancellationToken cancellationToken = default)
         {
-            var assetDto = await _assetsService.GetByAssetClassAsync(assetClassId, cancellationToken);
+            var assetDto = await _assetsService.GetByAssetTypeAsync(assetTypeId, cancellationToken);
             return Ok(assetDto);
         }
         

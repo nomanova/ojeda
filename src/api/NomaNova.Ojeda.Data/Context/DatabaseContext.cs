@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
 using NomaNova.Ojeda.Core.Domain.Assets;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Core.Helpers.Interfaces;
@@ -18,9 +18,9 @@ namespace NomaNova.Ojeda.Data.Context
         
         public DbSet<FieldSetField> FieldSetFields { get; set; }
 
-        public DbSet<AssetClass> AssetClasses { get; set; }
+        public DbSet<AssetType> AssetTypes { get; set; }
         
-        public DbSet<AssetClassFieldSet> AssetClassFieldSets { get; set; }
+        public DbSet<AssetTypeFieldSet> AssetTypeFieldSets { get; set; }
 
         public DbSet<Asset> Assets { get; set; }
         
@@ -59,7 +59,7 @@ namespace NomaNova.Ojeda.Data.Context
             
             BuildForFields(builder);
             BuildForFieldSets(builder);
-            BuildForAssetClasses(builder);
+            BuildForAssetTypes(builder);
             BuildForAssets(builder);
         }
 
@@ -102,26 +102,26 @@ namespace NomaNova.Ojeda.Data.Context
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
-        private static void BuildForAssetClasses(ModelBuilder builder)
+        private static void BuildForAssetTypes(ModelBuilder builder)
         {
-            // AssetClass
-            builder.Entity<AssetClass>()
+            // AssetType
+            builder.Entity<AssetType>()
                 .HasKey(_ => _.Id);
             
-            // AssetClassFieldSet
-            builder.Entity<AssetClassFieldSet>()
-                .HasKey(_ => new {_.FieldSetId, _.AssetClassId});
+            // AssetTypeFieldSet
+            builder.Entity<AssetTypeFieldSet>()
+                .HasKey(_ => new {_.FieldSetId, _.AssetTypeId});
             
-            builder.Entity<AssetClassFieldSet>()
+            builder.Entity<AssetTypeFieldSet>()
                 .HasOne(_ => _.FieldSet)
-                .WithMany(_ => _.AssetClassFieldSets)
+                .WithMany(_ => _.AssetTypeFieldSets)
                 .HasForeignKey(_ => _.FieldSetId)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            builder.Entity<AssetClassFieldSet>()
-                .HasOne(_ => _.AssetClass)
-                .WithMany(_ => _.AssetClassFieldSets)
-                .HasForeignKey(_ => _.AssetClassId)
+            builder.Entity<AssetTypeFieldSet>()
+                .HasOne(_ => _.AssetType)
+                .WithMany(_ => _.AssetTypeFieldSets)
+                .HasForeignKey(_ => _.AssetTypeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
 
@@ -130,23 +130,23 @@ namespace NomaNova.Ojeda.Data.Context
             // Asset
             builder.Entity<Asset>()
                 .HasKey(_ => _.Id);
-
+        
             builder.Entity<Asset>()
-                .HasOne(_ => _.AssetClass)
+                .HasOne(_ => _.AssetType)
                 .WithMany(_ => _.Assets)
-                .HasForeignKey(_ => _.AssetClassId)
+                .HasForeignKey(_ => _.AssetTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             // FieldValue
             builder.Entity<FieldValue>()
                 .HasKey(_ => _.Id);
-
+        
             builder.Entity<FieldValue>()
                 .HasOne(_ => _.Asset)
                 .WithMany(_ => _.FieldValues)
                 .HasForeignKey(_ => _.AssetId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+        
             builder.Entity<FieldValue>()
                 .HasOne(_ => _.FieldSet);
             

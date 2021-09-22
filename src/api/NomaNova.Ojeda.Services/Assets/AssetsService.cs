@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Exceptions;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
 using NomaNova.Ojeda.Core.Domain.Assets;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.AssetClasses;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
+using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
@@ -22,7 +22,7 @@ namespace NomaNova.Ojeda.Services.Assets
     {
         private readonly IMapper _mapper;
         private readonly IRepository<Asset> _assetsRepository;
-        private readonly IRepository<AssetClass> _assetClassesRepository;
+        private readonly IRepository<AssetType> _assetTypesRepository;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
         private readonly IFieldValueConverter _fieldValueConverter;
@@ -30,33 +30,33 @@ namespace NomaNova.Ojeda.Services.Assets
         public AssetsService(
             IMapper mapper,
             IRepository<Asset> assetsRepository,
-            IRepository<AssetClass> assetClassesRepository,
+            IRepository<AssetType> assetTypesRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<Field> fieldsRepository,
             IFieldValueConverter fieldValueConverter)
         {
             _mapper = mapper;
             _assetsRepository = assetsRepository;
-            _assetClassesRepository = assetClassesRepository;
+            _assetTypesRepository = assetTypesRepository;
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
             _fieldValueConverter = fieldValueConverter;
         }
 
-        public async Task<AssetDto> GetByAssetClassAsync(string assetClassId, CancellationToken cancellationToken)
+        public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken)
         {
-            var assetClass = await _assetClassesRepository.GetByIdAsync(assetClassId, query =>
+            var assetType = await _assetTypesRepository.GetByIdAsync(assetTypeId, query =>
             {
                 return query
-                    .Include(s => s.AssetClassFieldSets);
+                    .Include(s => s.AssetTypeFieldSets);
             }, cancellationToken);
             
-            if (assetClass == null)
+            if (assetType == null)
             {
                 throw new NotFoundException();
             }
             
-            return await AssetClassToAssetDto(assetClass, null, cancellationToken);
+            return await AssetTypeToAssetDto(assetType, null, cancellationToken);
         }
 
         public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -64,8 +64,8 @@ namespace NomaNova.Ojeda.Services.Assets
             var asset = await _assetsRepository.GetByIdAsync(id, query =>
             {
                 return query
-                    .Include(s => s.AssetClass)
-                    .ThenInclude(f => f.AssetClassFieldSets)
+                    .Include(s => s.AssetType)
+                    .ThenInclude(f => f.AssetTypeFieldSets)
                     .Include(a => a.FieldValues);
             }, cancellationToken);
             
@@ -74,10 +74,10 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new NotFoundException();
             }
 
-            var assetClass = asset.AssetClass;
+            var assetType = asset.AssetType;
             var fieldValues = asset.FieldValues;
 
-            var assetDto = await AssetClassToAssetDto(assetClass, (fieldSetId, fieldId, fieldType) =>
+            var assetDto = await AssetTypeToAssetDto(assetType, (fieldSetId, fieldId, fieldType) =>
             {
                 var fieldValue = fieldValues.FirstOrDefault(_ => _.FieldSetId.Equals(fieldSetId) && _.FieldId.Equals(fieldId));
                 var byteValue = fieldValue?.Value;
@@ -223,18 +223,18 @@ namespace NomaNova.Ojeda.Services.Assets
             assetDto.Id = id;
             
             await Validate(
-                new AssetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, _assetClassesRepository), 
+                new AssetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, _assetTypesRepository), 
                 assetDto, 
                 cancellationToken);
         }
         
-        private async Task<AssetDto> AssetClassToAssetDto(
-            AssetClass assetClass, 
+        private async Task<AssetDto> AssetTypeToAssetDto(
+            AssetType assetType, 
             Func<string, string, FieldType, string> fieldValueResolver, 
             CancellationToken cancellationToken)
         {
             // Field sets
-            var fieldSetIds = assetClass.AssetClassFieldSets
+            var fieldSetIds = assetType.AssetTypeFieldSets
                 .Select(_ => _.FieldSetId)
                 .ToList();
 
@@ -260,21 +260,21 @@ namespace NomaNova.Ojeda.Services.Assets
             var assetDto = new AssetDto
             {
                 Id = null,
-                AssetClass = _mapper.Map<AssetClassSummaryDto>(assetClass)
+                AssetType = _mapper.Map<AssetTypeSummaryDto>(assetType)
             };
 
-            foreach (var assetClassFieldSet in assetClass.AssetClassFieldSets)
+            foreach (var assetTypeFieldSet in assetType.AssetTypeFieldSets)
             {
-                var fieldSetId = assetClassFieldSet.FieldSetId;
+                var fieldSetId = assetTypeFieldSet.FieldSetId;
                 var fieldSet = fieldSets.FirstOrDefault(_ => _.Id.Equals(fieldSetId));
                 
                 if (fieldSet == null)
                 {
-                    throw new Exception($"Field set {fieldSetId} does not belong to asset class {assetClassFieldSet.AssetClassId}");
+                    throw new Exception($"Field set {fieldSetId} does not belong to asset type {assetTypeFieldSet.AssetTypeId}");
                 }
                 
                 var fieldSetDto = _mapper.Map<AssetFieldSetDto>(fieldSet);
-                fieldSetDto.Order = assetClassFieldSet.Order;
+                fieldSetDto.Order = assetTypeFieldSet.Order;
 
                 foreach (var fieldSetField in fieldSet.FieldSetFields)
                 {

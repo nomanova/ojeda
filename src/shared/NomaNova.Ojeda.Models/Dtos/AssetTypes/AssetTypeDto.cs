@@ -4,9 +4,9 @@ using FluentValidation;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared.Interfaces;
 
-namespace NomaNova.Ojeda.Models.AssetClasses
+namespace NomaNova.Ojeda.Models.Dtos.AssetTypes
 {
-    public class AssetClassSummaryDto : IIdentityDto, INamedDto
+    public class AssetTypeSummaryDto : IIdentityDto, INamedDto
     {
         public string Id { get; set; }
         
@@ -15,14 +15,14 @@ namespace NomaNova.Ojeda.Models.AssetClasses
         public string Description { get; set; }   
     }
 
-    public class AssetClassDto : AssetClassSummaryDto
+    public class AssetTypeDto : AssetTypeSummaryDto
     {
-        public List<AssetClassFieldSetDto> FieldSets { get; set; } = new();
+        public List<AssetTypeFieldSetDto> FieldSets { get; set; } = new();
     }
 
-    public class AssetClassDtoValidator : AbstractValidator<AssetClassDto>
+    public class AssetTypeDtoValidator : AbstractValidator<AssetTypeDto>
     {
-        public AssetClassDtoValidator()
+        public AssetTypeDtoValidator()
         {
             RuleFor(_ =>  _.Name).NotEmpty();
             RuleFor(_ =>  _.Name).MaximumLength(40);
@@ -35,20 +35,20 @@ namespace NomaNova.Ojeda.Models.AssetClasses
                 return fieldSetIds.Count == fieldSetIds.Distinct().Count();
             }).WithMessage("A field set must not be added more than once.");
             
-            RuleForEach(_ => _.FieldSets).SetValidator(new AssetClassFieldSetDtoValidator());
+            RuleForEach(_ => _.FieldSets).SetValidator(new AssetTypeFieldSetDtoValidator());
         }
     }
 
-    public class AssetClassFieldSetDto
+    public class AssetTypeFieldSetDto
     {
         public int Order { get; set; }
 
         public FieldSetSummaryDto FieldSet { get; set; }
     }
 
-    public class AssetClassFieldSetDtoValidator : AbstractValidator<AssetClassFieldSetDto>
+    public class AssetTypeFieldSetDtoValidator : AbstractValidator<AssetTypeFieldSetDto>
     {
-        public AssetClassFieldSetDtoValidator()
+        public AssetTypeFieldSetDtoValidator()
         {
             RuleFor(_ => _.Order).GreaterThanOrEqualTo(0);
             RuleFor(_ => _.FieldSet.Id).NotEmpty().WithMessage("Field set id is missing.");

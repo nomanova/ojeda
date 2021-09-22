@@ -1,0 +1,25 @@
+@page "/admin/asset-types/add"
+@layout AdminLayout
+
+@inject OjedaClient Ojeda
+
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
+
+<h3>Add Asset Type</h3>
+
+<AssetTypeForm OnSubmit="@OnAdd"></AssetTypeForm>
+
+@code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Asset Types", Url = "/admin/asset-types"},
+        new () {Text = "Add"}
+    };
+    
+    private async Task<OjedaDataResult<AssetTypeDto>> OnAdd(AssetTypeDto assetType)
+    {
+        return await Ojeda.AssetTypesService.CreateAsync(assetType);
+    }
+}

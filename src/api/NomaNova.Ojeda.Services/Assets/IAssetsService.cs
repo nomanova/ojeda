@@ -1,15 +1,14 @@
 using System.Threading;
 using System.Threading.Tasks;
-using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
     public interface IAssetsService
     {
-        Task<AssetDto> GetByAssetClassAsync(
-            string assetClassId, CancellationToken cancellationToken = default);
+        Task<AssetDto> GetByAssetTypeAsync(
+            string assetTypeId, CancellationToken cancellationToken = default);
         
         Task<AssetDto> GetByIdAsync(
             string id, CancellationToken cancellationToken = default);

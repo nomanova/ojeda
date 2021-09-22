@@ -1,12 +1,12 @@
-@page "/admin/asset-classes"
+@page "/admin/asset-types"
 @layout AdminLayout
-@inherits ListItemsPage<AssetClassDto>
+@inherits ListItemsPage<AssetTypeDto>
 
 @inject OjedaClient Ojeda
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-<h3>Asset Classes</h3>
+<h3>Asset Types</h3>
 
 <div class="d-flex justify-content-between my-3">
 
@@ -16,7 +16,7 @@
         </div>
 
         <div class="ms-2">
-            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Class"/>
+            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Type"/>
         </div>
 
     </div>
@@ -41,7 +41,7 @@ else if (!Items.Any())
 }
 else
 {
-    <ActionsTableTemplate TItem="AssetClassDto"
+    <ActionsTableTemplate TItem="AssetTypeDto"
                           Items="@Items"
                           EditItemCallBack="@OnEdit"
                           DeleteItemCallBack="@OnDelete">
@@ -50,12 +50,12 @@ else
             <th>Description</th>
             <th># Field Sets</th>
         </TableHeader>
-        <RowTemplate Context="assetClass">
-            <td>@assetClass.Name</td>
+        <RowTemplate Context="assetType">
+            <td>@assetType.Name</td>
             <td>
-                <Description Value="@assetClass.Description"/>
+                <Description Value="@assetType.Description"/>
             </td>
-            <td>@assetClass.FieldSets.Count</td>
+            <td>@assetType.FieldSets.Count</td>
         </RowTemplate>
     </ActionsTableTemplate>
 
@@ -75,21 +75,21 @@ else
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new() {Text = "Admin", Url = "/admin"},
-        new() {Text = "Asset Classes"}
+        new() {Text = "Asset Types"}
     };
 
-    protected override string Path => "/admin/asset-classes";
+    protected override string Path => "/admin/asset-types";
 
-    protected override async Task<OjedaResult> DeleteItemAsync(AssetClassDto item)
+    protected override async Task<OjedaResult> DeleteItemAsync(AssetTypeDto item)
     {
-        return await Ojeda.AssetClassesService.DeleteAsync(item.Id);
+        return await Ojeda.AssetTypesService.DeleteAsync(item.Id);
     }
 
-    protected override async Task<OjedaDataResult<PaginatedListDto<AssetClassDto>>> FetchItemsAsync(string query = null,
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetTypeDto>>> FetchItemsAsync(string query = null,
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.AssetClassesService.GetAsync(query, null, true, pageNumber, pageSize);
+        return await Ojeda.AssetTypesService.GetAsync(query, null, true, pageNumber, pageSize);
     }
 
 }

@@ -1,0 +1,76 @@
+@page "/admin/asset-types/edit/{AssetTypeId}"
+@using NomaNova.Ojeda.Models.Dtos.FieldSets
+@layout AdminLayout
+
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+@inject OjedaClient Ojeda
+
+<OjedaBreadcrumb Data="@_breadcrumbItems" />
+
+<h3>Edit Asset Type</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>   
+}
+else
+{
+    <AssetTypeForm AssetType="@_assetType" OnSubmit="@OnEdit"></AssetTypeForm>    
+}
+
+@code {
+    
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new () {Text = "Admin", Url = "/admin"},
+        new () {Text = "Asset Types", Url = "/admin/asset-types"},
+        new () {Text = "Edit"}
+    };
+    
+    private bool _isLoading;
+    private readonly AssetTypeDto _assetType = new();
+    
+    [Parameter]
+    public string AssetTypeId { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        var result = await Ojeda.AssetTypesService.GetByIdAsync(AssetTypeId);
+
+        if (result.Success)
+        {
+            var assetTypeDto = result.Data;
+            
+            _assetType.Id = assetTypeDto.Id;
+            _assetType.Name = assetTypeDto.Name;
+            _assetType.Description = assetTypeDto.Description;
+            
+            _assetType.FieldSets.Clear();
+            _assetType.FieldSets.AddRange(assetTypeDto.FieldSets.Select(_ => new AssetTypeFieldSetDto
+            {
+                Order = _.Order,
+                FieldSet = new FieldSetSummaryDto
+                {
+                    Id = _.FieldSet.Id,
+                    Name = _.FieldSet.Name,
+                    Description = _.FieldSet.Description
+                }
+            }));
+        }
+        else
+        {
+            ToastService.ShowError($"Could not load asset type. {result.Error?.Message} ({result.Error?.Code}).");
+            NavManager.NavigateTo("/admin/asset-types");
+        }
+
+        _isLoading = false;
+    }
+    
+    private async Task<OjedaDataResult<AssetTypeDto>> OnEdit(AssetTypeDto assetType)
+    {
+        return await Ojeda.AssetTypesService.UpdateAsync(assetType.Id, assetType);
+    }
+}

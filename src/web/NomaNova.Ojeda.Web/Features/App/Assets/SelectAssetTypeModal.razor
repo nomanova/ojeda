@@ -1,10 +1,9 @@
-@using NomaNova.Ojeda.Models.Shared
-@inherits SelectItemModal<AssetClassDto>
+@inherits SelectItemModal<AssetTypeDto>
 
 @inject OjedaClient Ojeda
 
-<SelectItemModalTemplate TItem="AssetClassDto"
-                         HelpText="Select the <strong>asset class</strong> of the asset to add below."
+<SelectItemModalTemplate TItem="AssetTypeDto"
+                         HelpText="Select the <strong>asset type</strong> of the asset to add below."
                          Error="@Error"
                          IsLoading="@IsLoading"
                          SearchQuery="@SearchQuery"
@@ -19,21 +18,21 @@
         <th>Name</th>
         <th>Description</th>
     </TableHeader>
-    <RowTemplate Context="assetClass">
-        <td class="pb-2">@assetClass.Name.Truncate()</td>
-        <td class="pb-2"><Description Value="@assetClass.Description" /></td>
+    <RowTemplate Context="assetType">
+        <td class="pb-2">@assetType.Name.Truncate()</td>
+        <td class="pb-2"><Description Value="@assetType.Description" /></td>
     </RowTemplate>
 </SelectItemModalTemplate>
 
 @code {
     
-    protected override async Task<OjedaDataResult<PaginatedListDto<AssetClassDto>>> FetchItemsAsync(
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetTypeDto>>> FetchItemsAsync(
         string query = null,
         IList<string> excludedIds = null,
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.AssetClassesService.GetAsync(
+        return await Ojeda.AssetTypesService.GetAsync(
             query, null, true, pageNumber, pageSize);
     }
 }

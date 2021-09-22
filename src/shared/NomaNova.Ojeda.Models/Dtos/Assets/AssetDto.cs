@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using NomaNova.Ojeda.Models.AssetClasses;
+using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared.Interfaces;
 
-namespace NomaNova.Ojeda.Models.Assets
+namespace NomaNova.Ojeda.Models.Dtos.Assets
 {
     public class AssetSummaryDto : IIdentityDto
     {
         public string Id { get; set; }
 
-        public AssetClassSummaryDto AssetClass { get; set; }
+        public AssetTypeSummaryDto AssetType { get; set; }
     }
 
     public class AssetDto : AssetSummaryDto

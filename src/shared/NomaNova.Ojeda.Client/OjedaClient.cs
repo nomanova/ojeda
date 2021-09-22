@@ -1,6 +1,6 @@
 using System;
-using NomaNova.Ojeda.Client.Services.AssetClasses;
 using NomaNova.Ojeda.Client.Services.Assets;
+using NomaNova.Ojeda.Client.Services.AssetTypes;
 using NomaNova.Ojeda.Client.Services.Fields;
 using NomaNova.Ojeda.Client.Services.FieldSets;
 
@@ -30,7 +30,7 @@ namespace NomaNova.Ojeda.Client
 
             FieldsService = new FieldsService(_httpClient);
             FieldSetsService = new FieldSetsService(_httpClient);
-            AssetClassesService = new AssetClassesService(_httpClient);
+            AssetTypesService = new AssetTypesService(_httpClient);
             AssetsService = new AssetsService(_httpClient);
         }
 
@@ -38,7 +38,7 @@ namespace NomaNova.Ojeda.Client
         
         public IFieldSetsService FieldSetsService { get; private set; }
 
-        public IAssetClassesService AssetClassesService { get; private set; }
+        public IAssetTypesService AssetTypesService { get; private set; }
         
         public IAssetsService AssetsService { get; private set; }
 

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 
 namespace NomaNova.Ojeda.Core.Domain.Assets
 {
@@ -10,9 +10,9 @@ namespace NomaNova.Ojeda.Core.Domain.Assets
         
         public DateTime UpdatedAt { get; set; }
 
-        public string AssetClassId { get; set; }
+        public string AssetTypeId { get; set; }
         
-        public AssetClass AssetClass { get; set; }
+        public AssetType AssetType { get; set; }
 
         public virtual ICollection<FieldValue> FieldValues { get; set; }
     }

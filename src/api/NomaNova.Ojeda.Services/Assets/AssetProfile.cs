@@ -3,8 +3,7 @@ using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data;
-using NomaNova.Ojeda.Models;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Services.Assets
@@ -28,7 +27,7 @@ namespace NomaNova.Ojeda.Services.Assets
             
             // Dto -> Domain
             CreateMap<AssetDto, Asset>()
-                .ForMember(dest => dest.AssetClass, opt => opt.Ignore())
+                .ForMember(dest => dest.AssetType, opt => opt.Ignore())
                 .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
         }
     }

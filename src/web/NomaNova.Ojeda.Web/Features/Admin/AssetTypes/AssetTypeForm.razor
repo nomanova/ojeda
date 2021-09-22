@@ -11,16 +11,16 @@
     
     <!-- Name -->
     <div class="mb-3 w-50">
-        <label for="assetClassName" class="form-label">Name*</label>
-        <InputText @bind-Value="_assetClass.Name" class="form-control" id="assetClassName" disabled="@_isLoading"></InputText>
-        <ValidationMessage For="@(() => _assetClass.Name)"></ValidationMessage>
+        <label for="assetTypeName" class="form-label">Name*</label>
+        <InputText @bind-Value="_assetType.Name" class="form-control" id="assetTypeName" disabled="@_isLoading"></InputText>
+        <ValidationMessage For="@(() => _assetType.Name)"></ValidationMessage>
     </div>
     
     <!-- Description -->
     <div class="mb-3 w-50">
-        <label for="assetClassDescription" class="form-label">Description</label>
-        <InputText @bind-Value="_assetClass.Description" class="form-control" id="assetClassDescription" disabled="@_isLoading"></InputText>
-        <ValidationMessage For="@(() => _assetClass.Description)"></ValidationMessage>
+        <label for="assetTypeDescription" class="form-label">Description</label>
+        <InputText @bind-Value="_assetType.Description" class="form-control" id="assetTypeDescription" disabled="@_isLoading"></InputText>
+        <ValidationMessage For="@(() => _assetType.Description)"></ValidationMessage>
     </div>
 
     <!-- Field Sets -->
@@ -30,7 +30,7 @@
             <a class="btn-link @(_isLoading ? "disabled" : "")" role="button" @onclick="@OnAddFieldSet">Add Field Set</a>
         </div>
         <div>
-            @if (_assetClass.FieldSets?.Count > 0)
+            @if (_assetType.FieldSets?.Count > 0)
             {
                 <table class="table">
                     <thead>
@@ -43,38 +43,38 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var assetClassFieldSet in _assetClass.FieldSets.OrderBy(f => f.Order))
+                    @foreach (var assetTypeFieldSet in _assetType.FieldSets.OrderBy(f => f.Order))
                     {
                         <tr>
                             <td class="pb-2 pr-0">
-                                @if (assetClassFieldSet.Order != 1 && _assetClass.FieldSets.Count > 1)
+                                @if (assetTypeFieldSet.Order != 1 && _assetType.FieldSets.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldSetUp(assetClassFieldSet))">
+                                    <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldSetUp(assetTypeFieldSet))">
                                         <i class="fs-6 bi-arrow-up-circle"></i>
                                     </a>
                                 }
                             </td>
                             <td class="pb-2 pr-0">
-                                @if (assetClassFieldSet.Order != _assetClass.FieldSets.Count && _assetClass.FieldSets.Count > 1)
+                                @if (assetTypeFieldSet.Order != _assetType.FieldSets.Count && _assetType.FieldSets.Count > 1)
                                 {
-                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldSetDown(assetClassFieldSet))">
+                                    <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldSetDown(assetTypeFieldSet))">
                                         <i class="fs-6 bi-arrow-down-circle"></i>
                                     </a>
                                 }
                             </td>
-                            <td class="pb-2 pr-3">@assetClassFieldSet.FieldSet.Name.Truncate()</td>
+                            <td class="pb-2 pr-3">@assetTypeFieldSet.FieldSet.Name.Truncate()</td>
                             <td class="pb-2 pr-3">
-                                @if (string.IsNullOrEmpty(assetClassFieldSet.FieldSet.Description))
+                                @if (string.IsNullOrEmpty(assetTypeFieldSet.FieldSet.Description))
                                 {
                                     <span class="text-muted fst-italic">No description</span>
                                 }
                                 else
                                 {
-                                    @assetClassFieldSet.FieldSet.Description.Truncate()    
+                                    @assetTypeFieldSet.FieldSet.Description.Truncate()    
                                 }
                             </td>
                             <td class="pb-2 pr-3">
-                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(assetClassFieldSet))">
+                                <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(assetTypeFieldSet))">
                                     <i class="fs-6 bi-x-circle"></i>
                                 </a>
                             </td>
@@ -87,7 +87,7 @@
             {
                 <p class="text-muted fst-italic">Use the link on the right to start adding field sets.</p>
             }
-            <ValidationMessage For="@(() => _assetClass.FieldSets)"></ValidationMessage>
+            <ValidationMessage For="@(() => _assetType.FieldSets)"></ValidationMessage>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
 
 @code {
     
-    private AssetClassDto _assetClass;
+    private AssetTypeDto _assetType;
     private EditContext _editContext;
     
     private ServerSideFluentValidation _serverValidation;
@@ -120,10 +120,10 @@
     public IModalService Modal { get; set; }
 
     [Parameter]
-    public AssetClassDto AssetClass { get; set; }
+    public AssetTypeDto AssetType { get; set; }
     
     [Parameter] 
-    public Func<AssetClassDto, Task<OjedaDataResult<AssetClassDto>>> OnSubmit { get; set; }
+    public Func<AssetTypeDto, Task<OjedaDataResult<AssetTypeDto>>> OnSubmit { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -131,14 +131,14 @@
         
         Init();
 
-        if (AssetClass != null)
+        if (AssetType != null)
         {
-            _assetClass.Id = AssetClass.Id;
-            _assetClass.Name = AssetClass.Name;
-            _assetClass.Description = AssetClass.Description;
+            _assetType.Id = AssetType.Id;
+            _assetType.Name = AssetType.Name;
+            _assetType.Description = AssetType.Description;
             
-            _assetClass.FieldSets.Clear();
-            _assetClass.FieldSets.AddRange(AssetClass.FieldSets.Select(_ => new AssetClassFieldSetDto
+            _assetType.FieldSets.Clear();
+            _assetType.FieldSets.AddRange(AssetType.FieldSets.Select(_ => new AssetTypeFieldSetDto
             {
                 Order = _.Order,
                 FieldSet = new FieldSetSummaryDto
@@ -165,7 +165,7 @@
         
         var parameters = new ModalParameters();
         
-        var excludedIds = _assetClass.FieldSets.Select(_ => _.FieldSet.Id).ToList();
+        var excludedIds = _assetType.FieldSets.Select(_ => _.FieldSet.Id).ToList();
         parameters.Add("ExcludedIds", excludedIds);
         
         var selectFieldModal = Modal.Show<SelectFieldSetModal>("Add Field Set", parameters, Constants.DefaultModalOptions);
@@ -173,9 +173,9 @@
 
         if (!result.Cancelled)
         {
-            _assetClass.FieldSets.Add(new AssetClassFieldSetDto
+            _assetType.FieldSets.Add(new AssetTypeFieldSetDto
             {
-                Order = _assetClass.FieldSets.Count == 0 ? 1 : _assetClass.FieldSets.Max(f => f.Order) + 1,
+                Order = _assetType.FieldSets.Count == 0 ? 1 : _assetType.FieldSets.Max(f => f.Order) + 1,
                 FieldSet = (FieldSetSummaryDto) result.Data
             });
             
@@ -200,47 +200,47 @@
             return;
         }
         
-        NavManager.NavigateTo("/admin/asset-classes");
+        NavManager.NavigateTo("/admin/asset-types");
     }
     
-    private void OnMoveFieldSetUp(AssetClassFieldSetDto assetClassFieldSetDto)
+    private void OnMoveFieldSetUp(AssetTypeFieldSetDto assetTypeFieldSetDto)
     {
         if (_isLoading)
         {
             return;
         }
         
-        var index = _assetClass.FieldSets.IndexOf(assetClassFieldSetDto);
+        var index = _assetType.FieldSets.IndexOf(assetTypeFieldSetDto);
         
-        _assetClass.FieldSets.RemoveAt(index);
-        _assetClass.FieldSets.Insert(index - 1, assetClassFieldSetDto);
+        _assetType.FieldSets.RemoveAt(index);
+        _assetType.FieldSets.Insert(index - 1, assetTypeFieldSetDto);
         
         UpdateOrder();
     }
     
-    private void OnMoveFieldSetDown(AssetClassFieldSetDto assetClassFieldSetDto)
+    private void OnMoveFieldSetDown(AssetTypeFieldSetDto assetTypeFieldSetDto)
     {
         if (_isLoading)
         {
             return;
         }
         
-        var index = _assetClass.FieldSets.IndexOf(assetClassFieldSetDto);
+        var index = _assetType.FieldSets.IndexOf(assetTypeFieldSetDto);
         
-        _assetClass.FieldSets.RemoveAt(index);
-        _assetClass.FieldSets.Insert(index + 1, assetClassFieldSetDto);
+        _assetType.FieldSets.RemoveAt(index);
+        _assetType.FieldSets.Insert(index + 1, assetTypeFieldSetDto);
         
         UpdateOrder();
     }
     
-    private void OnRemoveField(AssetClassFieldSetDto assetClassFieldSetDto)
+    private void OnRemoveField(AssetTypeFieldSetDto assetTypeFieldSetDto)
     {
         if (_isLoading)
         {
             return;
         }
         
-        _assetClass.FieldSets.Remove(assetClassFieldSetDto);
+        _assetType.FieldSets.Remove(assetTypeFieldSetDto);
         UpdateOrder();
     }
     
@@ -253,9 +253,9 @@
         
         _isLoading = true;
         _serverValidation.ClearErrors();
-        Init(_assetClass);
+        Init(_assetType);
         
-        var result = await OnSubmit(_assetClass);
+        var result = await OnSubmit(_assetType);
         
         if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
         {
@@ -263,30 +263,30 @@
         }
         else if (!result.Success)
         {
-            ToastService.ShowError($"Could not submit asset class. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError($"Could not submit asset type. {result.Error?.Message} ({result.Error?.Code}).");
         }
         else
         {
-            NavManager.NavigateTo("/admin/asset-classes");
+            NavManager.NavigateTo("/admin/asset-types");
         }
         
         _isLoading = false;
     }
     
-    private void Init(AssetClassDto assetClass = null)
+    private void Init(AssetTypeDto assetType = null)
     {
-        _assetClass = assetClass ?? new AssetClassDto();
+        _assetType = assetType ?? new AssetTypeDto();
         
-        _editContext = new EditContext(_assetClass);
+        _editContext = new EditContext(_assetType);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
     
     private void UpdateOrder()
     {
         var order = 1;
-        foreach (var assetClassFieldSet in _assetClass.FieldSets)
+        foreach (var assetTypeFieldSet in _assetType.FieldSets)
         {
-            assetClassFieldSet.Order = order;
+            assetTypeFieldSet.Order = order;
             order++;
         }
     }

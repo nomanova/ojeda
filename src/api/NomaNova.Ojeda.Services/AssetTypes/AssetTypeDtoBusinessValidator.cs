@@ -1,46 +1,46 @@
 using System.Linq;
 using FluentValidation;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models.AssetClasses;
+using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 
-namespace NomaNova.Ojeda.Services.AssetClasses
+namespace NomaNova.Ojeda.Services.AssetTypes
 {
-    internal class AssetClassDtoBusinessValidator : AbstractValidator<AssetClassDto>
+    internal class AssetTypeDtoBusinessValidator : AbstractValidator<AssetTypeDto>
     {
-        public AssetClassDtoBusinessValidator(
+        public AssetTypeDtoBusinessValidator(
             IRepository<FieldSet> fieldSetsRepository,
-            IRepository<AssetClass> assetClassesRepository)
+            IRepository<AssetType> assetTypesRepository)
         {
             // Field validation
-            Include(new AssetClassDtoValidator());
+            Include(new AssetTypeDtoValidator());
             
             // Business rule: ensure unique name
             RuleFor(_ => new {_.Name, _.Id}).MustAsync(async (_, cancellation) =>
             {
-                var assetClass = (await assetClassesRepository.GetAllAsync(query =>
+                var assetType = (await assetTypesRepository.GetAllAsync(query =>
                 {
                     return query.Where(f => f.Name.Equals(_.Name));
                 }, cancellation)).FirstOrDefault();
 
-                if (assetClass == null)
+                if (assetType == null)
                 {
                     return true;
                 }
 
-                return _.Id != null && _.Id.Equals(assetClass.Id);
+                return _.Id != null && _.Id.Equals(assetType.Id);
 
             }).OverridePropertyName(_ => _.Name).WithMessage(_ => $"The name '{_.Name}' is already in use.");
             
             // Business rule: ensure field sets exist
             RuleForEach(_ => _.FieldSets)
-                .SetValidator(new AssetClassFieldSetDtoBusinessValidator(fieldSetsRepository));
+                .SetValidator(new AssetTypeFieldSetDtoBusinessValidator(fieldSetsRepository));
         }
         
-        private class AssetClassFieldSetDtoBusinessValidator : AbstractValidator<AssetClassFieldSetDto>
+        private class AssetTypeFieldSetDtoBusinessValidator : AbstractValidator<AssetTypeFieldSetDto>
         {
-            public AssetClassFieldSetDtoBusinessValidator(IRepository<FieldSet> fieldSetsRepository)
+            public AssetTypeFieldSetDtoBusinessValidator(IRepository<FieldSet> fieldSetsRepository)
             {
                 // Business rule: ensure field set exists
                 RuleFor(_ => _.FieldSet.Id).MustAsync(async (id, cancellation) =>

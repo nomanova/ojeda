@@ -13,13 +13,13 @@
     
     private async Task OnAdd()
     {
-        var addAssetModal = Modal.Show<SelectAssetClassModal>("Add Asset", Constants.DefaultModalOptions);
+        var addAssetModal = Modal.Show<SelectAssetTypeModal>("Add Asset", Constants.DefaultModalOptions);
         var result = await addAssetModal.Result;
 
         if (!result.Cancelled)
         {
-            var assetClass = (AssetClassDto) result.Data;
-            NavManager.NavigateTo($"/assets/add?assetClassId={assetClass.Id}");
+            var assetType = (AssetTypeDto) result.Data;
+            NavManager.NavigateTo($"/assets/add?assetTypeId={assetType.Id}");
         }
     }
     

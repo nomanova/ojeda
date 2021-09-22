@@ -1,9 +1,9 @@
 using FluentValidation;
-using NomaNova.Ojeda.Core.Domain.AssetClasses;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
@@ -12,14 +12,14 @@ namespace NomaNova.Ojeda.Services.Assets
         public AssetDtoBusinessValidator(
             IRepository<Field> fieldsRepository,
             IRepository<FieldSet> fieldSetsRepository,
-            IRepository<AssetClass> assetClassesRepository)
+            IRepository<AssetType> assetTypesRepository)
         {
             // Business rule: ensure asset class exists
-            RuleFor(_ => _.AssetClass.Id).MustAsync(async (id, cancellation) =>
+            RuleFor(_ => _.AssetType.Id).MustAsync(async (id, cancellation) =>
             {
-                var assetClass = await assetClassesRepository.GetByIdAsync(id, cancellation);
-                return assetClass != null;
-            }).WithMessage("Asset class does not exist.");
+                var assetType = await assetTypesRepository.GetByIdAsync(id, cancellation);
+                return assetType != null;
+            }).WithMessage("Asset type does not exist.");
             
             // Business rule: ensure field sets and fields exist
             RuleForEach(_ => _.FieldSets)

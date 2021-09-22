@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
-using NomaNova.Ojeda.Models.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 
 namespace NomaNova.Ojeda.Client.Services.Assets
 {
@@ -21,13 +21,13 @@ namespace NomaNova.Ojeda.Client.Services.Assets
             return await SendForDataAsync<AssetDto>(HttpMethod.Get, path, null, cancellationToken);
         }
 
-        public async Task<OjedaDataResult<AssetDto>> GetByAssetClass(
-            string assetClassId,
+        public async Task<OjedaDataResult<AssetDto>> GetByAssetType(
+            string assetTypeId,
             CancellationToken cancellationToken)
         {
             var qsb = QueryStringBuilder.New();
             
-            qsb.Add("assetClassId" , assetClassId);
+            qsb.Add("assetTypeId" , assetTypeId);
             
             var path = $"{BasePath}/new{qsb.Build()}";
 

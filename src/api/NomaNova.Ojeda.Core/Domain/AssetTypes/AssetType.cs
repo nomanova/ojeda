@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using NomaNova.Ojeda.Core.Domain.Assets;
 
-namespace NomaNova.Ojeda.Core.Domain.AssetClasses
+namespace NomaNova.Ojeda.Core.Domain.AssetTypes
 {
-    public class AssetClass : BaseEntity, INamedEntity, ITimestampedEntity
+    public class AssetType : BaseEntity, INamedEntity, ITimestampedEntity
     {
         public DateTime CreatedAt { get; set; }
         
@@ -16,7 +16,7 @@ namespace NomaNova.Ojeda.Core.Domain.AssetClasses
         [Searchable]
         public string Description { get; set; }
         
-        public virtual ICollection<AssetClassFieldSet> AssetClassFieldSets { get; set; }
+        public virtual ICollection<AssetTypeFieldSet> AssetTypeFieldSets { get; set; }
 
         public virtual ICollection<Asset> Assets { get; set; }
     }
