@@ -52,6 +52,7 @@ namespace NomaNova.Ojeda.Web.Features.Admin.AssetTypes
                     Id = fieldSet.Id
                 });
             
+                EditContext.Validate();
                 StateHasChanged();
             }
         }

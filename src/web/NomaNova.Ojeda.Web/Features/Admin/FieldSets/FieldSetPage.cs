@@ -24,7 +24,7 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
         protected abstract T UpsertFieldSet { get; set; }
 
         protected List<FieldDto> Fields { get; set; }
-
+        
         protected async Task OnAddField()
         {
             if (IsSubmitting)
@@ -51,7 +51,8 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
                     Order = UpsertFieldSet.Fields.Count == 0 ? 1 : UpsertFieldSet.Fields.Max(f => f.Order) + 1,
                     Id = field.Id
                 });
-
+                
+                EditContext.Validate();
                 StateHasChanged();
             }
         }
