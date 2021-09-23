@@ -8,7 +8,7 @@
 
 <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-    <FluentValidationValidator/>
+    <FluentValidationValidator Validator="@(new CreateFieldDtoFieldValidator())"/>
     <ServerSideFluentValidation @ref="ServerValidation"/>
 
     <div class="w-50 mb-4">

@@ -1,7 +1,14 @@
 @page "/"
 
+@inject NavigationManager NavManager
+
 <h3>Home</h3>
 
 @code {
-    
+
+    protected override void OnInitialized()
+    {
+        NavManager.NavigateTo("/assets");
+    }
+
 }
