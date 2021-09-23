@@ -19,14 +19,20 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             CreateMap<AssetTypeFieldSet, AssetTypeFieldSetDto>();
             
             // Dto -> Domain
-            CreateMap<AssetTypeDto, AssetType>();
-            CreateMap<AssetTypeSummaryDto, AssetType>();
+            CreateMap<CreateAssetTypeDto, AssetType>();
+            CreateMap<UpdateAssetTypeDto, AssetType>();
             
-            CreateMap<AssetTypeFieldSetDto, AssetTypeFieldSet>()
+            CreateMap<CreateAssetTypeFieldSetDto, AssetTypeFieldSet>()
                 .ForMember(dest => dest.AssetType, opt => opt.Ignore())
                 .ForMember(dest => dest.FieldSet, opt => opt.Ignore())
                 .ForMember(dest => dest.AssetTypeId, opt => opt.Ignore())
-                .ForMember(dest => dest.FieldSetId, opt => opt.MapFrom(src => src.FieldSet.Id));
+                .ForMember(dest => dest.FieldSetId, opt => opt.MapFrom(src => src.Id));
+            
+            CreateMap<UpdateAssetTypeFieldSetDto, AssetTypeFieldSet>()
+                .ForMember(dest => dest.AssetType, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSet, opt => opt.Ignore())
+                .ForMember(dest => dest.AssetTypeId, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSetId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

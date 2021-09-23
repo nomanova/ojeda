@@ -10,6 +10,8 @@ using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
+using NomaNova.Ojeda.Services.AssetTypes.Validators;
 
 namespace NomaNova.Ojeda.Services.AssetTypes
 {
@@ -81,9 +83,9 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         }
         
         public async Task<AssetTypeDto> CreateAsync(
-            AssetTypeDto assetTypeDto, CancellationToken cancellationToken)
+            CreateAssetTypeDto assetTypeDto, CancellationToken cancellationToken)
         {
-            await Validate(null, assetTypeDto, cancellationToken);
+            await Validate(new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, _assetTypesRepository), assetTypeDto, cancellationToken);
 
             var assetTypeId = Guid.NewGuid().ToString();
 
@@ -102,7 +104,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         }
         
         public async Task<AssetTypeDto> UpdateAsync(
-            string id, AssetTypeDto assetTypeDto, CancellationToken cancellationToken)
+            string id, UpdateAssetTypeDto assetTypeDto, CancellationToken cancellationToken)
         {
             var assetType = await _assetTypesRepository.GetByIdAsync(id, query =>
             {
@@ -114,7 +116,8 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 throw new NotFoundException();
             }
 
-            await Validate(id, assetTypeDto, cancellationToken);
+            await Validate(new UpdateAssetTypeDtoBusinessValidator(
+                _fieldSetsRepository, _assetTypesRepository, id), assetTypeDto, cancellationToken);
 
             assetType = _mapper.Map(assetTypeDto, assetType);
             assetType.Id = id;
@@ -137,12 +140,6 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             }
             
             await _assetTypesRepository.DeleteAsync(assetType, cancellationToken);
-        }
-
-        private async Task Validate(string id, AssetTypeDto assetTypeDto, CancellationToken cancellationToken)
-        {
-            assetTypeDto.Id = id;
-            await Validate(new AssetTypeDtoBusinessValidator(_fieldSetsRepository, _assetTypesRepository), assetTypeDto, cancellationToken);
         }
     }
 }

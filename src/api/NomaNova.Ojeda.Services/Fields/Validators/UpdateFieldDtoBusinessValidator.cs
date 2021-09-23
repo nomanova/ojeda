@@ -1,7 +1,6 @@
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.Fields;
-using NomaNova.Ojeda.Models.Dtos.Fields.Validators;
 using NomaNova.Ojeda.Models.Shared.Validation;
 
 namespace NomaNova.Ojeda.Services.Fields.Validators

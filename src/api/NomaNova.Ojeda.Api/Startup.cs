@@ -22,6 +22,7 @@ using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Services.Assets;
 using NomaNova.Ojeda.Services.AssetTypes;
+using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
 using NomaNova.Ojeda.Services.Fields;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
 using NomaNova.Ojeda.Services.FieldSets;

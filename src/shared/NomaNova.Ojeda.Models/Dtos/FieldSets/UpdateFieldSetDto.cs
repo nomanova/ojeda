@@ -1,3 +1,4 @@
+using FluentValidation;
 using NomaNova.Ojeda.Models.Dtos.FieldSets.Base;
 
 namespace NomaNova.Ojeda.Models.Dtos.FieldSets
@@ -8,5 +9,13 @@ namespace NomaNova.Ojeda.Models.Dtos.FieldSets
     
     public class UpdateFieldSetFieldDto : UpsertFieldSetFieldDto
     {
+    }
+    
+    public class UpdateFieldSetDtoFieldValidator : AbstractValidator<UpdateFieldSetDto>
+    {
+        public UpdateFieldSetDtoFieldValidator()
+        {
+            Include(new UpsertFieldSetDtoFieldValidator<UpdateFieldSetFieldDto>());
+        }
     }
 }

@@ -51,6 +51,8 @@ namespace NomaNova.Ojeda.Data.Context
 
             // Run seeders
             FieldsSeeder.Seed(this, _timeKeeper).Wait();
+            FieldSetsSeeder.Seed(this, _timeKeeper).Wait();
+            AssetTypesSeeder.Seed(this, _timeKeeper).Wait();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

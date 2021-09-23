@@ -25,7 +25,6 @@
                 <InputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
             </OjedaFormField>
 
-
             <!-- Fields -->
             <div class="mb-3">
                 <div class="d-flex justify-content-between">
@@ -54,7 +53,7 @@
                                     <td class="pb-2 pr-0">
                                         @if (fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)
                                         {
-                                            <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveFieldUp(fieldSetField))">
+                                            <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveItemUp(fieldSetField))">
                                                 <i class="fs-6 bi-arrow-up-circle"></i>
                                             </a>
                                         }
@@ -62,7 +61,7 @@
                                     <td class="pb-2 pr-0">
                                         @if (fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)
                                         {
-                                            <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveFieldDown(fieldSetField))">
+                                            <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveItemDown(fieldSetField))">
                                                 <i class="fs-6 bi-arrow-down-circle"></i>
                                             </a>
                                         }
@@ -80,7 +79,7 @@
                                     </td>
                                     <td class="pb-2 pr-3">@(GetFieldType(fieldSetField.Id))</td>
                                     <td class="pb-2 pr-3">
-                                        <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveField(fieldSetField))">
+                                        <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveItem(fieldSetField))">
                                             <i class="fs-6 bi-x-circle"></i>
                                         </a>
                                     </td>

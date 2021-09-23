@@ -43,13 +43,13 @@ namespace NomaNova.Ojeda.Client.Services.AssetTypes
             return await SendForDataAsync<PaginatedListDto<AssetTypeDto>>(HttpMethod.Get, path, null, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<AssetTypeDto>> CreateAsync(AssetTypeDto assetType, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<AssetTypeDto>> CreateAsync(CreateAssetTypeDto assetType, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}";
             return await SendForDataAsync<AssetTypeDto>(HttpMethod.Post, path, assetType, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<AssetTypeDto>> UpdateAsync(string id, AssetTypeDto assetType, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<AssetTypeDto>> UpdateAsync(string id, UpdateAssetTypeDto assetType, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<AssetTypeDto>(HttpMethod.Put, path, assetType, cancellationToken);

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.AssetTypes;
+using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers
@@ -75,10 +75,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(typeof(AssetTypeDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
-            [FromBody] AssetTypeDto assetTypeDto,
+            [FromBody] CreateAssetTypeDto createAssetTypeDto,
             CancellationToken cancellationToken = default)
         {
-            assetTypeDto = await _assetTypesService.CreateAsync(assetTypeDto, cancellationToken);
+            var assetTypeDto = await _assetTypesService.CreateAsync(createAssetTypeDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new {id = assetTypeDto.Id}, assetTypeDto);
         }
 
@@ -94,10 +94,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,
-            [FromBody] AssetTypeDto assetTypeDto,
+            [FromBody] UpdateAssetTypeDto updateAssetTypeDto,
             CancellationToken cancellationToken = default)
         {
-            assetTypeDto = await _assetTypesService.UpdateAsync(id, assetTypeDto, cancellationToken);
+            var assetTypeDto = await _assetTypesService.UpdateAsync(id, updateAssetTypeDto, cancellationToken);
             return Ok(assetTypeDto);
         }
 

@@ -19,10 +19,10 @@ namespace NomaNova.Ojeda.Client.Services.AssetTypes
             int pageSize = 10, 
             CancellationToken cancellationToken = default);
         
-        Task<OjedaDataResult<AssetTypeDto>> CreateAsync(AssetTypeDto assetType,
+        Task<OjedaDataResult<AssetTypeDto>> CreateAsync(CreateAssetTypeDto assetType,
             CancellationToken cancellationToken = default);
         
-        Task<OjedaDataResult<AssetTypeDto>> UpdateAsync(string id, AssetTypeDto assetType,
+        Task<OjedaDataResult<AssetTypeDto>> UpdateAsync(string id, UpdateAssetTypeDto assetType,
             CancellationToken cancellationToken = default);
 
         Task<OjedaResult> DeleteAsync(

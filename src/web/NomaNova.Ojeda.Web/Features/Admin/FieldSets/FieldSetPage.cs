@@ -56,45 +56,45 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
             }
         }
         
-        protected void OnMoveFieldUp(TS fieldSetFieldDto)
+        protected void OnMoveItemUp(TS item)
         {
             if (IsSubmitting)
             {
                 return;
             }
 
-            var index = UpsertFieldSet.Fields.IndexOf(fieldSetFieldDto);
+            var index = UpsertFieldSet.Fields.IndexOf(item);
 
             UpsertFieldSet.Fields.RemoveAt(index);
-            UpsertFieldSet.Fields.Insert(index - 1, fieldSetFieldDto);
+            UpsertFieldSet.Fields.Insert(index - 1, item);
 
             UpdateOrder();
         }
 
-        protected void OnMoveFieldDown(TS fieldSetFieldDto)
+        protected void OnMoveItemDown(TS item)
         {
             if (IsSubmitting)
             {
                 return;
             }
 
-            var index = UpsertFieldSet.Fields.IndexOf(fieldSetFieldDto);
+            var index = UpsertFieldSet.Fields.IndexOf(item);
 
             UpsertFieldSet.Fields.RemoveAt(index);
-            UpsertFieldSet.Fields.Insert(index + 1, fieldSetFieldDto);
+            UpsertFieldSet.Fields.Insert(index + 1, item);
 
             UpdateOrder();
         }
 
-        protected void OnRemoveField(TS fieldSetFieldDto)
+        protected void OnRemoveItem(TS item)
         {
             if (IsSubmitting)
             {
                 return;
             }
 
-            UpsertFieldSet.Fields.Remove(fieldSetFieldDto);
-            Fields.Remove(GetField(fieldSetFieldDto.Id));
+            UpsertFieldSet.Fields.Remove(item);
+            Fields.Remove(GetField(item.Id));
 
             UpdateOrder();
         }
@@ -127,9 +127,9 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
         private void UpdateOrder()
         {
             var order = 1;
-            foreach (var fieldSetField in UpsertFieldSet.Fields)
+            foreach (var item in UpsertFieldSet.Fields)
             {
-                fieldSetField.Order = order;
+                item.Order = order;
                 order++;
             }
         }

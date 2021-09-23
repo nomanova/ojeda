@@ -1,13 +1,104 @@
 @page "/admin/asset-types/add"
 @layout AdminLayout
-
-@inject OjedaClient Ojeda
+@inherits AssetTypePage<CreateAssetTypeDto, CreateAssetTypeFieldSetDto>
 
 <OjedaBreadcrumb Data="@_breadcrumbItems" />
 
 <h3>Add Asset Type</h3>
 
-<AssetTypeForm OnSubmit="@OnAdd"></AssetTypeForm>
+<EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
+
+    <FluentValidationValidator />
+    <ServerSideFluentValidation @ref="ServerValidation" />
+    
+    <div class="w-50 mb-4">
+    
+        <!-- Name -->
+        <OjedaFormField ForId="assettype-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertAssetType.Name)">
+            <InputText @bind-Value="UpsertAssetType.Name" class="form-control" id="assettype-name" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Description -->
+        <OjedaFormField ForId="assettype-description" Label="Description" ValidateFor="@(() => UpsertAssetType.Description)">
+            <InputText @bind-Value="UpsertAssetType.Description" class="form-control" id="assettype-description" disabled="@IsSubmitting"/>
+        </OjedaFormField>
+
+        <!-- Field Sets -->
+        <div class="mb-3">
+            <div class="d-flex justify-content-between">
+                <label class="form-label">Field Sets*</label>
+                <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddFieldSet">Add Field Set</a>
+            </div>
+            <div>
+                @if (UpsertAssetType.FieldSets?.Count > 0)
+                {
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="py-2"><!-- Move up --></th>
+                            <th class="py-2"><!-- Move down --></th>
+                            <th class="py-2">Name</th>
+                            <th class="py-2">Description</th>
+                            <th class="py-2"><!-- Remove --></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var assetTypeFieldSet in UpsertAssetType.FieldSets.OrderBy(f => f.Order))
+                        {
+                            <tr>
+                                <td class="pb-2 pr-0">
+                                    @if (assetTypeFieldSet.Order != 1 && UpsertAssetType.FieldSets.Count > 1)
+                                    {
+                                        <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveItemUp(assetTypeFieldSet))">
+                                            <i class="fs-6 bi-arrow-up-circle"></i>
+                                        </a>
+                                    }
+                                </td>
+                                <td class="pb-2 pr-0">
+                                    @if (assetTypeFieldSet.Order != UpsertAssetType.FieldSets.Count && UpsertAssetType.FieldSets.Count > 1)
+                                    {
+                                        <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveItemDown(assetTypeFieldSet))">
+                                            <i class="fs-6 bi-arrow-down-circle"></i>
+                                        </a>
+                                    }
+                                </td>
+                                <td class="pb-2 pr-3">@(GetFieldSetName(assetTypeFieldSet.Id))</td>
+                                <td class="pb-2 pr-3">
+                                    @if (string.IsNullOrEmpty(GetFieldSetDescription(assetTypeFieldSet.Id)))
+                                    {
+                                        <span class="text-muted fst-italic">No description</span>
+                                    }
+                                    else
+                                    {
+                                        @GetFieldSetDescription(assetTypeFieldSet.Id) 
+                                    }
+                                </td>
+                                <td class="pb-2 pr-3">
+                                    <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveItem(assetTypeFieldSet))">
+                                        <i class="fs-6 bi-x-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">Use the link on the right to start adding field sets.</p>
+                }
+                <ValidationMessage For="@(() => UpsertAssetType.FieldSets)"></ValidationMessage>
+            </div>
+        </div>
+    
+    </div>
+
+    <OjedaFormFooter
+        IsSubmitting="@IsSubmitting"
+        OnCancel="@OnCancel"
+        OnReset="@OnReset"/>
+
+</EditForm>
 
 @code {
     
@@ -18,8 +109,28 @@
         new () {Text = "Add"}
     };
     
-    private async Task<OjedaDataResult<AssetTypeDto>> OnAdd(AssetTypeDto assetType)
+    protected override CreateAssetTypeDto UpsertAssetType { get; set; }
+    
+    protected override void OnInitialized()
     {
-        return await Ojeda.AssetTypesService.CreateAsync(assetType);
+        Init();
     }
+
+    protected override async Task<OjedaDataResult<AssetTypeDto>> OnSubmitEntity()
+    {
+        return await Ojeda.AssetTypesService.CreateAsync(UpsertAssetType);
+    }
+    
+    protected override void Init()
+    {
+        UpsertAssetType = new CreateAssetTypeDto
+        {
+            FieldSets = new List<CreateAssetTypeFieldSetDto>()
+        };
+        FieldSets = new List<FieldSetSummaryDto>();
+
+        EditContext = new EditContext(UpsertAssetType);
+        EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+    
 }

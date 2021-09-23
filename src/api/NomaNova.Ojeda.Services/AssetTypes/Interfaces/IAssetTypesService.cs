@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
 
-namespace NomaNova.Ojeda.Services.AssetTypes
+namespace NomaNova.Ojeda.Services.AssetTypes.Interfaces
 {
     public interface IAssetTypesService
     {
@@ -19,10 +19,10 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             CancellationToken cancellationToken = default);
         
         Task<AssetTypeDto> CreateAsync(
-            AssetTypeDto assetTypeDto, CancellationToken cancellationToken = default);
+            CreateAssetTypeDto assetTypeDto, CancellationToken cancellationToken = default);
         
         Task<AssetTypeDto> UpdateAsync(
-            string id, AssetTypeDto assetTypeDto, CancellationToken cancellationToken = default);
+            string id, UpdateAssetTypeDto assetTypeDto, CancellationToken cancellationToken = default);
         
         Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     }
