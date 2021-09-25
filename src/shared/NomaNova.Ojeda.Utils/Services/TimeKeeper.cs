@@ -1,7 +1,7 @@
 using System;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
-namespace NomaNova.Ojeda.Core.Helpers
+namespace NomaNova.Ojeda.Utils.Services
 {
     public class TimeKeeper : ITimeKeeper
     {

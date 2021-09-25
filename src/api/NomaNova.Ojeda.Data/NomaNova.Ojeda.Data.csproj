@@ -15,6 +15,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\..\shared\NomaNova.Ojeda.Utils\NomaNova.Ojeda.Utils.csproj" />
       <ProjectReference Include="..\NomaNova.Ojeda.Core\NomaNova.Ojeda.Core.csproj" />
     </ItemGroup>
     

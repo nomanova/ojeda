@@ -1,7 +1,7 @@
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
 {

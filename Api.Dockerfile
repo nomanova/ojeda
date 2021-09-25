@@ -7,6 +7,12 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0 AS dotnet-builder
 WORKDIR /workdir
 
 # Restore
+COPY src/shared/NomaNova.Ojeda.Utils/NomaNova.Ojeda.Utils.csproj ./src/shared/NomaNova.Ojeda.Utils/
+RUN dotnet restore src/shared/NomaNova.Ojeda.Utils/NomaNova.Ojeda.Utils.csproj
+
+COPY test/shared/NomaNova.Ojeda.Utils.Tests/NomaNova.Ojeda.Utils.Tests.csproj ./test/shared/NomaNova.Ojeda.Utils.Tests/
+RUN dotnet restore test/shared/NomaNova.Ojeda.Utils.Tests/NomaNova.Ojeda.Utils.Tests.csproj
+
 COPY src/shared/NomaNova.Ojeda.Models/NomaNova.Ojeda.Models.csproj ./src/shared/NomaNova.Ojeda.Models/
 RUN dotnet restore src/shared/NomaNova.Ojeda.Models/NomaNova.Ojeda.Models.csproj
 
@@ -29,6 +35,10 @@ RUN dotnet restore test/api/NomaNova.Ojeda.Api.Tests/NomaNova.Ojeda.Api.Tests.cs
 COPY . .
 
 # Run tests
+WORKDIR ./test/shared/NomaNova.Ojeda.Utils.Tests
+RUN dotnet test --collect:"XPlat Code Coverage"
+WORKDIR ../../..
+
 WORKDIR ./test/api/NomaNova.Ojeda.Api.Tests
 RUN dotnet test --collect:"XPlat Code Coverage"
 WORKDIR ../../..

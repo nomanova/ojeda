@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using NomaNova.Ojeda.Core.Domain.Fields;
+using NomaNova.Ojeda.Services.Assets.Interfaces;
 
 namespace NomaNova.Ojeda.Services.Assets
 {

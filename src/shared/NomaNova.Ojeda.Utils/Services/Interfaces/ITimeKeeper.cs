@@ -1,6 +1,6 @@
 using System;
 
-namespace NomaNova.Ojeda.Core.Helpers.Interfaces
+namespace NomaNova.Ojeda.Utils.Services.Interfaces
 {
     public interface ITimeKeeper
     {

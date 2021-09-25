@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
 {

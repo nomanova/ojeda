@@ -26,7 +26,11 @@ namespace NomaNova.Ojeda.Services.Assets
             CreateMap<PaginatedList<Asset>, PaginatedListDto<AssetSummaryDto>>();
             
             // Dto -> Domain
-            CreateMap<AssetDto, Asset>()
+            CreateMap<CreateAssetDto, Asset>()
+                .ForMember(dest => dest.AssetType, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
+            
+            CreateMap<UpdateAssetDto, Asset>()
                 .ForMember(dest => dest.AssetType, opt => opt.Ignore())
                 .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
         }

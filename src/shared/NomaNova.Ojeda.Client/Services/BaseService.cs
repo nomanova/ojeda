@@ -6,36 +6,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using NomaNova.Ojeda.Client.Results;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Utils.Services;
 
 namespace NomaNova.Ojeda.Client.Services
 {
     internal abstract class BaseService
     {
-        private static readonly JsonSerializerSettings JsonSettings;
-
-        static BaseService()
-        {
-            JsonSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy
-                    {
-                        ProcessDictionaryKeys = false
-                    }
-                },
-                DateParseHandling = DateParseHandling.DateTimeOffset,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-
-            JsonSettings.Converters.Add(new StringEnumConverter());
-        }
-
         private readonly OjedaHttpClient _httpClient;
 
         protected BaseService(OjedaHttpClient httpClient)
@@ -127,7 +105,7 @@ namespace NomaNova.Ojeda.Client.Services
         private static async Task<T> GetPayloadAsync<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content, JsonSettings);
+            return JsonConvert.DeserializeObject<T>(content, Serializer.JsonSettings);
         }
 
         private static async Task<ErrorDto> TryParseErrorAsync(HttpResponseMessage response)
@@ -139,7 +117,7 @@ namespace NomaNova.Ojeda.Client.Services
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<ErrorDto>(content, JsonSettings);
+            return JsonConvert.DeserializeObject<ErrorDto>(content, Serializer.JsonSettings);
         }
 
         private static void TryAddPayload(HttpRequestMessage request, object payload)
@@ -149,7 +127,7 @@ namespace NomaNova.Ojeda.Client.Services
                 return;
             }
 
-            var body = JsonConvert.SerializeObject(payload, JsonSettings);
+            var body = JsonConvert.SerializeObject(payload, Serializer.JsonSettings);
             request.Content = new StringContent(body, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
     }

@@ -10,11 +10,13 @@ using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
+using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Services.Assets.Interfaces;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
@@ -26,6 +28,7 @@ namespace NomaNova.Ojeda.Services.Assets
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
         private readonly IFieldValueConverter _fieldValueConverter;
+        private readonly IFieldValueValidator _fieldValueValidator;
 
         public AssetsService(
             IMapper mapper,
@@ -33,7 +36,8 @@ namespace NomaNova.Ojeda.Services.Assets
             IRepository<AssetType> assetTypesRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<Field> fieldsRepository,
-            IFieldValueConverter fieldValueConverter)
+            IFieldValueConverter fieldValueConverter,
+            IFieldValueValidator fieldValueValidator)
         {
             _mapper = mapper;
             _assetsRepository = assetsRepository;
@@ -41,6 +45,7 @@ namespace NomaNova.Ojeda.Services.Assets
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
             _fieldValueConverter = fieldValueConverter;
+            _fieldValueValidator = fieldValueValidator;
         }
 
         public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken)
@@ -56,7 +61,10 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new NotFoundException();
             }
             
-            return await AssetTypeToAssetDto(assetType, null, cancellationToken);
+            var fieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
+            var fields = await GetFieldsAsync(fieldSets, cancellationToken);
+            
+            return AssetTypeToAssetDtoAsync(assetType, fieldSets, fields);
         }
 
         public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -76,8 +84,11 @@ namespace NomaNova.Ojeda.Services.Assets
 
             var assetType = asset.AssetType;
             var fieldValues = asset.FieldValues;
+            
+            var fieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
+            var fields = await GetFieldsAsync(fieldSets, cancellationToken);
 
-            var assetDto = await AssetTypeToAssetDto(assetType, (fieldSetId, fieldId, fieldType) =>
+            var assetDto = AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, (fieldSetId, fieldId, fieldType) =>
             {
                 var fieldValue = fieldValues.FirstOrDefault(_ => _.FieldSetId.Equals(fieldSetId) && _.FieldId.Equals(fieldId));
                 var byteValue = fieldValue?.Value;
@@ -88,7 +99,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 }
 
                 return _fieldValueConverter.FromBytes(byteValue, fieldType);
-            }, cancellationToken);
+            });
             
             assetDto.Id = id;
 
@@ -116,94 +127,119 @@ namespace NomaNova.Ojeda.Services.Assets
 
             return paginatedAssetsDto;
         }
-        
-        public async Task<AssetDto> CreateAsync(AssetDto assetDto, CancellationToken cancellationToken)
+
+        public async Task<AssetDto> CreateAsync(CreateAssetDto assetDto, CancellationToken cancellationToken)
         {
-            // Step 1: fetch the asset class & ensure it exists
-            
-            // Step 2: fetch all field sets and fields which are part of the asset class
-            
-            // Step 3: validate the dto against the field sets and fields
-            
-            // Step 4: store the asset
-            
-            // Step 5: store the field values
-            
-            
-            await Validate(null, assetDto, cancellationToken);
-            
-            // Asset
+            // Validate
+            var (dbFieldSets, dbFields) = await ValidateAsync(assetDto, cancellationToken);
+
+            // Store
+            var dtoFieldSets = assetDto.FieldSets;
+
             var asset = _mapper.Map<Asset>(assetDto);
+            
             asset.Id = Guid.NewGuid().ToString();
-
-            asset = await _assetsRepository.InsertAsync(asset, cancellationToken);
-
+            asset.FieldValues = new List<FieldValue>();
             
-            
-            // Fetch field sets & fields
-            var fieldSetIds = assetDto.FieldSets.Select(_ => _.Id);
-
-            var fieldSets = _fieldSetsRepository.GetAllAsync(query =>
+            foreach (var dbFieldSet in dbFieldSets)
             {
-                return query.Where(_ => fieldSetIds.Contains(_.Id));
-            }, cancellationToken);
+                var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+                var dbFieldSetFields = dbFields.Where(_ => dbFieldIds.Contains(_.Id)).ToList();
 
-            var fieldIds = assetDto.FieldSets.SelectMany(_ => _.Fields).Select(_ => _.Id).Distinct();
-
-            var fields = _fieldsRepository.GetAllAsync(query =>
-            {
-                return query.Where(_ => fieldIds.Contains(_.Id));
-            }, cancellationToken);
-            
-
-            
-            
-            
-            
-            // TODO: fetch all fieldsets
-            // TODO: fetch all fields
-            
-            var fieldValues = new List<FieldValue>();
-
-            var fieldSetDtos = assetDto.FieldSets;
-
-            foreach (var fieldSetDto in assetDto.FieldSets)
-            {
-                foreach (var fieldDto in fieldSetDto.Fields)
+                var dtoFieldSet = dtoFieldSets.First(_ => _.Id.Equals(dbFieldSet.Id));
+                
+                foreach (var dbField in dbFieldSetFields)
                 {
+                    var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
+                    
                     var fieldValue = new FieldValue
                     {
+                        Id = Guid.NewGuid().ToString(),
                         AssetId = asset.Id,
-                        FieldSetId = fieldSetDto.Id,
-                        FieldId = fieldDto.Id,
-                        //Value = _fieldValueConverter.ToBytes(fieldDto.Value, fie)
+                        FieldSetId = dbFieldSet.Id,
+                        FieldId = dbField.Id,
+                        Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type)
                     };
+                    
+                    asset.FieldValues.Add(fieldValue);
                 }
             }
 
-            // TODO: insert field values
-            
-            return _mapper.Map<AssetDto>(asset);
+            await _assetsRepository.InsertAsync(asset, cancellationToken);
+
+            // Return
+            return await GetByIdAsync(asset.Id, cancellationToken);
         }
 
-        public async Task<AssetDto> UpdateAsync(string id, AssetDto assetDto,
+        public async Task<AssetDto> UpdateAsync(string id, UpdateAssetDto assetDto,
             CancellationToken cancellationToken)
         {
-            var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);
+            // Fetch
+            var asset = await _assetsRepository.GetByIdAsync(id, query =>
+            {
+                return query.Include(s => s.FieldValues);
+            }, cancellationToken);
 
             if (asset == null)
             {
                 throw new NotFoundException();
             }
-
-            await Validate(id, assetDto, cancellationToken);
+            
+            // Validate
+            var (dbFieldSets, dbFields) = await ValidateAsync(assetDto, cancellationToken);
+            
+            // Store
+            var dtoFieldSets = assetDto.FieldSets;
+            var fieldValues = asset.FieldValues;
 
             asset = _mapper.Map(assetDto, asset);
             asset.Id = id;
-            
-            asset = await _assetsRepository.UpdateAsync(asset, cancellationToken);
 
-            return _mapper.Map<AssetDto>(asset);
+            var updatedFieldValues = new List<FieldValue>();
+
+            foreach (var dbFieldSet in dbFieldSets)
+            {
+                var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+                var dbFieldSetFields = dbFields.Where(_ => dbFieldIds.Contains(_.Id)).ToList();
+
+                var dtoFieldSet = dtoFieldSets.First(_ => _.Id.Equals(dbFieldSet.Id));
+
+                foreach (var dbField in dbFieldSetFields)
+                {
+                    var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
+
+                    var existingFieldValue = fieldValues.FirstOrDefault(_ => _.AssetId.Equals(id) &&
+                                                                             _.FieldSetId.Equals(dbFieldSet.Id) &&
+                                                                             _.FieldId.Equals(dbField.Id));
+
+                    if (existingFieldValue != null)
+                    {
+                        existingFieldValue.Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type);
+                        updatedFieldValues.Add(existingFieldValue);
+                    }
+                    else
+                    {
+                        // Field added after initial creation
+                        var newFieldValue = new FieldValue
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            AssetId = asset.Id,
+                            FieldSetId = dbFieldSet.Id,
+                            FieldId = dbField.Id,
+                            Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type)
+                        };
+                        
+                        updatedFieldValues.Add(newFieldValue);
+                    }
+                }
+            }
+
+            asset.FieldValues = updatedFieldValues;
+            
+            await _assetsRepository.UpdateAsync(asset, cancellationToken);
+            
+            // Return
+            return await GetByIdAsync(asset.Id, cancellationToken);
         }
         
         public async Task DeleteAsync(string id, CancellationToken cancellationToken)
@@ -217,46 +253,13 @@ namespace NomaNova.Ojeda.Services.Assets
 
             await _assetsRepository.DeleteAsync(asset, cancellationToken);
         }
-        
-        private async Task Validate(string id, AssetDto assetDto, CancellationToken cancellationToken)
-        {
-            assetDto.Id = id;
-            
-            await Validate(
-                new AssetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, _assetTypesRepository), 
-                assetDto, 
-                cancellationToken);
-        }
-        
-        private async Task<AssetDto> AssetTypeToAssetDto(
+
+        private AssetDto AssetTypeToAssetDtoAsync(
             AssetType assetType, 
-            Func<string, string, FieldType, string> fieldValueResolver, 
-            CancellationToken cancellationToken)
+            IReadOnlyCollection<FieldSet> fieldSets,
+            IReadOnlyCollection<Field> fields,
+            Func<string, string, FieldType, string> fieldValueResolver = null)
         {
-            // Field sets
-            var fieldSetIds = assetType.AssetTypeFieldSets
-                .Select(_ => _.FieldSetId)
-                .ToList();
-
-            var fieldSets = await _fieldSetsRepository.GetAllAsync(query =>
-            {
-                return query
-                    .Where(_ => fieldSetIds.Contains(_.Id))
-                    .Include(_ => _.FieldSetFields);
-            }, cancellationToken);
-            
-            // Fields
-            var fieldIds = fieldSets
-                .SelectMany(_ => _.FieldSetFields)
-                .Select(_ => _.FieldId)
-                .ToList();
-
-            var fields = await _fieldsRepository.GetAllAsync(query =>
-            {
-                return query.Where(_ => fieldIds.Contains(_.Id));
-            }, cancellationToken);
-            
-            // Dto
             var assetDto = new AssetDto
             {
                 Id = null,
@@ -312,6 +315,143 @@ namespace NomaNova.Ojeda.Services.Assets
                 .ToList();
             
             return assetDto;
+        }
+
+        private async Task<List<FieldSet>> GetFieldSetsAsync(AssetType assetType, CancellationToken cancellationToken)
+        {
+            var fieldSetIds = assetType.AssetTypeFieldSets
+                .Select(_ => _.FieldSetId)
+                .Distinct()
+                .ToList();
+
+            var fieldSets = await _fieldSetsRepository.GetAllAsync(query =>
+            {
+                return query
+                    .Where(_ => fieldSetIds.Contains(_.Id))
+                    .Include(_ => _.FieldSetFields);
+            }, cancellationToken);
+
+            return fieldSets;
+        }
+
+        private async Task<List<Field>> GetFieldsAsync(IEnumerable<FieldSet> fieldSets, CancellationToken cancellationToken)
+        {
+            var fieldIds = fieldSets
+                .SelectMany(_ => _.FieldSetFields)
+                .Select(_ => _.FieldId)
+                .Distinct()
+                .ToList();
+
+            var fields = await _fieldsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => fieldIds.Contains(_.Id));
+            }, cancellationToken);
+
+            return fields;
+        }
+
+        private async Task<(List<FieldSet>, List<Field>)> ValidateAsync<T, TS>(UpsertAssetDto <T, TS>  assetDto, CancellationToken cancellationToken)
+            where T : UpsertAssetFieldSetDto<TS> where TS : UpsertAssetFieldDto
+        {
+            var validationErrors = new Dictionary<string, List<string>>();
+            
+            // Step 1: ensure the asset type exists
+            var assetType = await _assetTypesRepository.GetByIdAsync(assetDto.AssetTypeId, query =>
+            {
+                return query
+                    .Include(s => s.AssetTypeFieldSets);
+            }, cancellationToken);
+
+            if (assetType == null)
+            {
+                validationErrors.Add(nameof(CreateAssetDto.AssetTypeId), new List<string>{"The asset type does not exist."});
+                throw new ValidationException(validationErrors);
+            }
+
+            // Step 2: ensure all expected field sets are present
+            var dbFieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
+            var dtoFieldSets = assetDto.FieldSets ?? new List<T>();
+            
+            var dbFieldSetIds = dbFieldSets.Select(_ => _.Id).ToList();
+            var dtoFieldSetIds = dtoFieldSets.Select(_ => _.Id).ToList();
+            
+            var missingFieldSetIds = dbFieldSetIds.Except(dtoFieldSetIds).ToList();
+            
+            if (missingFieldSetIds.Any())
+            {
+                var messages = missingFieldSetIds.Select(_ => $"Field set with id {_} is missing.").ToList();
+                validationErrors.Add(nameof(CreateAssetDto.FieldSets), messages);
+                
+                throw new ValidationException(validationErrors);
+            }
+
+            // Step 3: ensure all expected fields are present
+            foreach (var dbFieldSet in dbFieldSets)
+            {
+                var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+
+                var dtoFieldSet = dtoFieldSets.First(_ => _.Id.Equals(dbFieldSet.Id));
+
+                var dtoFieldIds = dtoFieldSet.Fields?.Select(_ => _.Id).ToList();
+
+                var missingFieldIds = dtoFieldIds == null ? 
+                    dbFieldIds : dbFieldIds.Except(dtoFieldIds).ToList();
+
+                if (missingFieldIds.Any())
+                {
+                    // FieldSet[i].Fields
+                    var idx = dtoFieldSets.IndexOf(dtoFieldSet);
+                    var key = $"{nameof(CreateAssetDto.FieldSets)}[{idx}].{nameof(CreateAssetFieldSetDto.Fields)}";
+
+                    var messages = missingFieldIds.Select(_ => $"Field with id {_} is missing.").ToList();
+                    validationErrors.Add(key, messages);
+                }
+            }
+
+            if (validationErrors.Any())
+            {
+                throw new ValidationException(validationErrors);
+            }
+
+            // Step 4: ensure field value validations pass
+            var dbFields = await GetFieldsAsync(dbFieldSets, cancellationToken);
+
+            foreach (var dbFieldSet in dbFieldSets)
+            {
+                var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+                var dbFieldSetFields = dbFields.Where(_ => dbFieldIds.Contains(_.Id)).ToList();
+                
+                var dtoFieldSet = dtoFieldSets.First(_ => _.Id.Equals(dbFieldSet.Id));
+
+                foreach (var dbField in dbFieldSetFields)
+                {
+                    var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
+
+                    var value = dtoField.Value;
+                    var messages = _fieldValueValidator.Validate(value, dbField.Type);
+                    
+                    if (messages.Any())
+                    {
+                        // FieldSet[idx].Fields[jdx].Value
+                        var idx = dtoFieldSets.IndexOf(dtoFieldSet);
+                        var jdx = dtoFieldSet.Fields.IndexOf(dtoField);
+
+                        var key = 
+                            $"{nameof(CreateAssetDto.FieldSets)}[{idx}]." +
+                            $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." + 
+                            $"{nameof(CreateAssetFieldDto.Value)}";
+                        
+                        validationErrors.Add(key, messages);
+                    }
+                }
+            }
+
+            if (validationErrors.Any())
+            {
+                throw new ValidationException(validationErrors);
+            }
+
+            return (dbFieldSets, dbFields);
         }
     }
 }

@@ -11,6 +11,7 @@
     
     <ItemGroup>
       <ProjectReference Include="..\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj" />
+      <ProjectReference Include="..\NomaNova.Ojeda.Utils\NomaNova.Ojeda.Utils.csproj" />
     </ItemGroup>
 
 </Project>

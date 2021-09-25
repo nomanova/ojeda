@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Core.Domain.Fields;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Data.Seeders
 {
     public static class FieldsSeeder
     {
-        public static readonly List<Field> Fields = new()
+        private static readonly List<Field> Fields = new()
         {
             new()
             {

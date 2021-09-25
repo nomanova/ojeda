@@ -4,7 +4,7 @@
     <thead>
         <tr>
             @TableHeader
-            <th>Actions</th>
+            <th style="text-align: end;">Actions</th>
         </tr>
     </thead>
     <tbody> 
@@ -12,7 +12,7 @@
         {
             <tr>
                 @RowTemplate(item)
-                <td>
+                <td style="text-align: end;">
                     <a class="btn-link" role="button" @onclick="@(() => EditItemCallBack.InvokeAsync(item))">Edit</a> |
                     <a class="btn-link" role="button" @onclick="@(() => DeleteItemCallBack.InvokeAsync(item))">Delete</a>
                 </td>

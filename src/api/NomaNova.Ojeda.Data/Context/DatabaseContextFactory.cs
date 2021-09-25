@@ -1,8 +1,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using NomaNova.Ojeda.Core.Helpers;
 using NomaNova.Ojeda.Data.Options;
+using NomaNova.Ojeda.Utils.Services;
 using MsOptions = Microsoft.Extensions.Options;
 
 namespace NomaNova.Ojeda.Data.Context

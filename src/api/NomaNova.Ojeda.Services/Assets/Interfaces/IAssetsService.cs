@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
 
-namespace NomaNova.Ojeda.Services.Assets
+namespace NomaNova.Ojeda.Services.Assets.Interfaces
 {
     public interface IAssetsService
     {
@@ -21,9 +21,9 @@ namespace NomaNova.Ojeda.Services.Assets
             int pageSize,
             CancellationToken cancellationToken = default);
 
-        Task<AssetDto> CreateAsync(AssetDto assetDto, CancellationToken cancellationToken = default);
+        Task<AssetDto> CreateAsync(CreateAssetDto assetDto, CancellationToken cancellationToken = default);
 
-        Task<AssetDto> UpdateAsync(string id, AssetDto assetDto,
+        Task<AssetDto> UpdateAsync(string id, UpdateAssetDto assetDto,
             CancellationToken cancellationToken = default);
         
         Task DeleteAsync(string id, CancellationToken cancellationToken = default);

@@ -8,12 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
-using NomaNova.Ojeda.Core.Extensions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.FieldSets.Interfaces;
 using NomaNova.Ojeda.Services.FieldSets.Validators;
+using NomaNova.Ojeda.Utils.Extensions;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {

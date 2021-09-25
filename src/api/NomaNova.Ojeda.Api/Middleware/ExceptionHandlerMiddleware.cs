@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Exceptions;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Middleware
 {

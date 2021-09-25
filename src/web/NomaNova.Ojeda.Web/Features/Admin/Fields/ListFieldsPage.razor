@@ -3,6 +3,7 @@
 @inherits ListItemsPage<FieldDto>
 
 @inject OjedaClient Ojeda
+@inject ITimeKeeper TimeKeeper
 
 <OjedaBreadcrumb Data="@_breadcrumbItems" />
 
@@ -50,11 +51,13 @@ else
             <th>Name</th>
             <th>Description</th>
             <th>Type</th>
+            <th>Last Updated</th>
         </TableHeader>
         <RowTemplate Context="field">
             <td>@field.Name</td>
             <td><Description Value="@field.Description"/></td>
             <td>@field.Type</td>
+            <td>@field.UpdatedAt.ToRelativeTime(TimeKeeper)</td>
         </RowTemplate>
     </ActionsTableTemplate>
 

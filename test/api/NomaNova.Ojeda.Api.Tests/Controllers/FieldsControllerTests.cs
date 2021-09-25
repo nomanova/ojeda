@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Api.Tests.Controllers.Base;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 using Xunit;
 
 namespace NomaNova.Ojeda.Api.Tests.Controllers

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Data.Seeders
 {

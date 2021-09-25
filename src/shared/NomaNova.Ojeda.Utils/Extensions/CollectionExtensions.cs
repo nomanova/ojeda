@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NomaNova.Ojeda.Core.Extensions
+namespace NomaNova.Ojeda.Utils.Extensions
 {
     public static class CollectionExtensions
     {

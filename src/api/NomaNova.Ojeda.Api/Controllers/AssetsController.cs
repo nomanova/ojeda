@@ -8,6 +8,7 @@ using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Assets;
+using NomaNova.Ojeda.Services.Assets.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Controllers
 {
@@ -85,10 +86,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(typeof(AssetDto), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create(
-            [FromBody] AssetDto assetDto, 
+            [FromBody] CreateAssetDto createAssetDto,
             CancellationToken cancellationToken = default)
         {
-            assetDto = await _assetsService.CreateAsync(assetDto, cancellationToken);
+            var assetDto = await _assetsService.CreateAsync(createAssetDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = assetDto.Id }, assetDto);
         }
         
@@ -103,10 +104,10 @@ namespace NomaNova.Ojeda.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(
             [FromRoute] string id,
-            [FromBody] AssetDto assetDto,
+            [FromBody] UpdateAssetDto updateAssetDto,
             CancellationToken cancellationToken = default)
         {
-            assetDto = await _assetsService.UpdateAsync(id, assetDto, cancellationToken);
+            var assetDto = await _assetsService.UpdateAsync(id, updateAssetDto, cancellationToken);
             return Ok(assetDto);
         }
         

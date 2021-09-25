@@ -5,6 +5,8 @@ using Blazored.Toast;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NomaNova.Ojeda.Client;
+using NomaNova.Ojeda.Utils.Services;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Web
 {
@@ -23,6 +25,8 @@ namespace NomaNova.Ojeda.Web
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddBlazoredModal();
 
+            builder.Services.AddSingleton<ITimeKeeper, TimeKeeper>();
+            
             await builder.Build().RunAsync();
         }
     }

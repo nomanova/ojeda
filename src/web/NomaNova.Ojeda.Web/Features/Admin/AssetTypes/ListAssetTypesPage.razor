@@ -2,6 +2,7 @@
 @layout AdminLayout
 @inherits ListItemsPage<AssetTypeDto>
 
+@inject ITimeKeeper TimeKeeper
 @inject OjedaClient Ojeda
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
@@ -49,6 +50,7 @@ else
             <th>Name</th>
             <th>Description</th>
             <th># Field Sets</th>
+            <th>Last Updated</th>
         </TableHeader>
         <RowTemplate Context="assetType">
             <td>@assetType.Name</td>
@@ -56,6 +58,7 @@ else
                 <Description Value="@assetType.Description"/>
             </td>
             <td>@assetType.FieldSets.Count</td>
+            <td>@assetType.UpdatedAt.ToRelativeTime(TimeKeeper)</td>
         </RowTemplate>
     </ActionsTableTemplate>
 

@@ -14,19 +14,20 @@ using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
-using NomaNova.Ojeda.Core.Helpers;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Data.Context.Interfaces;
 using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Services.Assets;
+using NomaNova.Ojeda.Services.Assets.Interfaces;
 using NomaNova.Ojeda.Services.AssetTypes;
 using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
 using NomaNova.Ojeda.Services.Fields;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
 using NomaNova.Ojeda.Services.FieldSets;
 using NomaNova.Ojeda.Services.FieldSets.Interfaces;
+using NomaNova.Ojeda.Utils.Services;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Api
 {
@@ -99,6 +100,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ISerializer, Serializer>();
             
             services.TryAddSingleton<IFieldValueConverter, FieldValueConverter>();
+            services.TryAddSingleton<IFieldValueValidator, FieldValueValidator>();
             
             services.TryAddScoped<IFieldsService, FieldsService>();
             services.TryAddScoped<IFieldSetsService, FieldSetsService>();

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -7,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NomaNova.Ojeda.Core;
-using NomaNova.Ojeda.Core.Extensions;
-using NomaNova.Ojeda.Core.Helpers.Interfaces;
 using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Data.Options;
+using NomaNova.Ojeda.Utils.Extensions;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Data.Repositories
 {
