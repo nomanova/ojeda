@@ -5,6 +5,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Files", "_Files", "{085F0C0F-B35E-4EF2-B006-717D53C1E755}"
 ProjectSection(SolutionItems) = preProject
 	README.md = README.md
+	azure-pipelines-api.yml = azure-pipelines-api.yml
+	azure-pipelines-web.yml = azure-pipelines-web.yml
 EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NomaNova.Ojeda.Core", "src\api\NomaNova.Ojeda.Core\NomaNova.Ojeda.Core.csproj", "{5EEFDD59-668C-4A96-87F9-9E3782FF6D20}"

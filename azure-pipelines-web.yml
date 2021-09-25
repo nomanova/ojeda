@@ -6,6 +6,7 @@ trigger:
     include:
       - src/web/*
       - src/shared/*
+      - test/api/*
       - azure-pipelines-web.yml
       - Web.Dockerfile
 
@@ -14,10 +15,31 @@ pr: none
 pool:
   vmImage: 'ubuntu-20.04'
 
+variables:
+  - name: 'DOCKER_FILE'
+    value: 'Web.Dockerfile'
+  - name: 'DOCKER_REGISTRY'
+    value: 'dockerhub'
+  - name: 'DOCKER_REPOSITORY'
+    value: 'nomanova/ojeda-web'
+
 steps:
-  # Docker image
   - task: Docker@2
     displayName: 'Build Image'
     inputs:
       command: build
-      Dockerfile: 'Web.Dockerfile'
+      containerRegistry: '$(DOCKER_REGISTRY)'
+      repository: '$(DOCKER_REPOSITORY)'
+      Dockerfile: '$(DOCKER_FILE)'
+      tags: |
+        '$(Build.BuildId)'
+        'latest'
+  - task: Docker@2
+    displayName: 'Push Image'
+    inputs:
+      command: push
+      containerRegistry: '$(DOCKER_REGISTRY)'
+      repository: '$(DOCKER_REPOSITORY)'
+      tags: |
+        '$(Build.BuildId)'
+        'latest'
