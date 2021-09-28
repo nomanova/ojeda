@@ -1,0 +1,47 @@
+@inject ILocalStorageService LocalStorageService
+
+<div class="btn-group" role="group">
+    <!-- Grid -->
+    <input type="radio" class="btn-check" name="btn-grid" id="btn-grid" autocomplete="off" @onclick="@(() => OnClick(ViewMode.Grid))" checked="@(_viewMode == ViewMode.Grid)">
+    <label class="btn btn-outline-primary" for="btn-grid"><i class="fs-6 bi-grid"></i></label>
+    <!-- Table -->
+    <input type="radio" class="btn-check" name="btn-list" id="btn-list" autocomplete="off" @onclick="@(() => OnClick(ViewMode.Table))" checked="@(_viewMode == ViewMode.Table)">
+    <label class="btn btn-outline-primary" for="btn-list"><i class="fs-6 bi-list"></i></label>
+</div>
+
+@code {
+
+    private ViewMode _viewMode;
+
+    [Parameter]
+    public EventCallback<ViewMode> OnViewModeChanged { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _viewMode = await GetViewMode();
+        await OnViewModeChanged.InvokeAsync(_viewMode);
+    }
+    
+    private async Task OnClick(ViewMode mode)
+    {
+        _viewMode = mode;
+
+        await StoreViewMode(_viewMode);
+        await OnViewModeChanged.InvokeAsync(_viewMode);
+    }
+    
+    private async Task<ViewMode> GetViewMode()
+    {
+        if (await LocalStorageService.ContainKeyAsync(Constants.StorageKeyViewMode))
+        {
+            return await LocalStorageService.GetItemAsync<ViewMode>(Constants.StorageKeyViewMode);
+        }
+
+        return ViewMode.Grid;
+    }
+
+    private async Task StoreViewMode(ViewMode viewMode)
+    {
+        await LocalStorageService.SetItemAsync(Constants.StorageKeyViewMode, viewMode);
+    }
+}

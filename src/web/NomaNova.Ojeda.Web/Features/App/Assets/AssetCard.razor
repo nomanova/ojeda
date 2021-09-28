@@ -1,0 +1,30 @@
+@inject ITimeKeeper TimeKeeper
+
+<div class="card" @onclick="@(() => OnSelected.InvokeAsync())" style="width: 100%;">
+
+    <!-- TODO: placeholder -->
+    @if (Asset.Id.GetHashCode() % 2 == 0)
+    {
+        <img src="/img/mobile_iphone.jpg" style="object-fit: cover;" class="card-img-top" alt="asset" width="100%" height="120" />    
+    }
+    else
+    {
+        <img src="/img/laptop_macbook.jpg" style="object-fit: cover;" class="card-img-top" alt="asset" width="100%" height="120" />
+    }
+    
+    <!-- Body -->
+    <div class="card-body">
+        <h5 class="card-title">@Asset.AssetType.Name</h5>
+        <p class="card-text text-muted">Last updated: @Asset.UpdatedAt.ToRelativeTime(TimeKeeper)</p>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public AssetSummaryDto Asset { get; set; }
+
+    [Parameter]
+    public EventCallback OnSelected { get; set; }
+
+}

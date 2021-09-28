@@ -120,7 +120,10 @@ namespace NomaNova.Ojeda.Services.Assets
             }
 
             var paginatedAssets = await _assetsRepository.GetAllPaginatedAsync(
-                searchQuery, null, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
+                searchQuery, query =>
+                {
+                    return query.Include(_ => _.AssetType);
+                }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
             var paginatedAssetsDto = _mapper.Map<PaginatedListDto<AssetSummaryDto>>(paginatedAssets);
             paginatedAssetsDto.Items = paginatedAssets.Select(f => _mapper.Map<AssetSummaryDto>(f)).ToList();

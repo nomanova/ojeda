@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
-using NomaNova.Ojeda.Core;
 
 namespace NomaNova.Ojeda.Api.Utils
 {

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models.Dtos.Assets;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Client.Services.Assets
 {
@@ -34,6 +35,27 @@ namespace NomaNova.Ojeda.Client.Services.Assets
             return await SendForDataAsync<AssetDto>(HttpMethod.Get, path, null, cancellationToken);
         }
 
+        public async Task<OjedaDataResult<PaginatedListDto<AssetSummaryDto>>> GetAsync(
+            string query,
+            string orderBy, 
+            bool orderAsc,
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken)
+        {
+            var qsb = QueryStringBuilder.New();
+
+            qsb.Add("query" , query);
+            qsb.Add("orderBy" , orderBy);
+            qsb.Add("orderAsc" , orderAsc);
+            qsb.Add("pageNumber" , pageNumber);
+            qsb.Add("pageSize" , pageSize);
+
+            var path = $"{BasePath}{qsb.Build()}";
+            
+            return await SendForDataAsync<PaginatedListDto<AssetSummaryDto>>(HttpMethod.Get, path, null, cancellationToken);
+        }
+        
         public async Task<OjedaDataResult<AssetDto>> CreateAsync(AssetDto asset, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}";

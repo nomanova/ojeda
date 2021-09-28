@@ -4,7 +4,7 @@ namespace NomaNova.Ojeda.Api
     {
         public const string AppName = "Ojeda";
         
-        public const string CompanyName = "nomanova";
+        public const string CompanyName = "NomaNova";
         public const string CompanyEmail = "hello@nomanova.com";
 
         public const string AspNetCoreEnvironmentVar = "ASPNETCORE_ENVIRONMENT";

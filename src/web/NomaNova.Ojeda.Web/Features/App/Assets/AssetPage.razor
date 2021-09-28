@@ -1,0 +1,11 @@
+@page "/assets/{AssetId}"
+
+<h3>Asset</h3>
+
+<p>@AssetId</p>
+
+@code {
+    
+    [Parameter]
+    public string AssetId { get; set; }
+}

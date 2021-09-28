@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -144,7 +145,10 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
         }
 
-        protected abstract Task<OjedaResult> DeleteItemAsync(T item);
+        protected virtual Task<OjedaResult> DeleteItemAsync(T item)
+        {
+            throw new NotImplementedException($"{nameof(DeleteItemAsync)} should be overridden");
+        }
 
         protected abstract Task<OjedaDataResult<PaginatedListDto<T>>> FetchItemsAsync(
             string query = null, 

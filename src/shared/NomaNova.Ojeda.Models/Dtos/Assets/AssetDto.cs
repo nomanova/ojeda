@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.Fields;
@@ -8,6 +9,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
     public class AssetSummaryDto : IIdentityDto
     {
         public string Id { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
 
         public AssetTypeSummaryDto AssetType { get; set; }
     }

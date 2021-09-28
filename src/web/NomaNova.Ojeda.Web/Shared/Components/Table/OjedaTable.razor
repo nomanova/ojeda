@@ -1,0 +1,60 @@
+@typeparam TItem
+@inject ITimeKeeper TimeKeeper
+
+<table class="table table-hover w-100">
+    <thead>
+    <tr>
+        @foreach (var column in Columns)
+        {
+            <th class="@GetAlignmentClass(column.Alignment)">@column.Caption</th>
+        }
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in DataItems)
+    {
+        <tr @onclick="@(() => OnItemSelected.InvokeAsync(item))">
+            @foreach (var column in Columns)
+            {
+                <td class="@GetAlignmentClass(column.Alignment)">@GetFormattedValue(item, column)</td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public ICollection<TItem> DataItems { get; set; }
+
+    [Parameter]
+    public ICollection<ColumnDefinition> Columns { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> OnItemSelected { get; set; }
+
+    private string GetFormattedValue(TItem item, ColumnDefinition column)
+    {
+        switch (column.DataType)
+        {
+            case DataType.NotSet:
+            case DataType.String:
+                return typeof(TItem).GetProperty(column.DataField)?.GetValue(item)?.ToString();
+            case DataType.RelativeDateTime:
+                if (DateTime.TryParse(typeof(TItem).GetProperty(column.DataField)?.GetValue(item)?.ToString(), out var result))
+                {
+                    return result.ToRelativeTime(TimeKeeper);
+                }
+                return string.Empty;
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private string GetAlignmentClass(Alignment alignment)
+    {
+        return alignment == Alignment.NotSet ? string.Empty : $"align-{alignment.ToString().ToLower()}";
+    }
+
+}

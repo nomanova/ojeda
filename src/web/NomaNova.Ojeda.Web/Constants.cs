@@ -19,5 +19,6 @@ namespace NomaNova.Ojeda.Web
         };
         
         public const string StorageKeyPageSize = "key-pager-page-size";
+        public const string StorageKeyViewMode = "key-view-selector-mode";
     }
 }

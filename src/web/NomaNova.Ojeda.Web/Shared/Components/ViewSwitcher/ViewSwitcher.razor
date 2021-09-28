@@ -1,0 +1,21 @@
+@if (ViewMode == ViewMode.Grid)
+{
+    @GridTemplate
+}
+else if (ViewMode == ViewMode.Table)
+{
+    @TableTemplate
+}
+
+@code {
+    
+    [Parameter]
+    public ViewMode ViewMode { get; set; }
+
+    [Parameter]
+    public RenderFragment GridTemplate { get; set; }
+    
+    [Parameter]
+    public RenderFragment TableTemplate { get; set; }
+
+}
