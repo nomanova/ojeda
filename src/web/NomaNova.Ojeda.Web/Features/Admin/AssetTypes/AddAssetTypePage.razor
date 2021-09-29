@@ -11,7 +11,7 @@
     <FluentValidationValidator Validator="@(new CreateAssetTypeDtoFieldValidator())" />
     <ServerSideFluentValidation @ref="ServerValidation" />
     
-    <div class="w-50 mb-4">
+    <div class="ojeda-form mb-4">
     
         <!-- Name -->
         <OjedaFormField ForId="assettype-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertAssetType.Name)">

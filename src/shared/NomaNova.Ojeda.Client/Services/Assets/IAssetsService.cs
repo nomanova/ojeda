@@ -24,10 +24,10 @@ namespace NomaNova.Ojeda.Client.Services.Assets
             CancellationToken cancellationToken = default);
         
         Task<OjedaDataResult<AssetDto>> CreateAsync(
-            AssetDto asset, CancellationToken cancellationToken = default);
+            CreateAssetDto asset, CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<AssetDto>> UpdateAsync(
-            string id, AssetDto asset,
+            string id, UpdateAssetDto asset,
             CancellationToken cancellationToken = default);
 
         Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);

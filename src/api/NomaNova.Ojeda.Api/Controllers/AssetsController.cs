@@ -4,10 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.Assets;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Controllers

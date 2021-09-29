@@ -17,6 +17,8 @@ else if (_isLoading)
 }
 else
 {
+    <div class="ojeda-form mt-3">
+    
     <!-- Class -->        
     <div class="card mb-3">
         <div class="card-body">
@@ -37,50 +39,47 @@ else
         <FluentValidationValidator />
         <ServerSideFluentValidation @ref="_serverValidation" />
         
-        @foreach (var fieldSet in _asset.FieldSets)
+        @foreach (var fieldSet in _createAsset.FieldSets)
         {
-            <FormSection Title="@fieldSet.Name" HelpText="@fieldSet.Description">
+            <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))">
                 @foreach (var field in fieldSet.Fields)
                 {
                     var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
                     
                     <div class="mb-3">
-                        <label for="@hash" class="form-label">@field.Name</label>
-                        <InputText @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isLoading"></InputText>
-                        @if (!string.IsNullOrEmpty(field.Description))
-                        {
-                            <p class="text-muted fst-italic mt-1">@field.Description</p>
-                        }
+                        <label for="@hash" class="form-label">@(GetFieldName(fieldSet.Id, field.Id))</label>
+                        <InputText @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                    placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))">
+                        </InputText>
+                        <ValidationMessage For="@(() => field.Value)"></ValidationMessage>
                     </div>
-
                 }
             </FormSection>
         }
-        
-        <!-- Footer -->
+
         <div class="my-4">
-            <button class="btn btn-primary" type="submit" disabled="@_isLoading">
-                @if (_isLoading)
-                {
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="visually-hidden">Loading...</span>   
-                }
-                Submit
-            </button>
-            <button class="btn" type="button" @onclick="OnCancel" disabled="@_isLoading">Cancel</button>
+            <OjedaFormFooter
+                IsSubmitting="@_isSubmitting"
+                OnCancel="@OnCancel"
+                OnReset="@OnReset"/>
         </div>
         
     </EditForm>
+    
+    </div>
 }
 
 @code {
 
+    private CreateAssetDto _createAsset = new();
+    
     private AssetDto _asset;
     private EditContext _editContext;
     
     private ServerSideFluentValidation _serverValidation;
 
     private bool _isLoading;
+    private bool _isSubmitting;
     private string _error;
     
     protected override async Task OnInitializedAsync()
@@ -92,17 +91,15 @@ else
 
     private async Task OnSubmitForm()
     {
-        Console.WriteLine("here");
-        
-        if (_isLoading)
+        if (_isSubmitting)
         {
             return;
         }
         
-        _isLoading = true;
+        _isSubmitting = true;
         _serverValidation.ClearErrors();
 
-        var result = await Ojeda.AssetsService.CreateAsync(_asset);
+        var result = await Ojeda.AssetsService.CreateAsync(_createAsset);
         
         if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
         {
@@ -114,15 +111,16 @@ else
         }
         else
         {
-            NavManager.NavigateTo("/assets"); // TODO: replace with asset location
+            var asset = result.Data;
+            NavManager.NavigateTo($"/assets/{asset.Id}");
         }
         
-        _isLoading = false;
+        _isSubmitting = false;
     }
 
     private void OnCancel()
     {
-        if (_isLoading)
+        if (_isSubmitting)
         {
             return;
         }
@@ -130,6 +128,61 @@ else
         NavManager.NavigateTo("/assets");
     }
     
+    private void OnReset()
+    {
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        Init();
+    }
+
+    private string GetFieldSetName(string id)
+    {
+        return GetFieldSet(id).Name;
+    }
+
+    private string GetFieldSetDescription(string id)
+    {
+        return GetFieldSet(id).Description;
+    }
+
+    private string GetFieldName(string fieldSetId, string fieldId)
+    {
+        return GetField(fieldSetId, fieldId).Name;
+    }
+
+    private string GetFieldDescription(string fieldSetId, string fieldId)
+    {
+        return GetField(fieldSetId, fieldId).Description;
+    }
+
+    private AssetFieldSetDto GetFieldSet(string id)
+    {
+        var fieldSet = _asset.FieldSets.FirstOrDefault(_ => _.Id.Equals(id));
+        
+        if (fieldSet == null)
+        {
+            throw new Exception($"Invalid state: field set {id} not available.");
+        }
+        
+        return fieldSet;
+    }
+
+    private AssetFieldDto GetField(string fieldSetId, string fieldId)
+    {
+        var fieldSet = GetFieldSet(fieldSetId);
+        var field = fieldSet.Fields.FirstOrDefault(_ => _.Id.Equals(fieldId));
+
+        if (field == null)
+        {
+            throw new Exception($"Invalid state: field {fieldId} not available.");
+        }
+
+        return field;
+    }
+
     private async Task GetAssetType(string assetTypeId)
     {
         if (string.IsNullOrEmpty(assetTypeId))
@@ -146,9 +199,8 @@ else
         {
             _error = null;
             _asset = result.Data;
-            
-            _editContext = new EditContext(_asset);
-            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+
+            Init();
         }
         else if (result.StatusCode == HttpStatusCode.NotFound)
         {
@@ -162,4 +214,25 @@ else
 
         _isLoading = false;
     }
+
+    private void Init()
+    {
+        _createAsset = new CreateAssetDto
+        {
+            AssetTypeId = _asset.AssetType.Id,
+            FieldSets = _asset.FieldSets.Select(fs => new CreateAssetFieldSetDto
+            {
+                Id = fs.Id,
+                Fields = fs.Fields.Select(f => new CreateAssetFieldDto
+                {
+                    Id = f.Id,
+                    Value = f.Value
+                }).ToList()
+            }).ToList()
+        };
+
+        _editContext = new EditContext(_createAsset);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
 }

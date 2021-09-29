@@ -1,11 +1,43 @@
 @page "/assets/{AssetId}"
 
+@inject OjedaClient Ojeda
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+
 <h3>Asset</h3>
 
 <p>@AssetId</p>
 
+<OjedaButton 
+    Text="Delete" 
+    Style="@ButtonStyle.Danger" 
+    OnClick="OnDelete" 
+    IsLoading="_isLoading" 
+    IsDisabled="_isLoading" />
+
 @code {
+
+    private bool _isLoading;
     
     [Parameter]
     public string AssetId { get; set; }
+
+    private async Task OnDelete()
+    {
+        _isLoading = true;
+        
+        var result = await Ojeda.AssetsService.DeleteAsync(AssetId);
+
+        if (result.Success)
+        {
+            NavManager.NavigateTo("/assets");
+        }
+        else
+        {
+            ToastService.ShowError($"Could not delete asset. {result.Error?.Message} ({result.Error?.Code}).");
+        }
+
+        _isLoading = false;
+    }
+
 }

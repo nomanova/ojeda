@@ -113,10 +113,12 @@ namespace NomaNova.Ojeda.Web.Features.Admin.AssetTypes
         private FieldSetSummaryDto GetFieldSet(string id)
         {
             var fieldSet = FieldSets.FirstOrDefault(_ => _.Id.Equals(id));
+            
             if (fieldSet == null)
             {
                 throw new Exception($"Invalid state: field set {id} not available.");
             }
+            
             return fieldSet;
         }
         

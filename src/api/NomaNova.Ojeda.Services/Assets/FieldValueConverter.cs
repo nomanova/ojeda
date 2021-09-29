@@ -16,7 +16,7 @@ namespace NomaNova.Ojeda.Services.Assets
             switch (fieldType)
             {
                 case FieldType.Text:
-                    return Encoding.UTF8.GetBytes(value);
+                    return Encoding.UTF8.GetBytes(value ?? string.Empty);
                 default:
                     throw new NotImplementedException(fieldType.ToString());
             }

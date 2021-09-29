@@ -13,7 +13,7 @@
         <FluentValidationValidator Validator="@(new UpdateFieldSetDtoFieldValidator())"/>
         <ServerSideFluentValidation @ref="ServerValidation"/>
 
-        <div class="w-50 mb-4">
+        <div class="ojeda-form mb-4">
 
             <!-- Name -->
             <OjedaFormField ForId="fieldset-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertFieldSet.Name)">

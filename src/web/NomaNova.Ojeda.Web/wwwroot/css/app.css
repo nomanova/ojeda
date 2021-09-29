@@ -42,3 +42,7 @@
 .blazored-modal-content {
     min-width: 600px;
 }
+
+.ojeda-form {
+    max-width: 750px;
+}
