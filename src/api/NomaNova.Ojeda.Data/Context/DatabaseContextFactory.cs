@@ -50,9 +50,10 @@ namespace NomaNova.Ojeda.Data.Context
         {
             var contextBuilder = CreateContextBuilder();
             var timeKeeper = new TimeKeeper();
+            var serializer = new Serializer();
             var contextOptions = new DbContextOptionsBuilder<DatabaseContext>();
             
-            return new DatabaseContext(timeKeeper, contextBuilder, contextOptions.Options);
+            return new DatabaseContext(timeKeeper, serializer, contextBuilder, contextOptions.Options);
         }
     }
 }

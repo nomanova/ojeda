@@ -161,7 +161,7 @@ namespace NomaNova.Ojeda.Services.Assets
                         AssetId = asset.Id,
                         FieldSetId = dbFieldSet.Id,
                         FieldId = dbField.Id,
-                        Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type)
+                        Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type)
                     };
                     
                     asset.FieldValues.Add(fieldValue);
@@ -217,7 +217,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
                     if (existingFieldValue != null)
                     {
-                        existingFieldValue.Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type);
+                        existingFieldValue.Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type);
                         updatedFieldValues.Add(existingFieldValue);
                     }
                     else
@@ -229,7 +229,7 @@ namespace NomaNova.Ojeda.Services.Assets
                             AssetId = asset.Id,
                             FieldSetId = dbFieldSet.Id,
                             FieldId = dbField.Id,
-                            Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Type)
+                            Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type)
                         };
                         
                         updatedFieldValues.Add(newFieldValue);
@@ -298,7 +298,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     // Value
                     if (fieldValueResolver != null)
                     {
-                        fieldDto.Value = fieldValueResolver(fieldSetId, fieldId, field.Type);
+                        fieldDto.Value = fieldValueResolver(fieldSetId, fieldId, field.Data.Type);
                     }
 
                     fieldSetDto.Fields.Add(fieldDto);
@@ -431,7 +431,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
 
                     var value = dtoField.Value;
-                    var messages = _fieldValueValidator.Validate(value, dbField.Type);
+                    var messages = _fieldValueValidator.Validate(value, dbField.Data.Type);
                     
                     if (messages.Any())
                     {

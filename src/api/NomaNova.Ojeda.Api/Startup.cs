@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
 using NomaNova.Ojeda.Api.FileStore;
 using NomaNova.Ojeda.Api.FileStore.Interfaces;
 using NomaNova.Ojeda.Api.Middleware;
@@ -18,6 +21,8 @@ using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Data.Context.Interfaces;
 using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Models.Shared.Converters;
 using NomaNova.Ojeda.Services.Assets;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
 using NomaNova.Ojeda.Services.AssetTypes;
@@ -71,6 +76,7 @@ namespace NomaNova.Ojeda.Api
             app.UseRouting();
             app.UseCors(Constants.CorsPolicy);
 
+            app.UseRequestResponseLogging();
             app.UseExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>
@@ -152,6 +158,11 @@ namespace NomaNova.Ojeda.Api
                 options.SwaggerDoc(Swagger.GetDoc(), Swagger.GetInfo());
                 options.EnableAnnotations();
                 options.IncludeXmlComments(Swagger.GetXmlPath(typeof(Startup).Assembly));
+                options.UseOneOfForPolymorphism();
+                options.SelectSubTypesUsing(baseType =>
+                {
+                    return typeof(ErrorDto).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
+                });
             });
 
             services.AddSwaggerGenNewtonsoftSupport();

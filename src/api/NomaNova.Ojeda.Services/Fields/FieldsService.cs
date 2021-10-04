@@ -7,7 +7,6 @@ using AutoMapper;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
@@ -89,6 +88,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;
+            field.Data = _mapper.Map<FieldData>(fieldDto.Data);
             
             field = await _fieldsRepository.UpdateAsync(field, cancellationToken);
 

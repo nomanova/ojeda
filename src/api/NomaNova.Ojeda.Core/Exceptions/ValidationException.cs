@@ -7,6 +7,14 @@ namespace NomaNova.Ojeda.Core.Exceptions
     {
         public Dictionary<string, List<string>> ValidationErrors { get; }
 
+        public ValidationException(string field, string message)
+        {
+            ValidationErrors = new Dictionary<string, List<string>>
+            {
+                {field, new List<string> {message}}
+            };
+        }
+
         public ValidationException(string field, List<string> messages)
         {
             ValidationErrors = new Dictionary<string, List<string>>
@@ -14,7 +22,7 @@ namespace NomaNova.Ojeda.Core.Exceptions
                 {field, messages}
             };
         }
-        
+
         public ValidationException(Dictionary<string, List<string>> validationErrors)
         {
             ValidationErrors = validationErrors;

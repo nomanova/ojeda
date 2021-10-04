@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using NomaNova.Ojeda.Utils.Services;
+using Newtonsoft.Json;
+using NomaNova.Ojeda.Models.Shared.Converters;
+using NomaNova.Ojeda.Utils;
 
 namespace NomaNova.Ojeda.Api.Options.Framework
 {
@@ -12,11 +15,18 @@ namespace NomaNova.Ojeda.Api.Options.Framework
 
         public static void Apply(MvcNewtonsoftJsonOptions options)
         {
-            options.SerializerSettings.ContractResolver = Serializer.JsonSettings.ContractResolver;
-            options.SerializerSettings.Culture = Serializer.JsonSettings.Culture;
-            options.SerializerSettings.DateFormatString = Serializer.JsonSettings.DateFormatString;
-            options.SerializerSettings.ReferenceLoopHandling = Serializer.JsonSettings.ReferenceLoopHandling;
-            options.SerializerSettings.Converters = Serializer.JsonSettings.Converters;
+            var jsonConverters = new List<JsonConverter>
+            {
+                new FieldDataDtoJsonConverter()
+            };
+            
+            var settings = JsonSettings.Get(jsonConverters);
+            
+            options.SerializerSettings.ContractResolver = settings.ContractResolver;
+            options.SerializerSettings.Culture = settings.Culture;
+            options.SerializerSettings.DateFormatString = settings.DateFormatString;
+            options.SerializerSettings.ReferenceLoopHandling = settings.ReferenceLoopHandling;
+            options.SerializerSettings.Converters = settings.Converters;
         }
     }
 }

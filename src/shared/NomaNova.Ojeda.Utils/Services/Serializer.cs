@@ -1,44 +1,19 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Utils.Services
 {
     public class Serializer : ISerializer
     {
-        public static readonly JsonSerializerSettings JsonSettings;
-        
-        private const string DefaultCulture = "en-US";
-        private const string DefaultDateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ"; // ISO 8601
-        
-        static Serializer()
+        public string Serialize(object obj, ICollection<JsonConverter> converters = null)
         {
-            JsonSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy
-                    {
-                        ProcessDictionaryKeys = false
-                    }
-                },
-                Culture = new System.Globalization.CultureInfo(DefaultCulture),
-                DateFormatString = DefaultDateTimeFormat,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-
-            JsonSettings.Converters.Add(new StringEnumConverter());
-        }
-                
-        public string Serialize(object obj)
-        {
-            return JsonConvert.SerializeObject(obj, JsonSettings);
+            return JsonConvert.SerializeObject(obj, JsonSettings.Get(converters));
         }
         
-        public T Deserialize<T>(string obj)
+        public T Deserialize<T>(string obj, ICollection<JsonConverter> converters = null)
         {
-            return JsonConvert.DeserializeObject<T>(obj, JsonSettings);
+            return JsonConvert.DeserializeObject<T>(obj, JsonSettings.Get(converters));
         }
     }
 }

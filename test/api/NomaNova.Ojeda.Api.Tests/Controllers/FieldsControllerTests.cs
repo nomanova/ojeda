@@ -14,11 +14,14 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
         public async Task CreateField_WhenValid_ShouldReturnCreated()
         {
             // Create
-            var fieldDto = new FieldDto
+            var fieldDto = new CreateFieldDto
             {
                 Name = "Serial Number",
                 Description = "Unique device identification as provided by the manufacturer",
-                Type = FieldTypeDto.Text
+                Data = new TextFieldDataDto
+                {
+                    Type = FieldTypeDto.Text   
+                }
             };
             
             var request = new RequestBuilder(HttpMethod.Post, "/api/fields")

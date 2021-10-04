@@ -5,7 +5,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
 {
     public enum FieldTypeDto
     {
-        Text
+        Text,
+        Number
     }
     
     public class FieldDto : IIdentityDto, INamedDto
@@ -18,6 +19,6 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
         
         public string Description { get; set; }
 
-        public FieldTypeDto Type { get; set; }
+        public FieldDataDto Data { get; set; }
     }
 }

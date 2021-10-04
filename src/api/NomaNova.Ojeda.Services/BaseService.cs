@@ -11,6 +11,11 @@ namespace NomaNova.Ojeda.Services
         protected static async Task Validate<T>(AbstractValidator<T> validator, T instance,
             CancellationToken cancellationToken)
         {
+            if (instance == null)
+            {
+                throw new ValidationException(typeof(T).Name, "Invalid entity.");
+            }
+
             var result = await validator.ValidateAsync(instance, cancellationToken);
 
             if (!result.IsValid)

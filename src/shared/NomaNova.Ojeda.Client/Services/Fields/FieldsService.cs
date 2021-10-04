@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Models.Shared.Converters;
 
 namespace NomaNova.Ojeda.Client.Services.Fields
 {
@@ -16,6 +16,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         
         public FieldsService(OjedaHttpClient httpClient) : base(httpClient)
         {
+            JonConverters.Add(new FieldDataDtoJsonConverter());
         }
 
         public async Task<OjedaDataResult<FieldDto>> GetByIdAsync(string id, CancellationToken cancellationToken)

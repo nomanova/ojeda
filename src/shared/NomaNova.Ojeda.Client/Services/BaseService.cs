@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -9,16 +10,21 @@ using Newtonsoft.Json;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Utils.Services;
+using NomaNova.Ojeda.Utils.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Client.Services
 {
     internal abstract class BaseService
     {
         private readonly OjedaHttpClient _httpClient;
-
+        private readonly ISerializer _serializer;
+        
+        protected IList<JsonConverter> JonConverters { get; } = new List<JsonConverter>();
+        
         protected BaseService(OjedaHttpClient httpClient)
         {
             _httpClient = httpClient;
+            _serializer = new Serializer();
         }
 
         protected async Task<OjedaResult> SendAsync(
@@ -74,7 +80,7 @@ namespace NomaNova.Ojeda.Client.Services
             return await ParseDataResponseAsync<T>(response);
         }
 
-        private static async Task<OjedaResult> ParseResponseAsync(HttpResponseMessage response)
+        private  async Task<OjedaResult> ParseResponseAsync(HttpResponseMessage response)
         {
             var statusCode = response.StatusCode;
 
@@ -87,7 +93,7 @@ namespace NomaNova.Ojeda.Client.Services
             return OjedaResult.ForSuccess(statusCode);
         }
 
-        private static async Task<OjedaDataResult<T>> ParseDataResponseAsync<T>(HttpResponseMessage response)
+        private async Task<OjedaDataResult<T>> ParseDataResponseAsync<T>(HttpResponseMessage response)
         {
             var statusCode = response.StatusCode;
 
@@ -102,13 +108,13 @@ namespace NomaNova.Ojeda.Client.Services
             return OjedaDataResult<T>.ForSuccess(data, statusCode);
         }
 
-        private static async Task<T> GetPayloadAsync<T>(HttpResponseMessage response)
+        private async Task<T> GetPayloadAsync<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content, Serializer.JsonSettings);
+            return _serializer.Deserialize<T>(content, JonConverters);
         }
 
-        private static async Task<ErrorDto> TryParseErrorAsync(HttpResponseMessage response)
+        private async Task<ErrorDto> TryParseErrorAsync(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
 
@@ -117,17 +123,17 @@ namespace NomaNova.Ojeda.Client.Services
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<ErrorDto>(content, Serializer.JsonSettings);
+            return _serializer.Deserialize<ErrorDto>(content, JonConverters);
         }
 
-        private static void TryAddPayload(HttpRequestMessage request, object payload)
+        private void TryAddPayload(HttpRequestMessage request, object payload)
         {
             if (payload == null)
             {
                 return;
             }
 
-            var body = JsonConvert.SerializeObject(payload, Serializer.JsonSettings);
+            var body = _serializer.Serialize(payload, JonConverters);
             request.Content = new StringContent(body, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
     }
