@@ -1,6 +1,6 @@
 @page "/admin/fields/add"
 @layout AdminLayout
-@inherits FormPage<FieldDto>
+@inherits FieldPage
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
@@ -8,7 +8,7 @@
 
 <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-    <FluentValidationValidator Validator="@(new CreateFieldDtoFieldValidator())"/>
+    <FluentValidationValidator DisableAssemblyScanning="@true"/>
     <ServerSideFluentValidation @ref="ServerValidation"/>
 
     <div class="ojeda-form mb-4">
@@ -26,13 +26,50 @@
 
         <!-- Type -->
         <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
-            <InputSelect @bind-Value="_createField.Type" class="form-control" id="field-type" disabled="@IsSubmitting">
+            <InputSelect @bind-Value="_createField.Data.Type" @oninput="OnTypeChange" class="form-control" id="field-type" disabled="@IsSubmitting">
                 @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
                 {
                     <option value="@type">@type</option>
                 }
             </InputSelect>
         </OjedaFormField>
+
+        <!-- Type: Text -->
+        @if (_createField.Data.Type == FieldTypeDto.Text)
+        {
+            var textData = (TextFieldDataDto) _createField.Data;
+
+            <OjedaFormField ForId="field-text-minLength" Label="Minimum Length" ValidateFor="@(() => textData.MinLength)"
+                            HelpText="Optional, will validate the minimum input length.">
+                <InputNumber @bind-Value="textData.MinLength" DisplayName="Minimum Length" class="form-control" id="field-text-minLength" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+
+            <OjedaFormField ForId="field-text-maxLength" Label="Maximum Length" ValidateFor="@(() => textData.MaxLength)"
+                            HelpText="Optional, will validate the maximum input length.">
+                <InputNumber @bind-Value="textData.MaxLength" DisplayName="Maximum Length" class="form-control" id="field-text-maxLength" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+        }
+
+        <!-- Type: Number -->
+        @if (_createField.Data.Type == FieldTypeDto.Number)
+        {
+            var numberData = (NumberFieldDataDto) _createField.Data;
+            
+            <OjedaFormField ForId="field-text-withDecimals" Label="Allow Decimals" ValidateFor="@(() => numberData.WithDecimals)"
+                            HelpText="Determines if decimal numbers are allowed.">
+                <InputCheckbox @bind-Value="numberData.WithDecimals" DisplayName="Allow Decimals" id="field-text-withDecimals" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+            
+            <OjedaFormField ForId="field-text-minValue" Label="Minimum Value" ValidateFor="@(() => numberData.MinValue)"
+                            HelpText="Optional, will validate the minimum input value.">
+                <InputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+            
+            <OjedaFormField ForId="field-text-maxValue" Label="Maximum Value" ValidateFor="@(() => numberData.MaxValue)"
+                            HelpText="Optional, will validate the maximum input value.">
+                <InputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
+            </OjedaFormField>
+        }
 
     </div>
 
@@ -69,9 +106,17 @@
 
     protected override void Init()
     {
-        _createField = new CreateFieldDto();
+        _createField = new CreateFieldDto
+        {
+            Data = new TextFieldDataDto()
+        };
 
         EditContext = new EditContext(_createField);
         EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
+    protected override void SetFieldData(FieldDataDto fieldData)
+    {
+        _createField.Data = fieldData;
     }
 }

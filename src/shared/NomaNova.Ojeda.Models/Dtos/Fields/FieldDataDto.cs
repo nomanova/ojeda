@@ -9,6 +9,11 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
 
     public class TextFieldDataDto : FieldDataDto
     {
+        public TextFieldDataDto()
+        {
+            Type = FieldTypeDto.Text;
+        }
+
         public int? MinLength { get; set; }
 
         public int? MaxLength { get; set; }
@@ -32,6 +37,11 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
 
     public class NumberFieldDataDto : FieldDataDto
     {
+        public NumberFieldDataDto()
+        {
+            Type = FieldTypeDto.Number;
+        }
+        
         public bool WithDecimals { get; set; }
 
         public double? MinValue { get; set; }
@@ -45,12 +55,12 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
         {
             RuleFor(_ => new {_.MinValue, _.MaxValue}).Must(_ =>
                     !(_.MinValue.HasValue && _.MaxValue.HasValue && _.MinValue.Value > _.MaxValue.Value))
-                .WithName(nameof(TextFieldDataDto.MinLength))
+                .WithName(nameof(NumberFieldDataDto.MinValue))
                 .WithMessage("Min value should not be bigger than max value.");
 
             RuleFor(_ => new {_.MaxValue, _.MinValue}).Must(_ =>
                     !(_.MaxValue.HasValue && _.MinValue.HasValue && _.MaxValue.Value < _.MinValue.Value))
-                .WithName(nameof(TextFieldDataDto.MaxLength))
+                .WithName(nameof(NumberFieldDataDto.MaxValue))
                 .WithMessage("Max value should not be smaller than min value.");
         }
     }

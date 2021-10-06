@@ -56,7 +56,7 @@ else
         <RowTemplate Context="field">
             <td>@field.Name</td>
             <td><Description Value="@field.Description"/></td>
-            <td>@field.Type</td>
+            <td>@field.Data.Type</td>
             <td>@field.UpdatedAt.ToRelativeTime(TimeKeeper)</td>
         </RowTemplate>
     </ActionsTableTemplate>

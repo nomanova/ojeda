@@ -75,7 +75,7 @@ namespace NomaNova.Ojeda.Web.Shared.Base
 
             IsSubmitting = false;
         }
-        
+
         protected abstract Task<OjedaDataResult<TReturn>> OnSubmitEntity();
         
         protected abstract void Init();

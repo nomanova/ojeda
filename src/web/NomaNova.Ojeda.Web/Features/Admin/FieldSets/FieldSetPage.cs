@@ -110,11 +110,6 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
             return GetField(id).Description.Truncate();
         }
 
-        protected string GetFieldType(string id)
-        {
-            return GetField(id).Type.ToString();
-        }
-
         private FieldDto GetField(string id)
         {
             var field = Fields.FirstOrDefault(_ => _.Id.Equals(id));
