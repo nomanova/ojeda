@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  api:
+    image: nomanova/ojeda-api:latest
+    ports:
+      - '8081:80'
+    environment:
+      - 'ASPNETCORE_ENVIRONMENT=Production'
+      - 'Database__Type=Postgresql'
+      - 'Database__ConnectionString=User ID=ojeda;Password=ojeda;Host=database;Port=5432;Database=ojeda;Pooling=true;'
+      - 'Database__RunSeeders=true'
+    depends_on:
+      - 'database'
+  web:
+    image: nomanova/ojeda-web:latest
+    ports:
+      - '8080:80'
+    environment:
+      - 'API_LOCATION=http://api'
+    depends_on:
+      - 'api'
+  database:
+    image: postgres:13.3-alpine
+    environment:
+      - 'POSTGRES_DB=ojeda'
+      - 'POSTGRES_USER=ojeda'
+      - 'POSTGRES_PASSWORD=ojeda'
