@@ -19,6 +19,6 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields
         
         public string Description { get; set; }
 
-        public FieldDataDto Data { get; set; }
+        public FieldPropertiesDto Properties { get; set; }
     }
 }

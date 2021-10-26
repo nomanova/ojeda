@@ -16,10 +16,10 @@ namespace NomaNova.Ojeda.Web.Features.Admin.Fields
                 switch (type)
                 {
                     case FieldTypeDto.Text:
-                        SetFieldData(new TextFieldDataDto());
+                        SetFieldProperties(new TextFieldPropertiesDto());
                         break;
                     case FieldTypeDto.Number:
-                        SetFieldData(new NumberFieldDataDto());
+                        SetFieldProperties(new NumberFieldPropertiesDto());
                         break;
                     default:
                         throw new NotImplementedException(nameof(type));
@@ -27,6 +27,6 @@ namespace NomaNova.Ojeda.Web.Features.Admin.Fields
             }
         }
 
-        protected abstract void SetFieldData(FieldDataDto fieldData);
+        protected abstract void SetFieldProperties(FieldPropertiesDto fieldProperties);
     }
 }

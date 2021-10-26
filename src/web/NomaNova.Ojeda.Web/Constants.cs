@@ -4,7 +4,6 @@ namespace NomaNova.Ojeda.Web
 {
     public static class Constants
     {
-        public const string EnvDevelopment = "Development";
         public const string EnvProduction = "Production";
         
         public const int SearchMinInputChars = 1;

@@ -5,6 +5,7 @@ using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Models.Shared.Converters;
 
 namespace NomaNova.Ojeda.Client.Services.Assets
 {
@@ -14,6 +15,7 @@ namespace NomaNova.Ojeda.Client.Services.Assets
         
         public AssetsService(OjedaHttpClient httpClient) : base(httpClient)
         {
+            JonConverters.Add(new FieldPropertiesDtoJsonConverter());
         }
         
         public async Task<OjedaDataResult<AssetDto>> GetByIdAsync(string id, CancellationToken cancellationToken)

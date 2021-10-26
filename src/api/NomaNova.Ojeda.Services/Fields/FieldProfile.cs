@@ -14,18 +14,18 @@ namespace NomaNova.Ojeda.Services.Fields
             CreateMap<Field, FieldDto>();
             CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>();
 
-            CreateMap<FieldData, FieldDataDto>().IncludeAllDerived();
-            CreateMap<TextFieldData, TextFieldDataDto>();
-            CreateMap<NumberFieldData, NumberFieldDataDto>();
+            CreateMap<FieldProperties, FieldPropertiesDto>().IncludeAllDerived();
+            CreateMap<TextFieldProperties, TextFieldPropertiesDto>();
+            CreateMap<NumberFieldProperties, NumberFieldPropertiesDto>();
             
             // Dto -> Domain
             CreateMap<CreateFieldDto, Field>();
             CreateMap<UpdateFieldDto, Field>()
-                .ForMember(dest => dest.Data, opt => opt.Ignore());
+                .ForMember(dest => dest.Properties, opt => opt.Ignore());
             
-            CreateMap<FieldDataDto, FieldData>().IncludeAllDerived();
-            CreateMap<TextFieldDataDto, TextFieldData>();
-            CreateMap<NumberFieldDataDto, NumberFieldData>();
+            CreateMap<FieldPropertiesDto, FieldProperties>().IncludeAllDerived();
+            CreateMap<TextFieldPropertiesDto, TextFieldProperties>();
+            CreateMap<NumberFieldPropertiesDto, NumberFieldProperties>();
         }
     }
 }

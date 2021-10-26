@@ -1,13 +1,13 @@
 namespace NomaNova.Ojeda.Core.Domain.Fields
 {
-    public class FieldData
+    public class FieldProperties
     {
         public FieldType Type { get; set; }
     }
     
-    public class TextFieldData : FieldData
+    public class TextFieldProperties : FieldProperties
     {
-        public TextFieldData()
+        public TextFieldProperties()
         {
             Type = FieldType.Text;
         }
@@ -17,9 +17,9 @@ namespace NomaNova.Ojeda.Core.Domain.Fields
         public int? MaxLength { get; set; }
     }
     
-    public class NumberFieldData : FieldData
+    public class NumberFieldProperties : FieldProperties
     {
-        public NumberFieldData()
+        public NumberFieldProperties()
         {
             Type = FieldType.Number;
         }

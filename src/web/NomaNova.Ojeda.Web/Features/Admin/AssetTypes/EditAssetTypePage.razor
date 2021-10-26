@@ -4,7 +4,7 @@
 
 <OjedaBreadcrumb Data="@_breadcrumbItems" />
 
-<h3>Edit Asset Type</h3>
+<h3 class="mb-3">Edit Asset Type</h3>
 
 <OjedaLoader IsLoading="_isLoading">
 
@@ -15,16 +15,22 @@
     
     <div class="ojeda-form mb-4">
     
+        <FormSection Title="General">
+
         <!-- Name -->
         <OjedaFormField ForId="assettype-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertAssetType.Name)">
-            <InputText @bind-Value="UpsertAssetType.Name" class="form-control" id="assettype-name" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="UpsertAssetType.Name" class="form-control" id="assettype-name" disabled="@IsSubmitting"/>
         </OjedaFormField>
 
         <!-- Description -->
         <OjedaFormField ForId="assettype-description" Label="Description" ValidateFor="@(() => UpsertAssetType.Description)">
-            <InputText @bind-Value="UpsertAssetType.Description" class="form-control" id="assettype-description" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="UpsertAssetType.Description" class="form-control" id="assettype-description" disabled="@IsSubmitting"/>
         </OjedaFormField>
 
+        </FormSection>
+        
+        <FormSection Title="Field Sets">
+        
         <!-- Field Sets -->
         <div class="mb-3">
             <div class="d-flex justify-content-between">
@@ -37,11 +43,9 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th class="py-2"><!-- Move up --></th>
-                            <th class="py-2"><!-- Move down --></th>
+                            <th class="py-2" colspan="2"></th>
                             <th class="py-2">Name</th>
-                            <th class="py-2">Description</th>
-                            <th class="py-2"><!-- Remove --></th>
+                            <th class="py-2">Delete</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -49,36 +53,18 @@
                         {
                             <tr>
                                 <td class="pb-2 pr-0">
-                                    @if (assetTypeFieldSet.Order != 1 && UpsertAssetType.FieldSets.Count > 1)
-                                    {
-                                        <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveItemUp(assetTypeFieldSet))">
-                                            <i class="fs-6 bi-arrow-up-circle"></i>
-                                        </a>
-                                    }
+                                    <ItemOrderHandler Type="@OrderType.Up" 
+                                                      IsEnabled="@(assetTypeFieldSet.Order != 1 && UpsertAssetType.FieldSets.Count > 1)"
+                                                      OnClick="@(() => OnMoveItemUp(assetTypeFieldSet))" />
                                 </td>
                                 <td class="pb-2 pr-0">
-                                    @if (assetTypeFieldSet.Order != UpsertAssetType.FieldSets.Count && UpsertAssetType.FieldSets.Count > 1)
-                                    {
-                                        <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveItemDown(assetTypeFieldSet))">
-                                            <i class="fs-6 bi-arrow-down-circle"></i>
-                                        </a>
-                                    }
+                                    <ItemOrderHandler Type="@OrderType.Down" 
+                                                      IsEnabled="@(assetTypeFieldSet.Order != UpsertAssetType.FieldSets.Count && UpsertAssetType.FieldSets.Count > 1)"
+                                                      OnClick="@(() => OnMoveItemDown(assetTypeFieldSet))" />
                                 </td>
                                 <td class="pb-2 pr-3">@(GetFieldSetName(assetTypeFieldSet.Id))</td>
                                 <td class="pb-2 pr-3">
-                                    @if (string.IsNullOrEmpty(GetFieldSetDescription(assetTypeFieldSet.Id)))
-                                    {
-                                        <span class="text-muted fst-italic">No description</span>
-                                    }
-                                    else
-                                    {
-                                        @GetFieldSetDescription(assetTypeFieldSet.Id) 
-                                    }
-                                </td>
-                                <td class="pb-2 pr-3">
-                                    <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveItem(assetTypeFieldSet))">
-                                        <i class="fs-6 bi-x-circle"></i>
-                                    </a>
+                                    <ItemDeleteHandler OnClick="@(() => OnRemoveItem(assetTypeFieldSet))" />
                                 </td>
                             </tr>
                         }
@@ -93,13 +79,14 @@
             </div>
         </div>
     
+        </FormSection>
+        
     </div>
-
+    
     <OjedaFormFooter
         IsSubmitting="@IsSubmitting"
         OnCancel="@OnCancel"
         OnReset="@OnReset"/>
-
 </EditForm>
 
 </OjedaLoader>

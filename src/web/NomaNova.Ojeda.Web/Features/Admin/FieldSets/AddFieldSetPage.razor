@@ -4,7 +4,7 @@
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-<h3>Add Field Set</h3>
+<h3 class="mb-3">Add Field Set</h3>
 
 <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
@@ -13,16 +13,22 @@
 
     <div class="ojeda-form mb-4">
 
+        <FormSection Title="General">
+        
         <!-- Name -->
         <OjedaFormField ForId="fieldset-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertFieldSet.Name)">
-            <InputText @bind-Value="UpsertFieldSet.Name" class="form-control" id="fieldset-name" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="UpsertFieldSet.Name" class="form-control" id="fieldset-name" disabled="@IsSubmitting"/>
         </OjedaFormField>
 
         <!-- Description -->
         <OjedaFormField ForId="fieldset-description" Label="Description" ValidateFor="@(() => UpsertFieldSet.Description)">
-            <InputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
         </OjedaFormField>
 
+        </FormSection>
+        
+        <FormSection Title="Fields">
+        
         <!-- Fields -->
         <div class="mb-3">
             <div class="d-flex justify-content-between">
@@ -36,12 +42,9 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th class="py-2"><!-- Move up --></th>
-                            <th class="py-2"><!-- Move down --></th>
+                            <th class="py-2" colspan="2">Order</th>
                             <th class="py-2">Name</th>
-                            <th class="py-2">Description</th>
-                            <th class="py-2">Type</th>
-                            <th class="py-2"><!-- Remove --></th>
+                            <th class="py-2">Delete</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -49,36 +52,18 @@
                         {
                             <tr>
                                 <td class="pb-2 pr-0">
-                                    @if (fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)
-                                    {
-                                        <a class="text-dark text-decoration-none" title="Move up" role="button" @onclick="@(() => OnMoveItemUp(fieldSetField))">
-                                            <i class="fs-6 bi-arrow-up-circle"></i>
-                                        </a>
-                                    }
+                                    <ItemOrderHandler Type="@OrderType.Up" 
+                                                      IsEnabled="@(fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)"
+                                                      OnClick="@(() => OnMoveItemUp(fieldSetField))" />
                                 </td>
                                 <td class="pb-2 pr-0">
-                                    @if (fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)
-                                    {
-                                        <a class="text-dark text-decoration-none" title="Move down" role="button" @onclick="@(() => OnMoveItemDown(fieldSetField))">
-                                            <i class="fs-6 bi-arrow-down-circle"></i>
-                                        </a>
-                                    }
+                                    <ItemOrderHandler Type="@OrderType.Down" 
+                                                      IsEnabled="@(fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)"
+                                                      OnClick="@(() => OnMoveItemDown(fieldSetField))" />
                                 </td>
                                 <td class="pb-2 pr-3">@(GetFieldName(fieldSetField.Id))</td>
                                 <td class="pb-2 pr-3">
-                                    @if (string.IsNullOrEmpty(GetFieldDescription(fieldSetField.Id)))
-                                    {
-                                        <span class="text-muted fst-italic">No description</span>
-                                    }
-                                    else
-                                    {
-                                        @GetFieldDescription(fieldSetField.Id)
-                                    }
-                                </td>
-                                <td class="pb-2 pr-3">
-                                    <a class="text-dark text-decoration-none" title="Remove" role="button" @onclick="@(() => OnRemoveItem(fieldSetField))">
-                                        <i class="fs-6 bi-x-circle"></i>
-                                    </a>
+                                    <ItemDeleteHandler OnClick="@(() => OnRemoveItem(fieldSetField))" />
                                 </td>
                             </tr>
                         }
@@ -93,8 +78,10 @@
             </div>
         </div>
 
+        </FormSection>
+        
     </div>
-
+    
     <OjedaFormFooter
         IsSubmitting="@IsSubmitting"
         OnCancel="@OnCancel"

@@ -18,7 +18,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
             {
                 Name = "Serial Number",
                 Description = "Unique device identification as provided by the manufacturer",
-                Data = new TextFieldDataDto
+                Properties = new TextFieldPropertiesDto
                 {
                     Type = FieldTypeDto.Text   
                 }

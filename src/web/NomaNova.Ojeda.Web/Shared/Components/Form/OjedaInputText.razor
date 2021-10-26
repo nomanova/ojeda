@@ -1,0 +1,9 @@
+@* Adjusts the default InputText behaviour as to trigger validation on input rather than on change *@
+@inherits InputText
+
+<input
+    @attributes="AdditionalAttributes" 
+     class="@CssClass" 
+     value="@CurrentValue" 
+     @oninput="EventCallback.Factory.CreateBinder<string>(
+    this, value => CurrentValueAsString = value, CurrentValueAsString)" />

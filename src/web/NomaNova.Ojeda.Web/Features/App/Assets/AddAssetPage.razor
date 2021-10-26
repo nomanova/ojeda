@@ -1,4 +1,5 @@
 @page "/assets/add"
+@using NomaNova.Ojeda.Models.Dtos.Fields
 
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -36,7 +37,7 @@ else
                               
     <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
         
-        <FluentValidationValidator />
+        <AssetFluentValidationValidator Asset="@_asset" />
         <ServerSideFluentValidation @ref="_serverValidation" />
         
         @foreach (var fieldSet in _createAsset.FieldSets)
@@ -48,10 +49,28 @@ else
                     
                     <div class="mb-3">
                         <label for="@hash" class="form-label">@(GetFieldName(fieldSet.Id, field.Id))</label>
-                        <InputText @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                    placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))">
-                        </InputText>
-                        <ValidationMessage For="@(() => field.Value)"></ValidationMessage>
+                        
+                        @{
+                            var fieldType = GetFieldType(fieldSet.Id, field.Id); 
+                        }
+                        
+                        @if (fieldType == FieldTypeDto.Text)
+                        {
+                            <OjedaInputText @bind-Value="field.Data" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                        }
+                        
+                        @if (fieldType == FieldTypeDto.Number)
+                        {
+                            @* TODO: create input number component which can handle string values *@
+                            @*<OjedaInputNumber @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />*@
+
+                            <OjedaInputText @bind-Value="field.Data" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                        }
+                        
+                        <ValidationMessage For="@(() => field.Data)"></ValidationMessage>
                     </div>
                 }
             </FormSection>
@@ -75,7 +94,7 @@ else
     
     private AssetDto _asset;
     private EditContext _editContext;
-    
+
     private ServerSideFluentValidation _serverValidation;
 
     private bool _isLoading;
@@ -158,15 +177,20 @@ else
         return GetField(fieldSetId, fieldId).Description;
     }
 
+    private FieldTypeDto GetFieldType(string fieldSetId, string fieldId)
+    {
+        return GetField(fieldSetId, fieldId).Properties.Type;
+    }
+
     private AssetFieldSetDto GetFieldSet(string id)
     {
         var fieldSet = _asset.FieldSets.FirstOrDefault(_ => _.Id.Equals(id));
-        
+
         if (fieldSet == null)
         {
             throw new Exception($"Invalid state: field set {id} not available.");
         }
-        
+
         return fieldSet;
     }
 
@@ -226,7 +250,7 @@ else
                 Fields = fs.Fields.Select(f => new CreateAssetFieldDto
                 {
                     Id = f.Id,
-                    Value = f.Value
+                    Data = f.Data
                 }).ToList()
             }).ToList()
         };

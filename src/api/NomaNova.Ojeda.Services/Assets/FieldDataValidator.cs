@@ -1,16 +1,17 @@
 using System.Collections.Generic;
 using NomaNova.Ojeda.Core.Domain.Fields;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
-    public class FieldValueValidator : IFieldValueValidator
+    public class FieldDataValidator : IFieldDataValidator
     {
-        public FieldValueValidator()
+        public FieldDataValidator()
         {
         }
 
-        public List<string> Validate(string value, FieldType type)
+        public List<string> Validate(FieldDataDto data, FieldType type)
         {
             var validationMessages = new List<string>();
 

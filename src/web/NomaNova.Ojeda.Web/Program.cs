@@ -7,7 +7,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NomaNova.Ojeda.Client;
-using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Utils.Services;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
@@ -43,13 +42,18 @@ namespace NomaNova.Ojeda.Web
 
             builder.Services.AddSingleton<ITimeKeeper, TimeKeeper>();
             
-            // Validators
-            builder.Services.AddTransient<IValidator<CreateFieldDto>, CreateFieldDtoFieldValidator>();
-            builder.Services.AddTransient<IValidator<UpdateFieldDto>, UpdateFieldDtoFieldValidator>();
-            builder.Services.AddTransient<IValidator<TextFieldDataDto>, TextFieldDataDtoFieldValidator>();
-            builder.Services.AddTransient<IValidator<NumberFieldDataDto>, NumberFieldDataDtoFieldValidator>();
+            RegisterValidators(builder.Services);
 
             await builder.Build().RunAsync();
+        }
+
+        private static void RegisterValidators(IServiceCollection services)
+        {
+            // Fields
+            services.AddTransient<IValidator<CreateFieldDto>, CreateFieldDtoFieldValidator>();
+            services.AddTransient<IValidator<UpdateFieldDto>, UpdateFieldDtoFieldValidator>();
+            services.AddTransient<IValidator<TextFieldPropertiesDto>, TextFieldPropertiesDtoFieldValidator>();
+            services.AddTransient<IValidator<NumberFieldPropertiesDto>, NumberFieldPropertiesDtoFieldValidator>();
         }
     }
 }

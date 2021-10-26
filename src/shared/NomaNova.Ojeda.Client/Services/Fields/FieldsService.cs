@@ -16,7 +16,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         
         public FieldsService(OjedaHttpClient httpClient) : base(httpClient)
         {
-            JonConverters.Add(new FieldDataDtoJsonConverter());
+            JonConverters.Add(new FieldPropertiesDtoJsonConverter());
         }
 
         public async Task<OjedaDataResult<FieldDto>> GetByIdAsync(string id, CancellationToken cancellationToken)

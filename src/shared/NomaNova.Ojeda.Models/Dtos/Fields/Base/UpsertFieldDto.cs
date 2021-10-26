@@ -10,7 +10,7 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields.Base
         
         public string Description { get; set; }
 
-        public FieldDataDto Data { get; set; }
+        public FieldPropertiesDto Properties { get; set; }
     }
     
     public class UpsertFieldDtoFieldValidator : CompositeValidator<UpsertFieldDto>
@@ -19,9 +19,9 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields.Base
         {
             RegisterBaseValidator(new NamedFieldValidator());
             
-            RuleFor(x => x.Data).SetInheritanceValidator(_ => {
-                _.Add(new TextFieldDataDtoFieldValidator());
-                _.Add(new NumberFieldDataDtoFieldValidator());
+            RuleFor(x => x.Properties).SetInheritanceValidator(_ => {
+                _.Add(new TextFieldPropertiesDtoFieldValidator());
+                _.Add(new NumberFieldPropertiesDtoFieldValidator());
             });
         }
     }

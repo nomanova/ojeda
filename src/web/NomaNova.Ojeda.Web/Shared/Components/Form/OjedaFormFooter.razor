@@ -1,4 +1,5 @@
-<div>
+<div class="mb-5 @CssClass">
+
     <!-- Submit -->
     <OjedaButton
         Style="@ButtonStyle.Primary"
@@ -31,5 +32,8 @@
     
     [Parameter]
     public EventCallback OnCancel { get; set; }
+    
+    [Parameter]
+    public string CssClass { get; set; }
     
 }

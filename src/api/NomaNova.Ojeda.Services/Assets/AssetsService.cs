@@ -27,8 +27,8 @@ namespace NomaNova.Ojeda.Services.Assets
         private readonly IRepository<AssetType> _assetTypesRepository;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
-        private readonly IFieldValueConverter _fieldValueConverter;
-        private readonly IFieldValueValidator _fieldValueValidator;
+        private readonly IFieldDataConverter _fieldDataConverter;
+        private readonly IFieldDataValidator _fieldDataValidator;
 
         public AssetsService(
             IMapper mapper,
@@ -36,16 +36,16 @@ namespace NomaNova.Ojeda.Services.Assets
             IRepository<AssetType> assetTypesRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<Field> fieldsRepository,
-            IFieldValueConverter fieldValueConverter,
-            IFieldValueValidator fieldValueValidator)
+            IFieldDataConverter fieldDataConverter,
+            IFieldDataValidator fieldDataValidator)
         {
             _mapper = mapper;
             _assetsRepository = assetsRepository;
             _assetTypesRepository = assetTypesRepository;
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
-            _fieldValueConverter = fieldValueConverter;
-            _fieldValueValidator = fieldValueValidator;
+            _fieldDataConverter = fieldDataConverter;
+            _fieldDataValidator = fieldDataValidator;
         }
 
         public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken)
@@ -64,7 +64,8 @@ namespace NomaNova.Ojeda.Services.Assets
             var fieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
             var fields = await GetFieldsAsync(fieldSets, cancellationToken);
             
-            return AssetTypeToAssetDtoAsync(assetType, fieldSets, fields);
+            return AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, 
+                (_, _, fieldProperties) => _fieldDataConverter.FromBytes(null, fieldProperties));
         }
 
         public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -88,17 +89,12 @@ namespace NomaNova.Ojeda.Services.Assets
             var fieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
             var fields = await GetFieldsAsync(fieldSets, cancellationToken);
 
-            var assetDto = AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, (fieldSetId, fieldId, fieldType) =>
+            var assetDto = AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, (fieldSetId, fieldId, fieldData) =>
             {
                 var fieldValue = fieldValues.FirstOrDefault(_ => _.FieldSetId.Equals(fieldSetId) && _.FieldId.Equals(fieldId));
                 var byteValue = fieldValue?.Value;
 
-                if (byteValue == null || byteValue.Length == 0)
-                {
-                    return string.Empty;
-                }
-
-                return _fieldValueConverter.FromBytes(byteValue, fieldType);
+                return _fieldDataConverter.FromBytes(byteValue, fieldData);
             });
             
             assetDto.Id = id;
@@ -161,7 +157,7 @@ namespace NomaNova.Ojeda.Services.Assets
                         AssetId = asset.Id,
                         FieldSetId = dbFieldSet.Id,
                         FieldId = dbField.Id,
-                        Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type)
+                        Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties)
                     };
                     
                     asset.FieldValues.Add(fieldValue);
@@ -217,7 +213,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
                     if (existingFieldValue != null)
                     {
-                        existingFieldValue.Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type);
+                        existingFieldValue.Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties);
                         updatedFieldValues.Add(existingFieldValue);
                     }
                     else
@@ -229,7 +225,7 @@ namespace NomaNova.Ojeda.Services.Assets
                             AssetId = asset.Id,
                             FieldSetId = dbFieldSet.Id,
                             FieldId = dbField.Id,
-                            Value = _fieldValueConverter.ToBytes(dtoField.Value, dbField.Data.Type)
+                            Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties)
                         };
                         
                         updatedFieldValues.Add(newFieldValue);
@@ -261,7 +257,7 @@ namespace NomaNova.Ojeda.Services.Assets
             AssetType assetType, 
             IReadOnlyCollection<FieldSet> fieldSets,
             IReadOnlyCollection<Field> fields,
-            Func<string, string, FieldType, string> fieldValueResolver = null)
+            Func<string, string, FieldProperties, FieldDataDto> fieldValueResolver = null)
         {
             var assetDto = new AssetDto
             {
@@ -298,7 +294,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     // Value
                     if (fieldValueResolver != null)
                     {
-                        fieldDto.Value = fieldValueResolver(fieldSetId, fieldId, field.Data.Type);
+                        fieldDto.Data = fieldValueResolver(fieldSetId, fieldId, field.Properties);
                     }
 
                     fieldSetDto.Fields.Add(fieldDto);
@@ -430,8 +426,8 @@ namespace NomaNova.Ojeda.Services.Assets
                 {
                     var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
 
-                    var value = dtoField.Value;
-                    var messages = _fieldValueValidator.Validate(value, dbField.Data.Type);
+                    var data = dtoField.Data;
+                    var messages = _fieldDataValidator.Validate(data, dbField.Properties.Type);
                     
                     if (messages.Any())
                     {
@@ -442,7 +438,7 @@ namespace NomaNova.Ojeda.Services.Assets
                         var key = 
                             $"{nameof(CreateAssetDto.FieldSets)}[{idx}]." +
                             $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." + 
-                            $"{nameof(CreateAssetFieldDto.Value)}";
+                            $"{nameof(CreateAssetFieldDto.Data)}";
                         
                         validationErrors.Add(key, messages);
                     }

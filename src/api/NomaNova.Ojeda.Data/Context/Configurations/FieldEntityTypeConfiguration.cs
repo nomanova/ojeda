@@ -16,16 +16,16 @@ namespace NomaNova.Ojeda.Data.Context.Configurations
         public FieldEntityTypeConfiguration(ISerializer serializer)
         {
             _serializer = serializer;
-            _jonConverters = new List<JsonConverter>{new FieldDataJsonConverter()};
+            _jonConverters = new List<JsonConverter>{new FieldPropertiesJsonConverter()};
         }
 
         public void Configure(EntityTypeBuilder<Field> builder)
         {
             builder.HasKey(_ => _.Id);
 
-            builder.Property(_ => _.Data).HasConversion(
-                fieldData => _serializer.Serialize(fieldData, _jonConverters),
-                fieldData => _serializer.Deserialize<FieldData>(fieldData, _jonConverters));
+            builder.Property(_ => _.Properties).HasConversion(
+                fieldProperties => _serializer.Serialize(fieldProperties, _jonConverters),
+                fieldProperties => _serializer.Deserialize<FieldProperties>(fieldProperties, _jonConverters));
         }
     }
 }

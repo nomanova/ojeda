@@ -88,7 +88,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;
-            field.Data = _mapper.Map<FieldData>(fieldDto.Data);
+            field.Properties = _mapper.Map<FieldProperties>(fieldDto.Properties);
             
             field = await _fieldsRepository.UpdateAsync(field, cancellationToken);
 

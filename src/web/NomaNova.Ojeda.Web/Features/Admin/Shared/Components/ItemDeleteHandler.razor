@@ -1,0 +1,10 @@
+<a class="text-dark text-decoration-none" title="Delete" role="button" @onclick="@OnClick">
+    <i class="fs-6 bi-x-circle"></i>
+</a>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    
+}

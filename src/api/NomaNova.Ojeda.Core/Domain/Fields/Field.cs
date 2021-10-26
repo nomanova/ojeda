@@ -16,7 +16,7 @@ namespace NomaNova.Ojeda.Core.Domain.Fields
         [Searchable]
         public string Description { get; set; }
 
-        public FieldData Data { get; set; }
+        public FieldProperties Properties { get; set; }
 
         public virtual ICollection<FieldSetField> FieldSetFields { get; set; }
     }

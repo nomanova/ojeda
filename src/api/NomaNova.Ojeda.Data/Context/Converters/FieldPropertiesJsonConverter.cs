@@ -5,7 +5,7 @@ using NomaNova.Ojeda.Core.Domain.Fields;
 
 namespace NomaNova.Ojeda.Data.Context.Converters
 {
-    public class FieldDataJsonConverter : JsonConverter
+    public class FieldPropertiesJsonConverter : JsonConverter
     {
         public override bool CanWrite => false;
 
@@ -19,24 +19,24 @@ namespace NomaNova.Ojeda.Data.Context.Converters
         {
             var jo = JObject.Load(reader);
 
-            var fieldData = jo.ToObject<FieldData>();
+            var fieldProperties = jo.ToObject<FieldProperties>();
 
-            if (fieldData == null)
+            if (fieldProperties == null)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            return fieldData.Type switch
+            return fieldProperties.Type switch
             {
-                FieldType.Text => jo.ToObject(typeof(TextFieldData), serializer),
-                FieldType.Number => jo.ToObject(typeof(NumberFieldData), serializer),
-                _ => throw new NotImplementedException(fieldData.Type.ToString())
+                FieldType.Text => jo.ToObject(typeof(TextFieldProperties), serializer),
+                FieldType.Number => jo.ToObject(typeof(NumberFieldProperties), serializer),
+                _ => throw new NotImplementedException(fieldProperties.Type.ToString())
             };
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(FieldData);
+            return objectType == typeof(FieldProperties);
         }
     }
 }

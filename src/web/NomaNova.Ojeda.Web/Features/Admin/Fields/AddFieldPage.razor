@@ -4,7 +4,7 @@
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-<h3>Add Field</h3>
+<h3 class="mb-3">Add Field</h3>
 
 <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
@@ -13,20 +13,26 @@
 
     <div class="ojeda-form mb-4">
 
+        <FormSection Title="General">
+        
         <!-- Name -->
         <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createField.Name)">
-            <InputText @bind-Value="_createField.Name" class="form-control" id="field-name" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="_createField.Name" class="form-control" id="field-name" disabled="@IsSubmitting" />
         </OjedaFormField>
 
         <!-- Description -->
         <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _createField.Description)"
                         HelpText="Optional, will be used as hint for the field input control.">
-            <InputText @bind-Value="_createField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
+            <OjedaInputText @bind-Value="_createField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
         </OjedaFormField>
 
+        </FormSection>
+        
+        <FormSection Title="Properties">
+        
         <!-- Type -->
         <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
-            <InputSelect @bind-Value="_createField.Data.Type" @oninput="OnTypeChange" class="form-control" id="field-type" disabled="@IsSubmitting">
+            <InputSelect @bind-Value="_createField.Properties.Type" @oninput="OnTypeChange" class="form-control" id="field-type" disabled="@IsSubmitting">
                 @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
                 {
                     <option value="@type">@type</option>
@@ -35,25 +41,37 @@
         </OjedaFormField>
 
         <!-- Type: Text -->
-        @if (_createField.Data.Type == FieldTypeDto.Text)
+        @if (_createField.Properties.Type == FieldTypeDto.Text)
         {
-            var textData = (TextFieldDataDto) _createField.Data;
+            var textData = (TextFieldPropertiesDto) _createField.Properties;
 
             <OjedaFormField ForId="field-text-minLength" Label="Minimum Length" ValidateFor="@(() => textData.MinLength)"
                             HelpText="Optional, will validate the minimum input length.">
-                <InputNumber @bind-Value="textData.MinLength" DisplayName="Minimum Length" class="form-control" id="field-text-minLength" disabled="@IsSubmitting"/>
+                <OjedaInputNumber 
+                    @bind-Value="textData.MinLength" 
+                     DisplayName="Minimum Length"
+                     ParsingErrorMessage="The {0} field must be integer."
+                     class="form-control" 
+                     id="field-text-minLength" 
+                     disabled="@IsSubmitting"/>
             </OjedaFormField>
 
             <OjedaFormField ForId="field-text-maxLength" Label="Maximum Length" ValidateFor="@(() => textData.MaxLength)"
                             HelpText="Optional, will validate the maximum input length.">
-                <InputNumber @bind-Value="textData.MaxLength" DisplayName="Maximum Length" class="form-control" id="field-text-maxLength" disabled="@IsSubmitting"/>
+                <OjedaInputNumber 
+                    @bind-Value="textData.MaxLength" 
+                     DisplayName="Maximum Length" 
+                     ParsingErrorMessage="The {0} field must be integer."
+                     class="form-control" 
+                     id="field-text-maxLength" 
+                     disabled="@IsSubmitting"/>
             </OjedaFormField>
         }
 
         <!-- Type: Number -->
-        @if (_createField.Data.Type == FieldTypeDto.Number)
+        @if (_createField.Properties.Type == FieldTypeDto.Number)
         {
-            var numberData = (NumberFieldDataDto) _createField.Data;
+            var numberData = (NumberFieldPropertiesDto) _createField.Properties;
             
             <OjedaFormField ForId="field-text-withDecimals" Label="Allow Decimals" ValidateFor="@(() => numberData.WithDecimals)"
                             HelpText="Determines if decimal numbers are allowed.">
@@ -62,21 +80,23 @@
             
             <OjedaFormField ForId="field-text-minValue" Label="Minimum Value" ValidateFor="@(() => numberData.MinValue)"
                             HelpText="Optional, will validate the minimum input value.">
-                <InputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
+                <OjedaInputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
             </OjedaFormField>
             
             <OjedaFormField ForId="field-text-maxValue" Label="Maximum Value" ValidateFor="@(() => numberData.MaxValue)"
                             HelpText="Optional, will validate the maximum input value.">
-                <InputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
+                <OjedaInputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
             </OjedaFormField>
         }
 
+        </FormSection>
+        
     </div>
-
-    <OjedaFormFooter
-        IsSubmitting="@IsSubmitting"
-        OnCancel="@OnCancel"
-        OnReset="@OnReset"/>
+    
+        <OjedaFormFooter
+            IsSubmitting="@IsSubmitting"
+            OnCancel="@OnCancel"
+            OnReset="@OnReset"/>
 
 </EditForm>
 
@@ -108,15 +128,15 @@
     {
         _createField = new CreateFieldDto
         {
-            Data = new TextFieldDataDto()
+            Properties = new TextFieldPropertiesDto()
         };
 
         EditContext = new EditContext(_createField);
         EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
 
-    protected override void SetFieldData(FieldDataDto fieldData)
+    protected override void SetFieldProperties(FieldPropertiesDto fieldProperties)
     {
-        _createField.Data = fieldData;
+        _createField.Properties = fieldProperties;
     }
 }

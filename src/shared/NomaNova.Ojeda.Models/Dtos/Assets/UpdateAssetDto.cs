@@ -1,3 +1,4 @@
+using FluentValidation;
 using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 
 namespace NomaNova.Ojeda.Models.Dtos.Assets
@@ -12,5 +13,13 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
 
     public class UpdateAssetFieldDto : UpsertAssetFieldDto
     {
+    }
+    
+    public class UpdateAssetDtoFieldValidator : AbstractValidator<UpdateAssetDto>
+    {
+        public UpdateAssetDtoFieldValidator(AssetDto assetDto)
+        {
+            Include(new UpsertAssetDtoFieldValidator<UpdateAssetFieldSetDto, UpdateAssetFieldDto>(assetDto));
+        }
     }
 }

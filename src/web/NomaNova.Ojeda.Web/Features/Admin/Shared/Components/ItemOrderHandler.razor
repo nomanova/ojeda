@@ -1,0 +1,60 @@
+@if (IsEnabled)
+{
+    <a class="text-dark text-decoration-none" title="@(GetTitle())" role="button" @onclick="@OnClick">
+        <i class="@(GetIconCssClass())"></i>
+    </a>
+}
+else
+{
+    <i class="@GetIconCssClass()"></i>
+}
+
+@code {
+
+    [Parameter]
+    public OrderType Type { get; set; }
+
+    [Parameter]
+    public bool IsEnabled { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    
+    private string GetTitle()
+    {
+        switch (Type)
+        {
+            case OrderType.Up:
+                return "Move up";
+            case OrderType.Down:
+                return "Move down";
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private string GetIconCssClass()
+    {
+        var cssClass = "fs-6";
+
+        switch (Type)
+        {
+            case OrderType.Up:
+                cssClass = $"{cssClass} bi-arrow-up-circle";
+                break;
+            case OrderType.Down:
+                cssClass = $"{cssClass} bi-arrow-down-circle";
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+
+        if (!IsEnabled)
+        {
+            cssClass = $"{cssClass} text-muted";
+        }
+
+        return cssClass;
+    }
+
+}
