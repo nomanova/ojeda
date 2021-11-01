@@ -4,7 +4,7 @@ using NomaNova.Ojeda.Core.Domain.AssetTypes;
 
 namespace NomaNova.Ojeda.Core.Domain.FieldSets
 {
-    public class FieldSet : BaseEntity, INamedEntity, ITimestampedEntity
+    public class FieldSet : BaseEntity, INamedEntity, IDescribedEntity, ITimestampedEntity
     {
         public DateTime CreatedAt { get; set; }
         

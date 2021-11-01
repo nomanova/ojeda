@@ -17,17 +17,17 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
     
     public class CreateAssetDtoFieldValidator : AbstractValidator<CreateAssetDto>
     {
-        public CreateAssetDtoFieldValidator(AssetDto assetDto)
+        public CreateAssetDtoFieldValidator(IFieldPropertiesResolver fieldPropertiesResolver)
         {
-            Include(new UpsertAssetDtoFieldValidator<CreateAssetFieldSetDto, CreateAssetFieldDto>(assetDto));
+            Include(new UpsertAssetDtoFieldValidator<CreateAssetFieldSetDto, CreateAssetFieldDto>(fieldPropertiesResolver));
         }
     }
 
     public class CreateAssetFieldDtoFieldValidator : AbstractValidator<CreateAssetFieldDto>
     {
-        public CreateAssetFieldDtoFieldValidator(AssetDto assetDto)
+        public CreateAssetFieldDtoFieldValidator(IFieldPropertiesResolver fieldPropertiesResolver)
         {
-            Include(new UpsertAssetFieldDtoFieldValidator(assetDto));
+            Include(new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver));
         }
     }
 }

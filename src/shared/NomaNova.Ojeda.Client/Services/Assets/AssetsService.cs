@@ -16,6 +16,7 @@ namespace NomaNova.Ojeda.Client.Services.Assets
         public AssetsService(OjedaHttpClient httpClient) : base(httpClient)
         {
             JonConverters.Add(new FieldPropertiesDtoJsonConverter());
+            JonConverters.Add(new FieldDataDtoJsonConverter());
         }
         
         public async Task<OjedaDataResult<AssetDto>> GetByIdAsync(string id, CancellationToken cancellationToken)

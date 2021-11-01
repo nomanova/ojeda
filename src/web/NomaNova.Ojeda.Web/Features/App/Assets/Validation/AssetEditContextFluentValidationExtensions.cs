@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.Internal;
 using Microsoft.AspNetCore.Components.Forms;
 using NomaNova.Ojeda.Models.Dtos.Assets;
+using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 using NomaNova.Ojeda.Web.Shared.Validation;
 
 namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
@@ -21,7 +22,7 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             
             editContext.OnValidationRequested +=
                 (sender, _) => ValidateModel((EditContext) sender, messages, assetDto);
-
+            
             editContext.OnFieldChanged +=
                 (_, eventArgs) => ValidateField(editContext, messages, assetDto, eventArgs.FieldIdentifier);
         }
@@ -31,10 +32,8 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             ValidationMessageStore messages,
             AssetDto assetDto)
         {
-            Console.WriteLine("Validate model");
-            
-            var validator = GetValidatorForModel(editContext.Model, assetDto);
-            
+            var validator = (IValidator) new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+
             var context = ValidationContext<object>.CreateWithOptions(editContext.Model,
                 opt => opt.IncludeAllRuleSets());
             
@@ -51,17 +50,19 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             editContext.NotifyValidationStateChanged();
         }
 
-        private static async void ValidateField(EditContext editContext,
+        private static async void ValidateField(
+            EditContext editContext,
             ValidationMessageStore messages,
             AssetDto assetDto,
             FieldIdentifier fieldIdentifier)
         {
             var model = fieldIdentifier.Model;
-            
+            var fieldId = GetFieldId(editContext.Model, model);
+
             var properties = new[] {fieldIdentifier.FieldName};
             var context = new ValidationContext<object>(model, new PropertyChain(), new MemberNameValidatorSelector(properties));
             
-            var validator = GetValidatorForModel(model, assetDto);
+            var validator = GetFieldDataValidator(model, assetDto, fieldId);
             
             var validationResults = await validator.ValidateAsync(context);
             
@@ -71,19 +72,45 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             editContext.NotifyValidationStateChanged();
         }
 
-        private static IValidator GetValidatorForModel(object model, AssetDto assetDto)
+        private static IValidator GetFieldDataValidator(object model, AssetDto assetDto, string fieldId)
         {
-            if (model.GetType() == typeof(CreateAssetDto))
+            var resolver = new AssetDtoFieldPropertiesResolver(assetDto);
+            var fieldProperties = resolver.Resolve(fieldId);
+            
+            if (model.GetType() == typeof(StringFieldDataDto))
             {
-                return new CreateAssetDtoFieldValidator(assetDto);
+                return new StringFieldDataDtoFieldValidator(fieldProperties);
             }
 
-            if (model.GetType() == typeof(CreateAssetFieldDto))
+            if (model.GetType() == typeof(LongFieldDataDto))
             {
-                return new CreateAssetFieldDtoFieldValidator(assetDto);
+                return new LongFieldDataDtoFieldValidator(fieldProperties);
+            }
+            
+            if (model.GetType() == typeof(DoubleFieldDataDto))
+            {
+                return new DoubleFieldDataDtoFieldValidator(fieldProperties);
             }
 
             throw new NotImplementedException($"Missing validator for model: {model.GetType()}");
+        }
+
+        private static string GetFieldId(object editContextModel, object fieldModel)
+        {
+            var createAssetDto = (CreateAssetDto)editContextModel;
+
+            foreach (var createAssetFieldSetDto in createAssetDto.FieldSets)
+            {
+                foreach (var createAssetFieldDto in createAssetFieldSetDto.Fields)
+                {
+                    if (createAssetFieldDto.Data.Equals(fieldModel))
+                    {
+                        return createAssetFieldDto.Id;
+                    }
+                }
+            }
+
+            throw new ArgumentException("Invalid state, no matching field found");
         }
     }
 }

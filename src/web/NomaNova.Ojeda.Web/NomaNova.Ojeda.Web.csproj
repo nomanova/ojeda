@@ -21,8 +21,4 @@
     <ProjectReference Include="..\..\shared\NomaNova.Ojeda.Utils\NomaNova.Ojeda.Utils.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\App\Assets\Components" />
-  </ItemGroup>
-
 </Project>

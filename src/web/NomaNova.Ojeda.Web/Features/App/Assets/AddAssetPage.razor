@@ -1,5 +1,4 @@
 @page "/assets/add"
-@using NomaNova.Ojeda.Models.Dtos.Fields
 
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -51,26 +50,38 @@ else
                         <label for="@hash" class="form-label">@(GetFieldName(fieldSet.Id, field.Id))</label>
                         
                         @{
-                            var fieldType = GetFieldType(fieldSet.Id, field.Id); 
+                            var fieldDataType = GetFieldDataType(fieldSet.Id, field.Id);
                         }
                         
-                        @if (fieldType == FieldTypeDto.Text)
+                        @if (fieldDataType == FieldDataTypeDto.String)
                         {
-                            <OjedaInputText @bind-Value="field.Data" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                            var fieldData = (StringFieldDataDto)field.Data;
+                            
+                            <OjedaInputText @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                            placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                            
+                            <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
                         }
                         
-                        @if (fieldType == FieldTypeDto.Number)
+                        @if (fieldDataType == FieldDataTypeDto.Long)
                         {
-                            @* TODO: create input number component which can handle string values *@
-                            @*<OjedaInputNumber @bind-Value="field.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />*@
-
-                            <OjedaInputText @bind-Value="field.Data" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                             placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                            var fieldData = (LongFieldDataDto)field.Data;
+                            
+                            <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                              placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                            
+                            <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
                         }
                         
-                        <ValidationMessage For="@(() => field.Data)"></ValidationMessage>
+                        @if (fieldDataType == FieldDataTypeDto.Double)
+                        {
+                            var fieldData = (DoubleFieldDataDto)field.Data;
+                            
+                            <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                              placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
+                            
+                            <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                        }
                     </div>
                 }
             </FormSection>
@@ -177,9 +188,9 @@ else
         return GetField(fieldSetId, fieldId).Description;
     }
 
-    private FieldTypeDto GetFieldType(string fieldSetId, string fieldId)
+    private FieldDataTypeDto GetFieldDataType(string fieldSetId, string fieldId)
     {
-        return GetField(fieldSetId, fieldId).Properties.Type;
+        return GetField(fieldSetId, fieldId).Data.Type;
     }
 
     private AssetFieldSetDto GetFieldSet(string id)

@@ -4,19 +4,20 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
-using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
+using ValidationException = NomaNova.Ojeda.Core.Exceptions.ValidationException;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
@@ -412,7 +413,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new ValidationException(validationErrors);
             }
 
-            // Step 4: ensure field value validations pass
+            // Step 4: ensure field data validations pass
             var dbFields = await GetFieldsAsync(dbFieldSets, cancellationToken);
 
             foreach (var dbFieldSet in dbFieldSets)
@@ -426,21 +427,36 @@ namespace NomaNova.Ojeda.Services.Assets
                 {
                     var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
 
-                    var data = dtoField.Data;
-                    var messages = _fieldDataValidator.Validate(data, dbField.Properties.Type);
+                    var fieldPropertiesResolver = new FieldPropertiesResolver(_mapper, dbField.Properties);
+                    var validator = (IValidator) new CreateAssetFieldDtoFieldValidator(fieldPropertiesResolver);
+
+                    var context = ValidationContext<object>.CreateWithOptions(dtoField,
+                        opt => opt.IncludeAllRuleSets());
+            
+                    var validationResult = await validator.ValidateAsync(context, cancellationToken);
                     
-                    if (messages.Any())
+                    if (!validationResult.IsValid && validationResult.Errors.Any())
                     {
-                        // FieldSet[idx].Fields[jdx].Value
+                        // FieldSet[idx].Fields[jdx].Data.Value
                         var idx = dtoFieldSets.IndexOf(dtoFieldSet);
                         var jdx = dtoFieldSet.Fields.IndexOf(dtoField);
 
-                        var key = 
+                        var key =
                             $"{nameof(CreateAssetDto.FieldSets)}[{idx}]." +
-                            $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." + 
-                            $"{nameof(CreateAssetFieldDto.Data)}";
-                        
-                        validationErrors.Add(key, messages);
+                            $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." +
+                            $"{nameof(CreateAssetFieldDto.Data)}.Value";
+
+                        foreach (var error in validationResult.Errors)
+                        {
+                            if (validationErrors.ContainsKey(key))
+                            {
+                                validationErrors[key].Add(error.ErrorMessage);
+                            }
+                            else
+                            {
+                                validationErrors.Add(key, new List<string>{error.ErrorMessage});
+                            }
+                        }
                     }
                 }
             }

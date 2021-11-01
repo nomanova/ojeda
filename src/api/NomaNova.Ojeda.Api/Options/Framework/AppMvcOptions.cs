@@ -17,7 +17,8 @@ namespace NomaNova.Ojeda.Api.Options.Framework
         {
             var jsonConverters = new List<JsonConverter>
             {
-                new FieldPropertiesDtoJsonConverter()
+                new FieldPropertiesDtoJsonConverter(),
+                new FieldDataDtoJsonConverter()
             };
             
             var settings = JsonSettings.Get(jsonConverters);

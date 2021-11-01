@@ -11,7 +11,7 @@ namespace NomaNova.Ojeda.Services.Assets
         {
         }
 
-        public List<string> Validate(FieldDataDto data, FieldType type)
+        public List<string> Validate(FieldDataDto data, FieldProperties properties)
         {
             var validationMessages = new List<string>();
 

@@ -6,6 +6,6 @@ namespace NomaNova.Ojeda.Services.Assets.Interfaces
 {
     public interface IFieldDataValidator
     {
-        List<string> Validate(FieldDataDto data, FieldType type);
+        List<string> Validate(FieldDataDto data, FieldProperties properties);
     }
 }
