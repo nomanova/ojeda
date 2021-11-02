@@ -9,9 +9,10 @@ Open-Source IT and Enterprise Asset Management
 
 ## Try it
 
-Clone the repository or just copy the "docker-compose.yml" file. Run the following docker command:
+Clone the repository or just copy the "docker-compose.yml" file. Run the following docker commands:
 
 ```
+$ docker compose pull
 $ docker compose --project-name ojeda up
 ```
 
