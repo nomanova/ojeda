@@ -16,14 +16,14 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
 
     public class StringFieldDataDtoFieldValidator : AbstractValidator<StringFieldDataDto>
     {
-        public StringFieldDataDtoFieldValidator(FieldPropertiesDto fieldProperties)
+        public StringFieldDataDtoFieldValidator(FieldPropertiesDto fieldProperties, bool isRequired)
         {
             RuleFor(_ => _.Value).Must((_, value, context) =>
             {
                 switch (fieldProperties.Type)
                 {
                     case FieldTypeDto.Text:
-                        return ValidateTextTypeField(value, (TextFieldPropertiesDto)fieldProperties, context);
+                        return ValidateTextTypeField(value, (TextFieldPropertiesDto)fieldProperties, isRequired, context);
                     default:
                         throw new NotImplementedException(nameof(fieldProperties.Type));
                 }
@@ -33,12 +33,18 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
         private static bool ValidateTextTypeField(
             string value, 
             TextFieldPropertiesDto fieldProperties,
+            bool isRequired,
             ValidationContext<StringFieldDataDto> context)
         {
-            if (value == null)
+            if (string.IsNullOrEmpty(value))
             {
-                // Handled by required validator
-                return true;
+                if (!isRequired)
+                {
+                    return true;
+                }
+
+                context.MessageFormatter.AppendArgument("ValidationMessage", "Value is required.");
+                return false;
             }
         
             var hasFailures = false;

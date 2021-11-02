@@ -9,18 +9,22 @@ namespace NomaNova.Ojeda.Services.Assets
     {
         private readonly IMapper _mapper;
         private readonly FieldProperties _fieldProperties;
+        private readonly bool _isRequired;
         
         public FieldPropertiesResolver(
             IMapper mapper, 
-            FieldProperties fieldProperties)
+            FieldProperties fieldProperties,
+            bool isRequired)
         {
             _mapper = mapper;
             _fieldProperties = fieldProperties;
+            _isRequired = isRequired;
         }
 
-        public FieldPropertiesDto Resolve(string fieldId)
+        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldId)
         {
-            return _mapper.Map<FieldPropertiesDto>(_fieldProperties);
+            var fieldPropertiesDto = _mapper.Map<FieldPropertiesDto>(_fieldProperties);
+            return (fieldPropertiesDto, _isRequired);
         }
     }
 }

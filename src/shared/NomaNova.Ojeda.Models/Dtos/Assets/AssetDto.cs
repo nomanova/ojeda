@@ -43,6 +43,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
         
         public string Description { get; set; }
 
+        public bool IsRequired { get; set; }
+        
         public FieldPropertiesDto Properties { get; set; }
 
         public FieldDataDto Data { get; set; }

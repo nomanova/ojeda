@@ -29,7 +29,6 @@ namespace NomaNova.Ojeda.Services.Assets
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
         private readonly IFieldDataConverter _fieldDataConverter;
-        private readonly IFieldDataValidator _fieldDataValidator;
 
         public AssetsService(
             IMapper mapper,
@@ -37,8 +36,7 @@ namespace NomaNova.Ojeda.Services.Assets
             IRepository<AssetType> assetTypesRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<Field> fieldsRepository,
-            IFieldDataConverter fieldDataConverter,
-            IFieldDataValidator fieldDataValidator)
+            IFieldDataConverter fieldDataConverter)
         {
             _mapper = mapper;
             _assetsRepository = assetsRepository;
@@ -46,7 +44,6 @@ namespace NomaNova.Ojeda.Services.Assets
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
             _fieldDataConverter = fieldDataConverter;
-            _fieldDataValidator = fieldDataValidator;
         }
 
         public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken)
@@ -291,6 +288,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
                     var fieldDto = _mapper.Map<AssetFieldDto>(field);
                     fieldDto.Order = fieldSetField.Order;
+                    fieldDto.IsRequired = fieldSetField.IsRequired;
                     
                     // Value
                     if (fieldValueResolver != null)
@@ -413,7 +411,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new ValidationException(validationErrors);
             }
 
-            // Step 4: ensure field data validations pass
+            // Step 5: ensure field data validations pass
             var dbFields = await GetFieldsAsync(dbFieldSets, cancellationToken);
 
             foreach (var dbFieldSet in dbFieldSets)
@@ -426,35 +424,50 @@ namespace NomaNova.Ojeda.Services.Assets
                 foreach (var dbField in dbFieldSetFields)
                 {
                     var dtoField = dtoFieldSet.Fields.First(_ => _.Id.Equals(dbField.Id));
+                    var dbFieldSetField = dbFieldSet.FieldSetFields.First(_ => _.FieldId.Equals(dbField.Id));
 
-                    var fieldPropertiesResolver = new FieldPropertiesResolver(_mapper, dbField.Properties);
-                    var validator = (IValidator) new CreateAssetFieldDtoFieldValidator(fieldPropertiesResolver);
+                    var providedDataType = dtoField.Data.Type;
+                    var expectedDataType = _fieldDataConverter.GetMatchingDataType(dbField.Properties);
 
-                    var context = ValidationContext<object>.CreateWithOptions(dtoField,
-                        opt => opt.IncludeAllRuleSets());
-            
-                    var validationResult = await validator.ValidateAsync(context, cancellationToken);
+                    // FieldSet[idx].Fields[jdx].Data
+                    var idx = dtoFieldSets.IndexOf(dtoFieldSet);
+                    var jdx = dtoFieldSet.Fields.IndexOf(dtoField);
+
+                    var key =
+                        $"{nameof(CreateAssetDto.FieldSets)}[{idx}]." +
+                        $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." +
+                        $"{nameof(CreateAssetFieldDto.Data)}";
                     
-                    if (!validationResult.IsValid && validationResult.Errors.Any())
+                    if (providedDataType != expectedDataType)
                     {
-                        // FieldSet[idx].Fields[jdx].Data.Value
-                        var idx = dtoFieldSets.IndexOf(dtoFieldSet);
-                        var jdx = dtoFieldSet.Fields.IndexOf(dtoField);
+                        key = $"{key}.Type";
 
-                        var key =
-                            $"{nameof(CreateAssetDto.FieldSets)}[{idx}]." +
-                            $"{nameof(CreateAssetFieldSetDto.Fields)}[{jdx}]." +
-                            $"{nameof(CreateAssetFieldDto.Data)}.Value";
+                        validationErrors.Add(key, new List<string>{$"Invalid data type '{providedDataType}', expected '{expectedDataType}'."});
+                    }
+                    else
+                    {
+                        var fieldPropertiesResolver = new FieldPropertiesResolver(_mapper, dbField.Properties, dbFieldSetField.IsRequired);
+                        var validator = (IValidator) new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver);
 
-                        foreach (var error in validationResult.Errors)
+                        var context = ValidationContext<object>.CreateWithOptions(dtoField,
+                            opt => opt.IncludeAllRuleSets());
+            
+                        var validationResult = await validator.ValidateAsync(context, cancellationToken);
+                        
+                        if (!validationResult.IsValid && validationResult.Errors.Any())
                         {
-                            if (validationErrors.ContainsKey(key))
+                            key = $"{key}.Value";
+                            
+                            foreach (var error in validationResult.Errors)
                             {
-                                validationErrors[key].Add(error.ErrorMessage);
-                            }
-                            else
-                            {
-                                validationErrors.Add(key, new List<string>{error.ErrorMessage});
+                                if (validationErrors.ContainsKey(key))
+                                {
+                                    validationErrors[key].Add(error.ErrorMessage);
+                                }
+                                else
+                                {
+                                    validationErrors.Add(key, new List<string>{error.ErrorMessage});
+                                }
                             }
                         }
                     }

@@ -17,19 +17,19 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
             {
                 _.Add(dto =>
                 {
-                    var fieldProperties = fieldPropertiesResolver.Resolve(dto.Id);
-                    return new StringFieldDataDtoFieldValidator(fieldProperties);
+                    var (fieldProperties, isRequired) = fieldPropertiesResolver.Resolve(dto.Id);
+                    return new StringFieldDataDtoFieldValidator(fieldProperties, isRequired);
                 });
 
                 _.Add(dto => {
-                    var fieldProperties = fieldPropertiesResolver.Resolve(dto.Id);
-                    return new LongFieldDataDtoFieldValidator(fieldProperties);
+                    var (fieldProperties, isRequired) = fieldPropertiesResolver.Resolve(dto.Id);
+                    return new LongFieldDataDtoFieldValidator(fieldProperties, isRequired);
                 });
                 
                 _.Add(dto => 
                 {
-                    var fieldProperties = fieldPropertiesResolver.Resolve(dto.Id);
-                    return new DoubleFieldDataDtoFieldValidator(fieldProperties);
+                    var (fieldProperties, isRequired) = fieldPropertiesResolver.Resolve(dto.Id);
+                    return new DoubleFieldDataDtoFieldValidator(fieldProperties, isRequired);
                 });
             });
         }

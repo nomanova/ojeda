@@ -16,14 +16,14 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
     
     public class LongFieldDataDtoFieldValidator : AbstractValidator<LongFieldDataDto>
     {
-        public LongFieldDataDtoFieldValidator(FieldPropertiesDto fieldProperties)
+        public LongFieldDataDtoFieldValidator(FieldPropertiesDto fieldProperties, bool isRequired)
         {
             RuleFor(_ => _.Value).Must((_, value, context) =>
             {
                 switch (fieldProperties.Type)
                 {
                     case FieldTypeDto.Number:
-                        return ValidateNumberTypeField(value, (NumberFieldPropertiesDto)fieldProperties, context);
+                        return ValidateNumberTypeField(value, (NumberFieldPropertiesDto)fieldProperties, isRequired, context);
                     default:
                         throw new NotImplementedException(nameof(fieldProperties.Type));
                         
@@ -34,12 +34,18 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
         private static bool ValidateNumberTypeField(
             long? value,
             NumberFieldPropertiesDto fieldProperties,
+            bool isRequired,
             ValidationContext<LongFieldDataDto> context)
         {
             if (value == null)
             {
-                // Handled by required validator
-                return true;
+                if (!isRequired)
+                {
+                    return true;
+                }
+
+                context.MessageFormatter.AppendArgument("ValidationMessage", "Value is required.");
+                return false;
             }
             
             var hasFailures = false;

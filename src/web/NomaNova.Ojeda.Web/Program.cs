@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NomaNova.Ojeda.Client;
 using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Utils.Services;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
 
@@ -49,6 +50,10 @@ namespace NomaNova.Ojeda.Web
 
         private static void RegisterValidators(IServiceCollection services)
         {
+            // Field Sets
+            services.AddTransient<IValidator<CreateFieldSetDto>, CreateFieldSetDtoFieldValidator>();
+            services.AddTransient<IValidator<UpdateFieldSetDto>, UpdateFieldSetDtoFieldValidator>();
+
             // Fields
             services.AddTransient<IValidator<CreateFieldDto>, CreateFieldDtoFieldValidator>();
             services.AddTransient<IValidator<UpdateFieldDto>, UpdateFieldDtoFieldValidator>();

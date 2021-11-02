@@ -10,6 +10,8 @@ namespace NomaNova.Ojeda.Core.Domain.FieldSets
 
         public uint Order { get; set; }
 
+        public bool IsRequired { get; set; }
+
         public virtual Field Field { get; set; }
 
         public virtual FieldSet FieldSet { get; set; }

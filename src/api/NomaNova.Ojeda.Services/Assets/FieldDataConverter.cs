@@ -67,5 +67,25 @@ namespace NomaNova.Ojeda.Services.Assets
 
             throw new NotImplementedException(fieldProperties.Type.ToString());
         }
+
+        public FieldDataTypeDto GetMatchingDataType(FieldProperties fieldProperties)
+        {
+            if (fieldProperties.Type == FieldType.Text)
+            {
+                return FieldDataTypeDto.String;
+            }
+
+            if (fieldProperties.Type == FieldType.Number && !((NumberFieldProperties)fieldProperties).WithDecimals)
+            {
+                return FieldDataTypeDto.Long;
+            }
+
+            if (fieldProperties.Type == FieldType.Number && ((NumberFieldProperties)fieldProperties).WithDecimals)
+            {
+                return FieldDataTypeDto.Double;
+            }
+            
+            throw new NotImplementedException(fieldProperties.Type.ToString());
+        }
     }
 }

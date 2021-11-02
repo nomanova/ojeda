@@ -10,7 +10,7 @@
 
     <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-        <FluentValidationValidator Validator="@(new UpdateFieldSetDtoFieldValidator())"/>
+        <FluentValidationValidator DisableAssemblyScanning="@true"/>
         <ServerSideFluentValidation @ref="ServerValidation"/>
 
         <div class="ojeda-form mb-4">
@@ -46,6 +46,7 @@
                             <tr>
                                 <th class="py-2" colspan="2">Order</th>
                                 <th class="py-2">Name</th>
+                                <th class="py-2">Is Required</th>
                                 <th class="py-2">Delete</th>
                             </tr>
                             </thead>
@@ -53,19 +54,26 @@
                             @foreach (var fieldSetField in UpsertFieldSet.Fields)
                             {
                                 <tr>
+                                    <!-- Order -->
                                     <td class="pb-2 pr-0">
-                                        <ItemOrderHandler Type="@OrderType.Up" 
-                                                      IsEnabled="@(fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)"
-                                                      OnClick="@(() => OnMoveItemUp(fieldSetField))" />
+                                        <ItemOrderHandler Type="@OrderType.Up"
+                                                          IsEnabled="@(fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)"
+                                                          OnClick="@(() => OnMoveItemUp(fieldSetField))"/>
                                     </td>
                                     <td class="pb-2 pr-0">
-                                        <ItemOrderHandler Type="@OrderType.Down" 
-                                                      IsEnabled="@(fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)"
-                                                      OnClick="@(() => OnMoveItemDown(fieldSetField))" />
+                                        <ItemOrderHandler Type="@OrderType.Down"
+                                                          IsEnabled="@(fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)"
+                                                          OnClick="@(() => OnMoveItemDown(fieldSetField))"/>
                                     </td>
+                                    <!-- Name -->
                                     <td class="pb-2 pr-3">@(GetFieldName(fieldSetField.Id))</td>
+                                    <!-- Is Required -->
                                     <td class="pb-2 pr-3">
-                                        <ItemDeleteHandler OnClick="@(() => OnRemoveItem(fieldSetField))" />
+                                        <InputCheckbox @bind-Value="fieldSetField.IsRequired" id="@($"{fieldSetField.Id}-is-required")" disabled="@IsSubmitting"/>
+                                    </td>
+                                    <!-- Delete -->
+                                    <td class="pb-2 pr-3">
+                                        <ItemDeleteHandler OnClick="@(() => OnRemoveItem(fieldSetField))"/>
                                     </td>
                                 </tr>
                             }
@@ -145,7 +153,8 @@
             Fields = _fieldSet.Fields.Select(_ => new UpdateFieldSetFieldDto
             {
                 Id = _.Field.Id,
-                Order = _.Order
+                Order = _.Order,
+                IsRequired = _.IsRequired
             }).ToList()
         };
 

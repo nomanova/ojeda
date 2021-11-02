@@ -106,7 +106,6 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ISerializer, Serializer>();
             
             services.TryAddSingleton<IFieldDataConverter, FieldDataConverter>();
-            services.TryAddSingleton<IFieldDataValidator, FieldDataValidator>();
             
             services.TryAddScoped<IFieldsService, FieldsService>();
             services.TryAddScoped<IFieldSetsService, FieldSetsService>();

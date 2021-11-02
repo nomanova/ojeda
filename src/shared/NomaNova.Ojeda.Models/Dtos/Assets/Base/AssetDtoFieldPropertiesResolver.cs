@@ -13,7 +13,7 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
             _assetDto = assetDto;
         }
 
-        public FieldPropertiesDto Resolve(string fieldId)
+        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldId)
         {
             var assetField = _assetDto.FieldSets
                 .SelectMany(fs => fs.Fields)
@@ -24,7 +24,7 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
                 throw new ArgumentException($"Invalid state, field {fieldId} unknown.");
             }
 
-            return assetField.Properties;
+            return (assetField.Properties, assetField.IsRequired);
         }
     }
 }

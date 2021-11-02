@@ -75,21 +75,21 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
         private static IValidator GetFieldDataValidator(object model, AssetDto assetDto, string fieldId)
         {
             var resolver = new AssetDtoFieldPropertiesResolver(assetDto);
-            var fieldProperties = resolver.Resolve(fieldId);
+            var (fieldProperties, isRequired) = resolver.Resolve(fieldId);
             
             if (model.GetType() == typeof(StringFieldDataDto))
             {
-                return new StringFieldDataDtoFieldValidator(fieldProperties);
+                return new StringFieldDataDtoFieldValidator(fieldProperties, isRequired);
             }
 
             if (model.GetType() == typeof(LongFieldDataDto))
             {
-                return new LongFieldDataDtoFieldValidator(fieldProperties);
+                return new LongFieldDataDtoFieldValidator(fieldProperties, isRequired);
             }
             
             if (model.GetType() == typeof(DoubleFieldDataDto))
             {
-                return new DoubleFieldDataDtoFieldValidator(fieldProperties);
+                return new DoubleFieldDataDtoFieldValidator(fieldProperties, isRequired);
             }
 
             throw new NotImplementedException($"Missing validator for model: {model.GetType()}");

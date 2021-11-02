@@ -8,5 +8,7 @@ namespace NomaNova.Ojeda.Services.Assets.Interfaces
         byte[] ToBytes(FieldDataDto data, FieldProperties fieldProperties);
 
         FieldDataDto FromBytes(byte[] value, FieldProperties fieldProperties);
+
+        FieldDataTypeDto GetMatchingDataType(FieldProperties fieldProperties);
     }
 }

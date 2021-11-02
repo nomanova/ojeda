@@ -26,5 +26,7 @@ namespace NomaNova.Ojeda.Models.Dtos.FieldSets
         public int Order { get; set; }
 
         public FieldDto Field { get; set; }
+
+        public bool IsRequired { get; set; }
     }
 }

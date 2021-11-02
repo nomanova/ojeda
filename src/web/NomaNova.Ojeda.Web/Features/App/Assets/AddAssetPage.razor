@@ -47,7 +47,7 @@ else
                     var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
                     
                     <div class="mb-3">
-                        <label for="@hash" class="form-label">@(GetFieldName(fieldSet.Id, field.Id))</label>
+                        <label for="@hash" class="form-label">@(GetFieldLabel(fieldSet.Id, field.Id))</label>
                         
                         @{
                             var fieldDataType = GetFieldDataType(fieldSet.Id, field.Id);
@@ -67,7 +67,9 @@ else
                         {
                             var fieldData = (LongFieldDataDto)field.Data;
                             
-                            <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                            <OjedaInputNumber @bind-Value="fieldData.Value"
+                                              ParsingErrorMessage="Value must be integer."
+                                              class="form-control" id="@hash" disabled="@_isSubmitting"
                                               placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))" />
                             
                             <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
@@ -178,6 +180,16 @@ else
         return GetFieldSet(id).Description;
     }
 
+    private string GetFieldLabel(string fieldSetId, string fieldId)
+    {
+        var field = GetField(fieldSetId, fieldId);
+
+        var name = field.Name;
+        var isRequired = field.IsRequired;
+
+        return isRequired ? $"{name}*" : name;
+    }
+
     private string GetFieldName(string fieldSetId, string fieldId)
     {
         return GetField(fieldSetId, fieldId).Name;
@@ -261,7 +273,7 @@ else
                 Fields = fs.Fields.Select(f => new CreateAssetFieldDto
                 {
                     Id = f.Id,
-                    Data = f.Data
+                    Data = Copy(f.Data)
                 }).ToList()
             }).ToList()
         };
@@ -270,4 +282,23 @@ else
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
 
+    private static FieldDataDto Copy(FieldDataDto data)
+    {
+        return data.Type switch
+        {
+            FieldDataTypeDto.String => new StringFieldDataDto
+            {
+                Value = ((StringFieldDataDto)data).Value
+            },
+            FieldDataTypeDto.Long => new LongFieldDataDto
+            {
+                Value = ((LongFieldDataDto)data).Value
+            },
+            FieldDataTypeDto.Double => new DoubleFieldDataDto
+            {
+                Value = ((DoubleFieldDataDto)data).Value
+            },
+            _ => throw new NotImplementedException(data.Type.ToString())
+        };
+    }
 }
