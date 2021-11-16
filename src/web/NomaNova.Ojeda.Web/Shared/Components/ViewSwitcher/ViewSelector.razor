@@ -1,4 +1,4 @@
-@inject ILocalStorageService LocalStorageService
+@inject ILocalStorageService _localStorageService
 
 <div class="btn-group" role="group">
     <!-- Grid -->
@@ -32,9 +32,9 @@
     
     private async Task<ViewMode> GetViewMode()
     {
-        if (await LocalStorageService.ContainKeyAsync(Constants.StorageKeyViewMode))
+        if (await _localStorageService.ContainKeyAsync(Constants.StorageKeyViewMode))
         {
-            return await LocalStorageService.GetItemAsync<ViewMode>(Constants.StorageKeyViewMode);
+            return await _localStorageService.GetItemAsync<ViewMode>(Constants.StorageKeyViewMode);
         }
 
         return ViewMode.Grid;
@@ -42,6 +42,6 @@
 
     private async Task StoreViewMode(ViewMode viewMode)
     {
-        await LocalStorageService.SetItemAsync(Constants.StorageKeyViewMode, viewMode);
+        await _localStorageService.SetItemAsync(Constants.StorageKeyViewMode, viewMode);
     }
 }
