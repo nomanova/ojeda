@@ -52,7 +52,7 @@ namespace NomaNova.Ojeda.Web.Features.Admin.AssetTypes
                     Id = fieldSet.Id
                 });
             
-                EditContext.Validate();
+                EditContext.NotifyFieldChanged(EditContext.Field(nameof(FieldSets)));
                 StateHasChanged();
             }
         }

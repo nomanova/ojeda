@@ -24,7 +24,7 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
         protected abstract T UpsertFieldSet { get; set; }
 
         protected List<FieldDto> Fields { get; set; }
-        
+
         protected async Task OnAddField()
         {
             if (IsSubmitting)
@@ -52,7 +52,7 @@ namespace NomaNova.Ojeda.Web.Features.Admin.FieldSets
                     Id = field.Id
                 });
                 
-                EditContext.Validate();
+                EditContext.NotifyFieldChanged(EditContext.Field(nameof(Fields)));
                 StateHasChanged();
             }
         }
