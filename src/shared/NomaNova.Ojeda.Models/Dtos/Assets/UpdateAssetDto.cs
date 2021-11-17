@@ -14,7 +14,7 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
     public class UpdateAssetFieldDto : UpsertAssetFieldDto
     {
     }
-    
+
     public class UpdateAssetDtoFieldValidator : AbstractValidator<UpdateAssetDto>
     {
         public UpdateAssetDtoFieldValidator(IFieldPropertiesResolver fieldPropertiesResolver)

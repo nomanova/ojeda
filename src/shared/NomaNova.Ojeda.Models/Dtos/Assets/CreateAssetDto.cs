@@ -22,12 +22,4 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
             Include(new UpsertAssetDtoFieldValidator<CreateAssetFieldSetDto, CreateAssetFieldDto>(fieldPropertiesResolver));
         }
     }
-
-    public class CreateAssetFieldDtoFieldValidator : AbstractValidator<CreateAssetFieldDto>
-    {
-        public CreateAssetFieldDtoFieldValidator(IFieldPropertiesResolver fieldPropertiesResolver)
-        {
-            Include(new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver));
-        }
-    }
 }

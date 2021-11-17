@@ -32,7 +32,16 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             ValidationMessageStore messages,
             AssetDto assetDto)
         {
-            var validator = (IValidator) new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+            IValidator validator;
+
+            if (editContext.Model is CreateAssetDto)
+            {
+                validator = new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+            }
+            else
+            {
+                validator = new UpdateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+            }
 
             var context = ValidationContext<object>.CreateWithOptions(editContext.Model,
                 opt => opt.IncludeAllRuleSets());
@@ -97,18 +106,34 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
 
         private static string GetFieldId(object editContextModel, object fieldModel)
         {
-            var createAssetDto = (CreateAssetDto)editContextModel;
-
-            foreach (var createAssetFieldSetDto in createAssetDto.FieldSets)
+            if (editContextModel is CreateAssetDto createAssetDto)
             {
-                foreach (var createAssetFieldDto in createAssetFieldSetDto.Fields)
+                foreach (var createAssetFieldSetDto in createAssetDto.FieldSets)
                 {
-                    if (createAssetFieldDto.Data.Equals(fieldModel))
+                    foreach (var createAssetFieldDto in createAssetFieldSetDto.Fields)
                     {
-                        return createAssetFieldDto.Id;
+                        if (createAssetFieldDto.Data.Equals(fieldModel))
+                        {
+                            return createAssetFieldDto.Id;
+                        }
                     }
                 }
             }
+
+            if (editContextModel is UpdateAssetDto updateAssetDto)
+            {
+                foreach (var createAssetFieldSetDto in updateAssetDto.FieldSets)
+                {
+                    foreach (var createAssetFieldDto in createAssetFieldSetDto.Fields)
+                    {
+                        if (createAssetFieldDto.Data.Equals(fieldModel))
+                        {
+                            return createAssetFieldDto.Id;
+                        }
+                    }
+                }
+            }
+
 
             throw new ArgumentException("Invalid state, no matching field found");
         }

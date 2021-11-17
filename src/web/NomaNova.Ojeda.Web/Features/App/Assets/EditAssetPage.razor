@@ -1,43 +1,15 @@
-@page "/assets/add"
-
 @inherits UpsertAssetPage
 
-<h3>Add Asset</h3>
+<OjedaLoader IsLoading="_isLoading">
 
-@if (_error != null)
-{
-    <p class="text-danger fst-italic">@_error</p>
-    <a href="/assets">Return to Assets</a>
-}
-else if (_isLoading)
-{
-    <p class="text-muted fst-italic">Loading...</p>   
-}
-else
-{
-    <div class="ojeda-form mt-3">
+    <div class="ojeda-form">
     
-    <!-- Class -->        
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <h5>Class</h5>
-                </div>
-                <div class="col-8">
-                    <p>@Asset.AssetType.Name</p>
-                    <span class="text-muted fst-italic">@Asset.AssetType.Description</span>
-                </div>
-            </div>
-        </div>
-    </div>
-                              
     <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
-        
-        <AssetFluentValidationValidator Asset="@Asset" />
-        <ServerSideFluentValidation @ref="_serverValidation" />
-        
-        @foreach (var fieldSet in _createAsset.FieldSets)
+
+        <AssetFluentValidationValidator Asset="@Asset"/>
+        <ServerSideFluentValidation @ref="_serverValidation"/>
+
+        @foreach (var fieldSet in _updateAsset.FieldSets)
         {
             <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))">
                 @foreach (var field in fieldSet.Fields)
@@ -88,34 +60,56 @@ else
         }
 
         <div class="my-4">
-            <OjedaFormFooter
-                IsSubmitting="@_isSubmitting"
-                OnCancel="@OnCancel"
-                OnReset="@OnReset"/>
+            
+                <!-- Submit -->
+                <OjedaButton
+                    Style="@ButtonStyle.Primary"
+                    Type="@ButtonType.Submit"
+                    IsDisabled="@IsUpdateDisabled()"
+                    IsLoading="_isSubmitting"
+                    Text="Update"/>
+            
         </div>
-        
+
     </EditForm>
     
     </div>
-}
+
+</OjedaLoader>
 
 @code {
 
-    private CreateAssetDto _createAsset = new();
-    
+    private UpdateAssetDto _updateAsset = new();
+
     private EditContext _editContext;
 
     private ServerSideFluentValidation _serverValidation;
 
     private bool _isLoading;
     private bool _isSubmitting;
-    private string _error;
-    
+    private bool _isModified;
+
+    [Parameter]
+    public string AssetId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        NavManager.TryGetQueryString<string>("assetTypeId", out var assetTypeId);
+        _isLoading = true;
 
-        await GetAssetType(assetTypeId);
+        var result = await Ojeda.AssetsService.GetByIdAsync(AssetId);
+
+        if (result.Success)
+        {
+            Asset = result.Data;
+            Init();
+        }
+        else
+        {
+            ToastService.ShowError($"Could not load asset. {result.Error?.Message} ({result.Error?.Code}).");
+            NavManager.NavigateTo("/assets");
+        }
+
+        _isLoading = false;
     }
 
     private async Task OnSubmitForm()
@@ -128,8 +122,8 @@ else
         _isSubmitting = true;
         _serverValidation.ClearErrors();
 
-        var result = await Ojeda.AssetsService.CreateAsync(_createAsset);
-        
+        var result = await Ojeda.AssetsService.UpdateAsync(AssetId, _updateAsset);
+
         if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
         {
             _serverValidation.DisplayErrors(result.Error.ValidationErrors);
@@ -140,74 +134,21 @@ else
         }
         else
         {
-            var asset = result.Data;
-            NavManager.NavigateTo($"/assets/{asset.Id}");
+            InitEditContext();
         }
-        
+
         _isSubmitting = false;
-    }
-
-    private void OnCancel()
-    {
-        if (_isSubmitting)
-        {
-            return;
-        }
-        
-        NavManager.NavigateTo("/assets");
-    }
-    
-    private void OnReset()
-    {
-        if (_isSubmitting)
-        {
-            return;
-        }
-
-        Init();
-    }
-
-    private async Task GetAssetType(string assetTypeId)
-    {
-        if (string.IsNullOrEmpty(assetTypeId))
-        {
-            _error = "Cannot load asset: asset type id is missing.";
-            return;
-        }
-
-        _isLoading = true;
-        
-        var result = await Ojeda.AssetsService.GetByAssetType(assetTypeId);
-
-        if (result.Success)
-        {
-            _error = null;
-            Asset = result.Data;
-
-            Init();
-        }
-        else if (result.StatusCode == HttpStatusCode.NotFound)
-        {
-            _error = "Cannot load asset: asset type does not exist.";
-        }
-        else
-        {
-            ToastService.ShowError($"Could not load asset type. {result.Error?.Message} ({result.Error?.Code}).");
-            NavManager.NavigateTo("/assets");
-        }
-
-        _isLoading = false;
     }
 
     private void Init()
     {
-        _createAsset = new CreateAssetDto
+        _updateAsset = new UpdateAssetDto
         {
             AssetTypeId = Asset.AssetType.Id,
-            FieldSets = Asset.FieldSets.Select(fs => new CreateAssetFieldSetDto
+            FieldSets = Asset.FieldSets.Select(fs => new UpdateAssetFieldSetDto
             {
                 Id = fs.Id,
-                Fields = fs.Fields.Select(f => new CreateAssetFieldDto
+                Fields = fs.Fields.Select(f => new UpdateAssetFieldDto
                 {
                     Id = f.Id,
                     Data = f.Data.Copy()
@@ -215,7 +156,26 @@ else
             }).ToList()
         };
 
-        _editContext = new EditContext(_createAsset);
-        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+        InitEditContext();
     }
+
+    private void InitEditContext()
+    {
+        _editContext = new EditContext(_updateAsset);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+
+        _isModified = false;
+        _editContext.OnFieldChanged += OnFieldChanged;
+    }
+
+    private void OnFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        _isModified = _editContext.IsModified();
+    }
+
+    private bool IsUpdateDisabled()
+    {
+        return !_isModified || _isSubmitting;
+    }
+
 }

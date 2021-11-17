@@ -18,32 +18,18 @@
     </div>
 </div>
 
-<AssetTabSelector OnTabChanged="@OnTabChanged"/>
-
-<AssetTabSwitcher Tab="_tab">
-    <FieldsTemplate>
-        <AssetFieldsTab AssetId="@AssetId"/>
-    </FieldsTemplate>
-    <NotesTemplate>
-        <AssetNotesTab AssetId="@AssetId"/>
-    </NotesTemplate>
-</AssetTabSwitcher>
+<TabControl>
+  <TabPage Text="Fields">
+    <EditAssetPage AssetId="@AssetId"/>
+  </TabPage>
+</TabControl>
 
 @code {
 
     private bool _isLoading;
 
-    private AssetTab _tab = AssetTab.Fields;
-
     [Parameter]
     public string AssetId { get; set; }
-
-    private void OnTabChanged(AssetTab tab)
-    {
-        Console.WriteLine($"tab changed to: {tab}");
-
-        _tab = tab;
-    }
 
     private async Task OnDelete()
     {
