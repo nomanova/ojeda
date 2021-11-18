@@ -1,0 +1,19 @@
+@inherits DeleteItemModal
+
+@inject OjedaClient _ojeda
+
+<DeleteItemModalTemplate
+    Text="Are you sure you want to delete this asset?"
+    IsLoading="@IsLoading"
+    Error="@Error"
+    DeleteCallBack="@OnDeleteAsync"
+    CancelCallBack="@OnCancelAsync"/>
+
+@code {
+
+    protected override async Task<OjedaResult> DeleteAsync()
+    {
+        return await _ojeda.AssetsService.DeleteAsync(Id);
+    }
+
+}

@@ -4,7 +4,6 @@ using Blazored.Modal;
 using Blazored.Modal.Services;
 using Microsoft.AspNetCore.Components;
 using NomaNova.Ojeda.Client.Results;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Models.Shared.Interfaces;
 

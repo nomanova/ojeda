@@ -12,41 +12,36 @@
         <OjedaButton
             Text="Delete"
             Style="@ButtonStyle.Danger"
-            OnClick="OnDelete"
-            IsLoading="_isLoading"
-            IsDisabled="_isLoading"/>
+            OnClick="OnDelete"/>
     </div>
 </div>
 
 <TabControl>
-  <TabPage Text="Fields">
-    <EditAssetPage AssetId="@AssetId"/>
-  </TabPage>
+    <TabPage Text="Fields">
+        <EditAssetPage AssetId="@AssetId"/>
+    </TabPage>
 </TabControl>
 
 @code {
 
-    private bool _isLoading;
+    [CascadingParameter]
+    public IModalService Modal { get; set; }
 
     [Parameter]
     public string AssetId { get; set; }
 
     private async Task OnDelete()
     {
-        _isLoading = true;
+        var parameters = new ModalParameters();
+        parameters.Add("Id", AssetId);
 
-        var result = await _ojeda.AssetsService.DeleteAsync(AssetId);
+        var deleteAssetModal = Modal.Show<DeleteAssetModal>("Delete Asset", parameters, Constants.DefaultModalOptions);
+        var result = await deleteAssetModal.Result;
 
-        if (result.Success)
+        if (!result.Cancelled)
         {
             _navManager.NavigateTo("/assets");
         }
-        else
-        {
-            _toastService.ShowError($"Could not delete asset. {result.Error?.Message} ({result.Error?.Code}).");
-        }
-
-        _isLoading = false;
     }
 
 }

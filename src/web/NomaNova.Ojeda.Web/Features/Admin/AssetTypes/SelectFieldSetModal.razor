@@ -1,8 +1,6 @@
-@using NomaNova.Ojeda.Models.Shared
-@using NomaNova.Ojeda.Models.Dtos.FieldSets
 @inherits SelectItemModal<NomaNova.Ojeda.Models.Dtos.FieldSets.FieldSetDto>
 
-@inject OjedaClient Ojeda
+@inject OjedaClient _ojeda
 
 <SelectItemModalTemplate TItem="FieldSetDto"
                          HelpText="Select the <strong>field set</strong> to add below."
@@ -34,7 +32,7 @@
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.FieldSetsService.GetAsync(
+        return await _ojeda.FieldSetsService.GetAsync(
             query, null, true, ExcludedIds, pageNumber, pageSize);
     }
 

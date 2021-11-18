@@ -1,6 +1,6 @@
 @inherits SelectItemModal<FieldDto>
 
-@inject OjedaClient Ojeda
+@inject OjedaClient _ojeda
 
 <SelectItemModalTemplate TItem="FieldDto"
                          HelpText="Select the <strong>field</strong> to add below."
@@ -32,7 +32,7 @@
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.FieldsService.GetAsync(
+        return await _ojeda.FieldsService.GetAsync(
             query, null, true, ExcludedIds, pageNumber, pageSize);
     }
 }
