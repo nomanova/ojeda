@@ -64,7 +64,7 @@ namespace NomaNova.Ojeda.Services.Fields
 
         public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken)
         {
-            await Validate(new CreateFieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
+            await ValidateAndThrowAsync(new CreateFieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
 
             var field = _mapper.Map<Field>(fieldDto);
             field.Id = Guid.NewGuid().ToString();
@@ -84,7 +84,7 @@ namespace NomaNova.Ojeda.Services.Fields
                 throw new NotFoundException();
             }
 
-            await Validate(new UpdateFieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
+            await ValidateAndThrowAsync(new UpdateFieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
 
             field = _mapper.Map(fieldDto, field);
             field.Id = id;

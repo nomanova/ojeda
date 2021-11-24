@@ -6,7 +6,7 @@ using NomaNova.Ojeda.Models.Shared.Validation;
 
 namespace NomaNova.Ojeda.Models.Dtos.AssetTypes.Base
 {
-    public abstract class UpsertAssetTypeDto<T> : INamedDto where T : UpsertAssetTypeFieldSetDto
+    public abstract class UpsertAssetTypeDto<T> : INamedDto, IDescribedDto where T : UpsertAssetTypeFieldSetDto
     {
         public string Name { get; set; }
         
@@ -28,6 +28,7 @@ namespace NomaNova.Ojeda.Models.Dtos.AssetTypes.Base
         public UpsertAssetTypeDtoFieldValidator()
         {
             RegisterBaseValidator(new NamedFieldValidator());
+            RegisterBaseValidator(new DescribedFieldValidator());
             
             RuleFor(_ => _.FieldSets).NotEmpty().WithMessage("At least one field set is required.");
             

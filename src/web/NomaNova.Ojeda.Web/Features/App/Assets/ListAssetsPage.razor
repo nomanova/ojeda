@@ -1,8 +1,8 @@
 @page "/assets"
 @inherits ListItemsPage<AssetSummaryDto>
 
-@inject OjedaClient Ojeda
-@inject NavigationManager NavManager
+@inject OjedaClient _ojeda
+@inject NavigationManager _navManager
 
 <div class="d-flex justify-content-between mt-2 mb-4">
     <div class="d-flex align-items-center">
@@ -76,7 +76,8 @@ else
 
             _columnDefinitions.AddRange(new[]
             {
-                new ColumnDefinition {DataField = "Id", Caption = "Id"},
+                new ColumnDefinition {DataField = "Name", Caption = "Name"},
+                new ColumnDefinition {DataField = "AssetType.Name", Caption = "Type"},
                 new ColumnDefinition {DataField = "UpdatedAt", Caption = "Last Updated", DataType = DataType.RelativeDateTime, Alignment = Alignment.Right}
             });
         }
@@ -90,7 +91,7 @@ else
         if (!result.Cancelled)
         {
             var assetType = (AssetTypeDto) result.Data;
-            NavManager.NavigateTo($"/assets/add?assetTypeId={assetType.Id}");
+            _navManager.NavigateTo($"/assets/add?assetTypeId={assetType.Id}");
         }
     }
 
@@ -101,14 +102,14 @@ else
 
     private void OnShowAsset(AssetSummaryDto asset)
     {
-        NavManager.NavigateTo($"/assets/{asset.Id}");
+        _navManager.NavigateTo($"/assets/{asset.Id}");
     }
 
     protected override async Task<OjedaDataResult<PaginatedListDto<AssetSummaryDto>>> FetchItemsAsync(string query = null,
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.AssetsService.GetAsync(query, null, true, pageNumber, pageSize);
+        return await _ojeda.AssetsService.GetAsync(query, null, true, pageNumber, pageSize);
     }
 
 }

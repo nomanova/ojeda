@@ -85,7 +85,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         public async Task<AssetTypeDto> CreateAsync(
             CreateAssetTypeDto assetTypeDto, CancellationToken cancellationToken)
         {
-            await Validate(new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, _assetTypesRepository), assetTypeDto, cancellationToken);
+            await ValidateAndThrowAsync(new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, _assetTypesRepository), assetTypeDto, cancellationToken);
 
             var assetTypeId = Guid.NewGuid().ToString();
 
@@ -116,7 +116,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 throw new NotFoundException();
             }
 
-            await Validate(new UpdateAssetTypeDtoBusinessValidator(
+            await ValidateAndThrowAsync(new UpdateAssetTypeDtoBusinessValidator(
                 _fieldSetsRepository, _assetTypesRepository, id), assetTypeDto, cancellationToken);
 
             assetType = _mapper.Map(assetTypeDto, assetType);

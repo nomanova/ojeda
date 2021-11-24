@@ -1,22 +1,19 @@
-@inject ITimeKeeper TimeKeeper
+@inject ITimeKeeper _timeKeeper
 
 <div class="card" @onclick="@(() => OnSelected.InvokeAsync())" style="width: 100%;">
 
-    <!-- TODO: placeholder -->
-    @if (Asset.Id.GetHashCode() % 2 == 0)
-    {
-        <img src="/img/mobile_iphone.jpg" style="object-fit: cover;" class="card-img-top" alt="asset" width="100%" height="120" />    
-    }
-    else
-    {
-        <img src="/img/laptop_macbook.jpg" style="object-fit: cover;" class="card-img-top" alt="asset" width="100%" height="120" />
-    }
-    
+    <!-- Default -->
+    <div class="d-flex align-items-center justify-content-center card-img-top" style="width: 100%; height: 120px; background-color: #e9ecef;">
+        <img src="/img/box.svg" alt="asset" width="75" height="75"/>
+    </div>
+
     <!-- Body -->
     <div class="card-body">
-        <h5 class="card-title">@Asset.AssetType.Name</h5>
-        <p class="card-text text-muted">Last updated: @Asset.UpdatedAt.ToRelativeTime(TimeKeeper)</p>
+        <h5 class="card-title" style="margin-bottom: 0.3rem;">@Asset.Name.Truncate(28)</h5>
+        <p class="card-text text-muted" style="margin-bottom: 0.75rem;">@Asset.AssetType.Name</p>
+        <small class="text-muted" style="font-size: .75rem;">Last updated: @Asset.UpdatedAt.ToRelativeTime(_timeKeeper)</small>
     </div>
+
 </div>
 
 @code {

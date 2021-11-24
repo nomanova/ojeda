@@ -93,7 +93,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
         public async Task<FieldSetDto> CreateAsync(
             CreateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
-            await Validate(new CreateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository), 
+            await ValidateAndThrowAsync(new CreateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository), 
                 fieldSetDto, cancellationToken);
 
             var fieldSetId = Guid.NewGuid().ToString();
@@ -125,7 +125,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 throw new NotFoundException();
             }
 
-            await Validate(new UpdateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, id), 
+            await ValidateAndThrowAsync(new UpdateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, id), 
                 fieldSetDto, cancellationToken);
             
             fieldSet = _mapper.Map(fieldSetDto, fieldSet);

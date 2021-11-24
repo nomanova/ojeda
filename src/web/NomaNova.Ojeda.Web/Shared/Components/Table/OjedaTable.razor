@@ -1,5 +1,5 @@
 @typeparam TItem
-@inject ITimeKeeper TimeKeeper
+@inject ITimeKeeper _timeKeeper
 
 <table class="table table-hover w-100">
     <thead>
@@ -36,15 +36,20 @@
 
     private string GetFormattedValue(TItem item, ColumnDefinition column)
     {
+        if (!GetValue(item, column.DataField, out var value))
+        {
+            throw new Exception($"Could not retrieve value for {column.DataField}");
+        }
+        
         switch (column.DataType)
         {
             case DataType.NotSet:
             case DataType.String:
-                return typeof(TItem).GetProperty(column.DataField)?.GetValue(item)?.ToString();
+                return value?.ToString();
             case DataType.RelativeDateTime:
-                if (DateTime.TryParse(typeof(TItem).GetProperty(column.DataField)?.GetValue(item)?.ToString(), out var result))
+                if (DateTime.TryParse(value?.ToString(), out var result))
                 {
-                    return result.ToRelativeTime(TimeKeeper);
+                    return result.ToRelativeTime(_timeKeeper);
                 }
                 return string.Empty;
             default:
@@ -57,4 +62,39 @@
         return alignment == Alignment.NotSet ? string.Empty : $"align-{alignment.ToString().ToLower()}";
     }
 
+    private bool GetValue(object obj, string pathName, out object fieldValue) 
+    {
+        if (obj == null)
+        {
+            throw new ArgumentException(nameof(obj));
+        }
+
+        var currentObject = obj;
+        var fieldNames = pathName.Split(".");
+
+        foreach (var fieldName in fieldNames)
+        {
+            if (currentObject == null)
+            {
+                throw new ArgumentException(nameof(currentObject));
+            }
+
+            var currentRecordType = currentObject.GetType(); 
+            var property = currentRecordType.GetProperty(fieldName); 
+
+            if (property != null) 
+            { 
+                currentObject = property.GetValue(currentObject, null); 
+            } 
+            else 
+            { 
+                fieldValue = null; 
+                return false; 
+            }
+        }
+
+        fieldValue = currentObject;
+        return true; 
+    } 
+    
 }

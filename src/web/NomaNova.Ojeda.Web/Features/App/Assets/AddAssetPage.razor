@@ -16,27 +16,46 @@ else if (_isLoading)
 else
 {
     <div class="ojeda-form mt-3">
-    
-    <!-- Class -->        
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-4">
-                    <h5>Class</h5>
-                </div>
-                <div class="col-8">
-                    <p>@Asset.AssetType.Name</p>
-                    <span class="text-muted fst-italic">@Asset.AssetType.Description</span>
-                </div>
-            </div>
-        </div>
-    </div>
-                              
+
     <EditForm EditContext="_editContext" OnValidSubmit="OnSubmitForm">
         
         <AssetFluentValidationValidator Asset="@Asset" />
         <ServerSideFluentValidation @ref="_serverValidation" />
         
+        <!-- Header -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 d-flex align-items-center justify-content-center">
+                        
+                        <!-- Image -->
+                            <div class="image d-flex align-items-center justify-content-center">
+                                <i class="fs-6 bi-box" style="font-size: 90px !important; color: rgba(206, 212, 218, 0.5);"></i>
+                            </div>
+                        
+                    </div>
+                    <div class="col-8">
+
+                        <!-- Type -->
+                        <OjedaFormField ForId="field-type" Label="Type" IsRequired="false">
+                            <input
+                                class="form-control"
+                                id="field-type"
+                                value="@Asset.AssetType.Name" 
+                                disabled />
+                        </OjedaFormField>
+
+                        <!-- Name -->
+                        <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createAsset.Name)">
+                            <OjedaInputText @bind-Value="_createAsset.Name" class="form-control" id="field-name" disabled="@_isSubmitting" />
+                        </OjedaFormField>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Sets -->
         @foreach (var fieldSet in _createAsset.FieldSets)
         {
             <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))">
@@ -87,13 +106,13 @@ else
             </FormSection>
         }
 
-        <div class="my-4">
             <OjedaFormFooter
+                CssClass="my-4"
+                Alignment="@FormFooterAlignment.End"
                 IsSubmitting="@_isSubmitting"
                 OnCancel="@OnCancel"
                 OnReset="@OnReset"/>
-        </div>
-        
+
     </EditForm>
     
     </div>

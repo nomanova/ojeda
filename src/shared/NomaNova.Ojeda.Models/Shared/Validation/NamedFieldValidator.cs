@@ -9,7 +9,6 @@ namespace NomaNova.Ojeda.Models.Shared.Validation
         {
             RuleFor(_ =>  _.Name).NotEmpty();
             RuleFor(_ =>  _.Name).MaximumLength(Constants.NameMaxLength);
-            RuleFor(_ =>  _.Description).MaximumLength(Constants.DescriptionMaxLength);
         }
     }
 }

@@ -6,7 +6,7 @@ using NomaNova.Ojeda.Models.Shared.Validation;
 
 namespace NomaNova.Ojeda.Models.Dtos.FieldSets.Base
 {
-    public abstract class UpsertFieldSetDto<T> : INamedDto where T : UpsertFieldSetFieldDto
+    public abstract class UpsertFieldSetDto<T> : INamedDto, IDescribedDto where T : UpsertFieldSetFieldDto
     {
         public string Name { get; set; }
         
@@ -30,6 +30,7 @@ namespace NomaNova.Ojeda.Models.Dtos.FieldSets.Base
         public UpsertFieldSetDtoFieldValidator()
         {
             RegisterBaseValidator(new NamedFieldValidator());
+            RegisterBaseValidator(new DescribedFieldValidator());
             
             RuleFor(_ => _.Fields).NotEmpty().WithMessage("At least one field is required.");
 

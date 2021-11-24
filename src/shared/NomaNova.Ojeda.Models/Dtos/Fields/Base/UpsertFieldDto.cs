@@ -4,7 +4,7 @@ using NomaNova.Ojeda.Models.Shared.Validation;
 
 namespace NomaNova.Ojeda.Models.Dtos.Fields.Base
 {
-    public abstract class UpsertFieldDto : INamedDto
+    public abstract class UpsertFieldDto : INamedDto, IDescribedDto
     {
         public string Name { get; set; }
         
@@ -18,6 +18,7 @@ namespace NomaNova.Ojeda.Models.Dtos.Fields.Base
         public UpsertFieldDtoFieldValidator()
         {
             RegisterBaseValidator(new NamedFieldValidator());
+            RegisterBaseValidator(new DescribedFieldValidator());
             
             RuleFor(x => x.Properties).SetInheritanceValidator(_ => {
                 _.Add(new TextFieldPropertiesDtoFieldValidator());

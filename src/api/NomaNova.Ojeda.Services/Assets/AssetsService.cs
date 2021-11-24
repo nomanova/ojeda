@@ -16,6 +16,7 @@ using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
+using NomaNova.Ojeda.Models.Shared.Validation;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
 using ValidationException = NomaNova.Ojeda.Core.Exceptions.ValidationException;
 
@@ -128,7 +129,7 @@ namespace NomaNova.Ojeda.Services.Assets
         public async Task<AssetDto> CreateAsync(CreateAssetDto assetDto, CancellationToken cancellationToken)
         {
             // Validate
-            var (dbFieldSets, dbFields) = await ValidateAsync(assetDto, cancellationToken);
+            var (dbFieldSets, dbFields) = await ValidateUpsertAsync(assetDto, cancellationToken);
 
             // Store
             var dtoFieldSets = assetDto.FieldSets;
@@ -183,7 +184,7 @@ namespace NomaNova.Ojeda.Services.Assets
             }
             
             // Validate
-            var (dbFieldSets, dbFields) = await ValidateAsync(assetDto, cancellationToken);
+            var (dbFieldSets, dbFields) = await ValidateUpsertAsync(assetDto, cancellationToken);
             
             // Store
             var dtoFieldSets = assetDto.FieldSets;
@@ -348,12 +349,13 @@ namespace NomaNova.Ojeda.Services.Assets
             return fields;
         }
 
-        private async Task<(List<FieldSet>, List<Field>)> ValidateAsync<T, TS>(UpsertAssetDto <T, TS>  assetDto, CancellationToken cancellationToken)
+        private async Task<(List<FieldSet>, List<Field>)> ValidateUpsertAsync<T, TS>(UpsertAssetDto <T, TS>  assetDto, CancellationToken cancellationToken)
             where T : UpsertAssetFieldSetDto<TS> where TS : UpsertAssetFieldDto
         {
-            var validationErrors = new Dictionary<string, List<string>>();
+            // Step 1: field validation
+            var validationErrors = await ValidateAsync(new NamedFieldValidator(), assetDto, cancellationToken);
             
-            // Step 1: ensure the asset type exists
+            // Step 2: ensure the asset type exists
             var assetType = await _assetTypesRepository.GetByIdAsync(assetDto.AssetTypeId, query =>
             {
                 return query
@@ -366,7 +368,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new ValidationException(validationErrors);
             }
 
-            // Step 2: ensure all expected field sets are present
+            // Step 3: ensure all expected field sets are present
             var dbFieldSets = await GetFieldSetsAsync(assetType, cancellationToken);
             var dtoFieldSets = assetDto.FieldSets ?? new List<T>();
             
@@ -383,7 +385,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 throw new ValidationException(validationErrors);
             }
 
-            // Step 3: ensure all expected fields are present
+            // Step 4: ensure all expected fields are present
             foreach (var dbFieldSet in dbFieldSets)
             {
                 var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();

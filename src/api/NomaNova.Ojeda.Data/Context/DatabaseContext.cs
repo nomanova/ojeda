@@ -43,17 +43,18 @@ namespace NomaNova.Ojeda.Data.Context
             _databaseContextBuilder = databaseContextBuilder;
         }
 
-        public void EnsureSeeded()
+        public void EnsureMigrated()
         {
-            // Migrate database
             Database.Migrate();
             
             if (!this.AllMigrationsApplied())
             {
                 throw new Exception("Could not apply all database migrations.");
             }
+        }
 
-            // Run seeders
+        public void EnsureSeeded()
+        {
             FieldsSeeder.Seed(this, _timeKeeper).Wait();
             FieldSetsSeeder.Seed(this, _timeKeeper).Wait();
             AssetTypesSeeder.Seed(this, _timeKeeper).Wait();

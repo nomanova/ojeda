@@ -66,13 +66,28 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             FieldIdentifier fieldIdentifier)
         {
             var model = fieldIdentifier.Model;
-            var fieldId = GetFieldId(editContext.Model, model);
 
             var properties = new[] {fieldIdentifier.FieldName};
             var context = new ValidationContext<object>(model, new PropertyChain(), new MemberNameValidatorSelector(properties));
             
-            var validator = GetFieldDataValidator(model, assetDto, fieldId);
+            IValidator validator;
             
+            switch (model)
+            {
+                case CreateAssetDto:
+                    validator = new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+                    break;
+                case UpdateAssetDto:
+                    validator = new UpdateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+                    break;
+                default:
+                {
+                    var fieldId = GetFieldId(editContext.Model, model);
+                    validator = GetFieldDataValidator(model, assetDto, fieldId);
+                    break;
+                }
+            }
+
             var validationResults = await validator.ValidateAsync(context);
             
             messages.Clear(fieldIdentifier);

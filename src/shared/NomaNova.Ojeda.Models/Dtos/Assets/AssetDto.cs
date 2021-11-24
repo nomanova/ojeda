@@ -12,6 +12,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
 
         public DateTime UpdatedAt { get; set; }
 
+        public string Name { get; set; }
+        
         public AssetTypeSummaryDto AssetType { get; set; }
     }
 

@@ -1,39 +1,82 @@
-<div class="mb-5 @CssClass">
+@if (Alignment == FormFooterAlignment.Start)
+{
+    <div class="d-flex @CssClass">
 
-    <!-- Submit -->
-    <OjedaButton
-        Style="@ButtonStyle.Primary"
-        Type="@ButtonType.Submit"
-        IsDisabled="IsSubmitting"
-        IsLoading="IsSubmitting"
-        Text="Submit"/>
+        <!-- Submit -->
+        <OjedaButton
+            Style="@ButtonStyle.Primary"
+            Type="@ButtonType.Submit"
+            IsDisabled="IsSubmitting"
+            IsLoading="IsSubmitting"
+            Text="Submit"/>
 
-    <!-- Reset -->
-    <OjedaButton
-        Style="@ButtonStyle.Secondary"
-        OnClick="OnReset"
-        IsDisabled="IsSubmitting"
-        Text="Reset"/>
+        <span class="ps-2"></span>
 
-    <!-- Cancel -->
-    <OjedaButton
-        OnClick="OnCancel"
-        IsDisabled="IsSubmitting"
-        Text="Cancel"/>
-</div>
+        <!-- Reset -->
+        <OjedaButton
+            Style="@ButtonStyle.Secondary"
+            OnClick="OnReset"
+            IsDisabled="IsSubmitting"
+            Text="Reset"/>
+
+        <span class="ps-2"></span>
+
+        <!-- Cancel -->
+        <OjedaButton
+            OnClick="OnCancel"
+            IsDisabled="IsSubmitting"
+            Text="Cancel"/>
+
+    </div>
+}
+
+@if (Alignment == FormFooterAlignment.End)
+{
+    <div class="d-flex justify-content-end @CssClass">
+
+        <!-- Cancel -->
+        <OjedaButton
+            OnClick="OnCancel"
+            IsDisabled="IsSubmitting"
+            Text="Cancel"/>
+
+        <span class="ps-2"></span>
+
+        <!-- Reset -->
+        <OjedaButton
+            Style="@ButtonStyle.Secondary"
+            OnClick="OnReset"
+            IsDisabled="IsSubmitting"
+            Text="Reset"/>
+
+        <span class="ps-2"></span>
+
+        <!-- Submit -->
+        <OjedaButton
+            Style="@ButtonStyle.Primary"
+            Type="@ButtonType.Submit"
+            IsDisabled="IsSubmitting"
+            IsLoading="IsSubmitting"
+            Text="Submit"/>
+
+    </div>
+}
 
 @code {
-    
+
+    [Parameter]
+    public FormFooterAlignment Alignment { get; set; }
+
     [Parameter]
     public bool IsSubmitting { get; set; }
 
     [Parameter]
     public EventCallback OnReset { get; set; }
-    
+
     [Parameter]
     public EventCallback OnCancel { get; set; }
-    
+
     [Parameter]
     public string CssClass { get; set; }
-    
+
 }
