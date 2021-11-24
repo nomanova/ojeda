@@ -83,7 +83,7 @@ else
     protected override string Path => "/admin/fields";
 
     protected override async Task<OjedaResult> DeleteItemAsync(FieldDto item)
-    {
+    {        
         return await Ojeda.FieldsService.DeleteAsync(item.Id);
     }
 

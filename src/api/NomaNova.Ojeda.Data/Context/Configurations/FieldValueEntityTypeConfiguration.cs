@@ -14,10 +14,12 @@ namespace NomaNova.Ojeda.Data.Context.Configurations
                 .WithMany(_ => _.FieldValues)
                 .HasForeignKey(_ => _.AssetId)
                 .OnDelete(DeleteBehavior.Cascade);
-        
+
             builder.HasOne(_ => _.FieldSet);
-            
-            builder.HasOne(_ => _.Field);
+
+            builder.HasOne(_ => _.Field)
+                .WithMany(_ => _.FieldValues)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

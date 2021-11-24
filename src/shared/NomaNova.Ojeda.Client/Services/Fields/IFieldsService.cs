@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
 
@@ -28,7 +27,7 @@ namespace NomaNova.Ojeda.Client.Services.Fields
         Task<OjedaDataResult<FieldDto>> UpdateAsync(string id, UpdateFieldDto field,
             CancellationToken cancellationToken = default);
 
-        Task<OjedaResult> DeleteAsync(
-            string id, CancellationToken cancellationToken = default);
+        Task<OjedaDataResult<DeleteFieldDto>> DeleteAsync(
+            string id, bool dryRun = false, CancellationToken cancellationToken = default);
     }
 }

@@ -5,9 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using NomaNova.Ojeda.Api.Exceptions;
+using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.Fields;
+using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Fields;
+using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
 using NomaNova.Ojeda.Services.Fields.Validators;
@@ -18,13 +22,19 @@ namespace NomaNova.Ojeda.Services.Fields
     {
         private readonly IMapper _mapper;
         private readonly IRepository<Field> _fieldsRepository;
+        private readonly IRepository<FieldSet> _fieldSetRepository;
+        private readonly IRepository<Asset> _assetsRepository;
         
         public FieldsService(
             IMapper mapper,
-            IRepository<Field> fieldsRepository)
+            IRepository<Field> fieldsRepository,
+            IRepository<FieldSet> fieldSetsRepository,
+            IRepository<Asset> assetsRepository)
         {
             _mapper = mapper;
             _fieldsRepository = fieldsRepository;
+            _fieldSetRepository = fieldSetsRepository;
+            _assetsRepository = assetsRepository;
         }
 
         public async Task<FieldDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -95,7 +105,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task<DeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -104,7 +114,31 @@ namespace NomaNova.Ojeda.Services.Fields
                 throw new NotFoundException();
             }
 
+            var deleteFieldDto = new DeleteFieldDto();
+            
+            // Fetch impacted field sets
+            var fieldSets = await _fieldSetRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => _.FieldSetFields.Select(fsf => fsf.FieldId).Contains(id));
+            }, cancellationToken);
+            
+            deleteFieldDto.FieldSets = fieldSets.Select(_ => _mapper.Map<FieldSetSummaryDto>(_)).ToList();
+            
+            // Fetch impacted assets
+            var assets = await _assetsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => _.FieldValues.Select(fv => fv.FieldId).Contains(id));
+            }, cancellationToken);
+            
+            deleteFieldDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
+
+            if (dryRun)
+            {
+                return deleteFieldDto;
+            }
+
             await _fieldsRepository.DeleteAsync(field, cancellationToken);
+            return deleteFieldDto;
         }
     }
 }
