@@ -66,8 +66,11 @@ namespace NomaNova.Ojeda.Api
         {
             app.UseFileServer();
 
-            databaseContext.EnsureMigrated();
-            
+            if (!EnvUtils.IsTesting())
+            {
+                databaseContext.EnsureMigrated();
+            }
+
             if (_appOptions.Database.RunSeeders)
             {
                 databaseContext.EnsureSeeded();
