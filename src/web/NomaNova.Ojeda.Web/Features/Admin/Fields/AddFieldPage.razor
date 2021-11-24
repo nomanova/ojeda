@@ -91,12 +91,14 @@
 
         </FormSection>
         
+            <OjedaFormFooter
+                    CssClass="my-4"
+                    Alignment="@FormFooterAlignment.End"
+                    IsSubmitting="@IsSubmitting"
+                    OnCancel="@OnCancel"
+                    OnReset="@OnReset"/>
+        
     </div>
-    
-        <OjedaFormFooter
-            IsSubmitting="@IsSubmitting"
-            OnCancel="@OnCancel"
-            OnReset="@OnReset"/>
 
 </EditForm>
 

@@ -12,6 +12,9 @@
         <div class="d-flex align-items-center me-3">
             <Spinner IsLoading="@IsLoading"/>
         </div>
+        <div class="me-3" style="width: 350px;">
+            <Search OnValueChanged="@OnSearchAsync"></Search>
+        </div>
         <ViewSelector OnViewModeChanged="@OnViewModeChanged"/>
         <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button>
     </div>
@@ -23,7 +26,14 @@
 }
 else if (!Items.Any())
 {
-    <p class="text-muted fst-italic">No assets available.</p>
+    if (string.IsNullOrEmpty(SearchQuery))
+    {
+        <p class="text-muted fst-italic">No assets available.</p>
+    }
+    else
+    {
+        <p class="text-muted fst-italic">No search results.</p>
+    }
 }
 else
 {
