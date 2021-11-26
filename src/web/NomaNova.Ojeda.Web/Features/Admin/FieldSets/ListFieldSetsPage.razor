@@ -88,6 +88,7 @@ else
     {
         var parameters = new ModalParameters();
         parameters.Add("Id", item.Id);
+        parameters.Add("Name", item.Name);
 
         var deleteFieldSetModal = Modal.Show<DeleteFieldSetModal>("Delete Field Set", parameters, Constants.DefaultModalOptions);
 

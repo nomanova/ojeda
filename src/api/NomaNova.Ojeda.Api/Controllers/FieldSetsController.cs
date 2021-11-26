@@ -107,14 +107,19 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <summary>
         /// Delete field set
         /// </summary>
+        /// <param name="dryRun">When true only the impact of deletion will be calculated.</param>
         [HttpDelete("{id}")]
         [SwaggerOperation(Tags = new[] {Tag})]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(DeleteFieldSetDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Delete(
+            [FromRoute] string id,
+            [FromQuery] bool dryRun,
+            CancellationToken cancellationToken = default)
         {
-            await _fieldSetsService.DeleteAsync(id, cancellationToken);
-            return Ok();
+            var deleteFieldSetDto = await _fieldSetsService.DeleteAsync(id, dryRun, cancellationToken);
+            return Ok(deleteFieldSetDto);
         }
     }
 }

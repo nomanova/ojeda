@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Exceptions;
+using NomaNova.Ojeda.Core.Domain.Assets;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Models.Dtos.Assets;
+using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.FieldSets.Interfaces;
@@ -22,15 +26,21 @@ namespace NomaNova.Ojeda.Services.FieldSets
         private readonly IMapper _mapper;
         private readonly IRepository<Field> _fieldsRepository; 
         private readonly IRepository<FieldSet> _fieldSetsRepository;
-        
+        private readonly IRepository<AssetType> _assetTypeRepository;
+        private readonly IRepository<Asset> _assetsRepository;
+
         public FieldSetsService(
             IMapper mapper,
             IRepository<Field> fieldsRepository,
-            IRepository<FieldSet> fieldSetsRepository)
+            IRepository<FieldSet> fieldSetsRepository,
+            IRepository<AssetType> assetTypeRepository,
+            IRepository<Asset> assetsRepository)
         {
             _mapper = mapper;
             _fieldsRepository = fieldsRepository;
             _fieldSetsRepository = fieldSetsRepository;
+            _assetTypeRepository = assetTypeRepository;
+            _assetsRepository = assetsRepository;
         }
         
         public async Task<FieldSetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -139,7 +149,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
-        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task<DeleteFieldSetDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -147,8 +157,32 @@ namespace NomaNova.Ojeda.Services.FieldSets
             {
                 throw new NotFoundException();
             }
+
+            var deleteFieldSetDto = new DeleteFieldSetDto();
             
+            // Fetch impacted asset types
+            var assetTypes = await _assetTypeRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => _.AssetTypeFieldSets.Select(atf => atf.FieldSetId).Contains(id));
+            }, cancellationToken);
+
+            deleteFieldSetDto.AssetTypes = assetTypes.Select(_ => _mapper.Map<AssetTypeSummaryDto>(_)).ToList();
+            
+            // Fetch impacted assets
+            var assets = await _assetsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => _.FieldValues.Select(fv => fv.FieldSetId).Contains(id));
+            }, cancellationToken);
+
+            deleteFieldSetDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
+
+            if (dryRun)
+            {
+                return deleteFieldSetDto;
+            }
+
             await _fieldSetsRepository.DeleteAsync(fieldSet, cancellationToken);
+            return deleteFieldSetDto;
         }
     }
 }
