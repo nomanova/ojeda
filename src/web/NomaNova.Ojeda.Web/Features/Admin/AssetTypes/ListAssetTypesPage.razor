@@ -2,8 +2,8 @@
 @layout AdminLayout
 @inherits ListItemsPage<AssetTypeDto>
 
-@inject ITimeKeeper TimeKeeper
-@inject OjedaClient Ojeda
+@inject ITimeKeeper _timeKeeper
+@inject OjedaClient _ojeda
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
@@ -58,7 +58,7 @@ else
                 <Description Value="@assetType.Description"/>
             </td>
             <td>@assetType.FieldSets.Count</td>
-            <td>@assetType.UpdatedAt.ToRelativeTime(TimeKeeper)</td>
+            <td>@assetType.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
         </RowTemplate>
     </ActionsTableTemplate>
 
@@ -83,16 +83,22 @@ else
 
     protected override string Path => "/admin/asset-types";
 
-    protected override async Task<OjedaResult> DeleteItemAsync(AssetTypeDto item)
+    protected override async Task<bool> DeleteItemAsync(AssetTypeDto item)
     {
-        return await Ojeda.AssetTypesService.DeleteAsync(item.Id);
+        var parameters = new ModalParameters();
+        parameters.Add("Id", item.Id);
+
+        var deleteAssetTypeModal = Modal.Show<DeleteAssetTypeModal>("Delete Asset Type", parameters, Constants.DefaultModalOptions);
+
+        var result = await deleteAssetTypeModal.Result;
+        return !result.Cancelled;
     }
 
     protected override async Task<OjedaDataResult<PaginatedListDto<AssetTypeDto>>> FetchItemsAsync(string query = null,
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.AssetTypesService.GetAsync(query, null, true, pageNumber, pageSize);
+        return await _ojeda.AssetTypesService.GetAsync(query, null, true, pageNumber, pageSize);
     }
 
 }

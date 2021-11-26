@@ -3,8 +3,9 @@
 @inject OjedaClient _ojeda
 
 <DeleteItemModalTemplate
-    Text="Are you sure you want to delete this asset?"
+    Text="<p>Are you sure you want to delete this asset?</p>"
     IsLoading="@IsLoading"
+    IsDisabled="@IsLoading"
     Error="@Error"
     DeleteCallBack="@OnDeleteAsync"
     CancelCallBack="@OnCancelAsync"/>

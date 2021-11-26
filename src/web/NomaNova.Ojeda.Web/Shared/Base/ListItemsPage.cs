@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
+using Blazored.Modal.Services;
 using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
 using NomaNova.Ojeda.Client.Results;
@@ -31,6 +32,9 @@ namespace NomaNova.Ojeda.Web.Shared.Base
 
         [Inject] 
         private IToastService ToastService { get; set; }
+        
+        [CascadingParameter]
+        public IModalService Modal { get; set; }
         
         protected abstract string Path { get; }
 
@@ -63,12 +67,9 @@ namespace NomaNova.Ojeda.Web.Shared.Base
         
         protected async Task OnDelete(T item)
         {
-            IsLoading = true;
-            StateHasChanged();
+            var isDeleted = await DeleteItemAsync(item);
 
-            var result = await DeleteItemAsync(item);
-
-            if (result.Success)
+            if (isDeleted)
             {
                 var toRemove = Items.FirstOrDefault(_ => _.Id.Equals(item.Id));
                 if (toRemove != null)
@@ -77,19 +78,10 @@ namespace NomaNova.Ojeda.Web.Shared.Base
                     TotalCount--;
                 }
             }
-            else
-            {
-                ToastService.ShowError($"Could not delete item. {result.Error?.Message} ({result.Error?.Code}).");
-            }
 
             if (!Items.Any() && CurrentPage > 1)
             {
                 await GetItemsAsync(SearchQuery, CurrentPage - 1, PageSize);
-            }
-            else
-            {
-                IsLoading = false;
-                StateHasChanged();   
             }
         }
         
@@ -145,7 +137,7 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             await LocalStorageService.SetItemAsync(Constants.StorageKeyPageSize, pageSize);
         }
 
-        protected virtual Task<OjedaResult> DeleteItemAsync(T item)
+        protected virtual Task<bool> DeleteItemAsync(T item)
         {
             throw new NotImplementedException($"{nameof(DeleteItemAsync)} should be overridden");
         }

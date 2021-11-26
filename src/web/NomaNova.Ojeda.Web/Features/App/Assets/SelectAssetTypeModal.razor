@@ -1,6 +1,6 @@
 @inherits SelectItemModal<AssetTypeDto>
 
-@inject OjedaClient Ojeda
+@inject OjedaClient _ojeda
 
 <SelectItemModalTemplate TItem="AssetTypeDto"
                          HelpText="Select the <strong>asset type</strong> of the asset to add below."
@@ -32,7 +32,7 @@
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.AssetTypesService.GetAsync(
+        return await _ojeda.AssetTypesService.GetAsync(
             query, null, true, pageNumber, pageSize);
     }
 }

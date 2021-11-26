@@ -1,0 +1,50 @@
+@using System.Text
+@inherits DryRunDeleteItemModal<DeleteFieldDto>
+
+@inject OjedaClient _ojeda
+
+<DeleteItemModalTemplate
+    Text="@Text"
+    IsLoading="@IsLoading"
+    IsDisabled="@IsDisabled"
+    Error="@Error"
+    DeleteCallBack="@OnDeleteAsync"
+    CancelCallBack="@OnCancelAsync"/>
+
+@code {
+
+    protected override async Task<OjedaResult> DeleteAsync()
+    {
+        return await _ojeda.FieldsService.DeleteAsync(Id);
+    }
+
+    protected override async Task<OjedaDataResult<DeleteFieldDto>> DeleteDryRunAsync()
+    {
+        return await _ojeda.FieldsService.DeleteAsync(Id, true);
+    }
+
+    protected override string GetText(DeleteFieldDto data)
+    {
+        var text = new StringBuilder();
+
+        text.AppendLine($"<p>Are you sure you want to delete field '<b>{Name}</b>'?</p>");
+
+        if (data.FieldSets.Count > 0)
+        {
+            text.AppendLine($"<p>This field is included in <b>{data.FieldSets.Count} field set(s)</b>, from which it will be removed.</p>");
+        }
+
+        if (data.Assets.Count > 0)
+        {
+            text.AppendLine($"<p>This field has an assigned value in <b>{data.FieldSets.Count} asset(s)</b>. Any value(s) will be lost.</p>");
+        }
+
+        if (data.FieldSets.Count > 0 || data.Assets.Count > 0)
+        {
+            text.AppendLine("<p>These changes are <b>irreversible</b>.</p>");
+        }
+
+        return text.ToString();
+    }
+
+}

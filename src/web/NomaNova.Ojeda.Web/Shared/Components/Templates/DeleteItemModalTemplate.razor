@@ -1,8 +1,8 @@
 <div class="d-flex flex-column justify-content-between">
 
     <div class="mb-3" style="height: 200px; overflow-y: auto;">
-        <p>@((MarkupString)Text)</p>
-        
+        @((MarkupString)Text)
+
         @if (Error != null)
         {
             <p class="text-danger fst-italic">@Error</p>
@@ -25,7 +25,7 @@
                 Style="@ButtonStyle.Danger"
                 OnClick="DeleteCallBack"
                 Text="Delete"
-                IsDisabled="@IsLoading"/>
+                IsDisabled="@(IsDisabled || IsLoading)"/>
         </div>
 
     </div>
@@ -36,16 +36,19 @@
 
     [Parameter]
     public string Text { get; set; }
-    
+
     [Parameter]
     public string Error { get; set; }
-    
+
     [Parameter]
     public bool IsLoading { get; set; }
 
     [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
     public EventCallback CancelCallBack { get; set; }
-    
+
     [Parameter]
     public EventCallback DeleteCallBack { get; set; }
 

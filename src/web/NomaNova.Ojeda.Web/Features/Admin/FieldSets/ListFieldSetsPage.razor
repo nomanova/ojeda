@@ -2,8 +2,8 @@
 @layout AdminLayout
 @inherits ListItemsPage<FieldSetDto>
 
-@inject ITimeKeeper TimeKeeper
-@inject OjedaClient Ojeda
+@inject ITimeKeeper _timeKeeper
+@inject OjedaClient _ojeda
 
 <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
@@ -59,7 +59,7 @@ else
                 <Description Value="@fieldSet.Description"/>
             </td>
             <td>@fieldSet.Fields.Count</td>
-            <td>@fieldSet.UpdatedAt.ToRelativeTime(TimeKeeper)</td>
+            <td>@fieldSet.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
         </RowTemplate>
     </ActionsTableTemplate>
 
@@ -84,16 +84,22 @@ else
 
     protected override string Path => "/admin/field-sets";
 
-    protected override async Task<OjedaResult> DeleteItemAsync(FieldSetDto item)
+    protected override async Task<bool> DeleteItemAsync(FieldSetDto item)
     {
-        return await Ojeda.FieldSetsService.DeleteAsync(item.Id);
+        var parameters = new ModalParameters();
+        parameters.Add("Id", item.Id);
+
+        var deleteFieldSetModal = Modal.Show<DeleteFieldSetModal>("Delete Field Set", parameters, Constants.DefaultModalOptions);
+
+        var result = await deleteFieldSetModal.Result;
+        return !result.Cancelled;
     }
 
     protected override async Task<OjedaDataResult<PaginatedListDto<FieldSetDto>>> FetchItemsAsync(string query = null,
         int pageNumber = Constants.DefaultPageNumber,
         int pageSize = Constants.DefaultPageSize)
     {
-        return await Ojeda.FieldSetsService.GetAsync(query, null, true, null, pageNumber, pageSize);
+        return await _ojeda.FieldSetsService.GetAsync(query, null, true, null, pageNumber, pageSize);
     }
 
 }

@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.Fields;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Controllers
@@ -102,7 +100,7 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <summary>
         /// Delete field
         /// </summary>
-        /// <param name="dryRun">Dry run flag. When true only the impact of deletion will be calculated.</param>
+        /// <param name="dryRun">When true only the impact of deletion will be calculated.</param>
         [HttpDelete("{id}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(typeof(DeleteFieldDto), StatusCodes.Status200OK)]

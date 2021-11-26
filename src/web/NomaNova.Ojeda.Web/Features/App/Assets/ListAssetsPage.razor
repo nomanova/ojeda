@@ -71,9 +71,6 @@ else
 
     private ViewMode _viewMode = ViewMode.Grid;
 
-    [CascadingParameter]
-    public IModalService Modal { get; set; }
-
     protected override string Path => "/assets";
 
     private List<ColumnDefinition> _columnDefinitions;
