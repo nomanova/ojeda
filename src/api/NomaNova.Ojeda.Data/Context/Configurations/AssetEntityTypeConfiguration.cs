@@ -13,7 +13,7 @@ namespace NomaNova.Ojeda.Data.Context.Configurations
             builder.HasOne(_ => _.AssetType)
                 .WithMany(_ => _.Assets)
                 .HasForeignKey(_ => _.AssetTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

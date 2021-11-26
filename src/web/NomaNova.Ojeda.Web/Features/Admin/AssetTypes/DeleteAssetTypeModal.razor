@@ -1,5 +1,41 @@
-<h3>DeleteAssetTypeModal</h3>
+@using System.Text
+@inherits DryRunDeleteItemModal<DeleteAssetTypeDto>
+
+@inject OjedaClient _ojeda
+
+<DeleteItemModalTemplate
+    Text="@Text"
+    IsLoading="@IsLoading"
+    IsDisabled="@IsDisabled"
+    Error="@Error"
+    DeleteCallBack="@OnDeleteAsync"
+    CancelCallBack="@OnCancelAsync"/>
 
 @code {
+    
+    protected override async Task<OjedaResult> DeleteAsync()
+    {
+        return await _ojeda.AssetTypesService.DeleteAsync(Id);
+    }
+    
+    protected override async Task<OjedaDataResult<DeleteAssetTypeDto>> DeleteDryRunAsync()
+    {
+        return await _ojeda.AssetTypesService.DeleteAsync(Id, true);
+    }
+
+    protected override string GetText(DeleteAssetTypeDto data)
+    {
+        var text = new StringBuilder();
+
+        text.AppendLine($"<p>Are you sure you want to delete asset type '<b>{Name}</b>'?</p>");
+
+        if (data.Assets.Count > 0)
+        {
+            text.AppendLine($"<p>This asset type is used by <b>{data.Assets.Count} asset(s)</b>. All linked assets and related data will be deleted.</p>");
+            text.AppendLine("<p>This change is <b>irreversible</b>!</p>");
+        }
+
+        return text.ToString();
+    }
     
 }

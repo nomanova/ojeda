@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Exceptions;
+using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
+using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
@@ -20,15 +22,18 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         private readonly IMapper _mapper;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<AssetType> _assetTypesRepository;
+        private readonly IRepository<Asset> _assetsRepository;
 
         public AssetTypesService(
             IMapper mapper,
             IRepository<FieldSet> fieldSetsRepository,
-            IRepository<AssetType> assetTypesRepository)
+            IRepository<AssetType> assetTypesRepository,
+            IRepository<Asset> assetsRepository)
         {
             _mapper = mapper;
             _fieldSetsRepository = fieldSetsRepository;
             _assetTypesRepository = assetTypesRepository;
+            _assetsRepository = assetsRepository;
         }
 
         public async Task<AssetTypeDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -130,7 +135,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             return _mapper.Map<AssetTypeDto>(assetType);
         }
         
-        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task<DeleteAssetTypeDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
             var assetType = await _assetTypesRepository.GetByIdAsync(id, cancellationToken);
 
@@ -138,8 +143,24 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             {
                 throw new NotFoundException();
             }
+
+            var deleteAssetTypeDto = new DeleteAssetTypeDto();
             
+            // Fetch impacted assets
+            var assets = await _assetsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ => _.AssetTypeId == id);
+            }, cancellationToken);
+
+            deleteAssetTypeDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
+            
+            if (dryRun)
+            {
+                return deleteAssetTypeDto;
+            }
+
             await _assetTypesRepository.DeleteAsync(assetType, cancellationToken);
+            return deleteAssetTypeDto;
         }
     }
 }

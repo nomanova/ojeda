@@ -87,6 +87,7 @@ else
     {
         var parameters = new ModalParameters();
         parameters.Add("Id", item.Id);
+        parameters.Add("Name", item.Name);
 
         var deleteAssetTypeModal = Modal.Show<DeleteAssetTypeModal>("Delete Asset Type", parameters, Constants.DefaultModalOptions);
 

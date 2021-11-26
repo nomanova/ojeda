@@ -55,10 +55,15 @@ namespace NomaNova.Ojeda.Client.Services.AssetTypes
             return await SendForDataAsync<AssetTypeDto>(HttpMethod.Put, path, assetType, cancellationToken);
         }
         
-        public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task<OjedaDataResult<DeleteAssetTypeDto>> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
-            var path = $"{BasePath}/{id}";
-            return await SendAsync(HttpMethod.Delete, path, null, cancellationToken);
+            var qsb = QueryStringBuilder.New();
+            
+            qsb.Add("dryRun" , dryRun);
+            
+            var path = $"{BasePath}/{id}{qsb.Build()}";
+
+            return await SendForDataAsync<DeleteAssetTypeDto>(HttpMethod.Delete, path, null, cancellationToken);
         }
     }
 }
