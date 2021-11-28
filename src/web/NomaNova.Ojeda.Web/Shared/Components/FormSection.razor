@@ -1,4 +1,4 @@
-<div class="card mb-3">
+<div class="card @CssClass">
     <div class="card-body">
         <div class="row">
             <div class="col-4">
@@ -22,5 +22,8 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
 
 }

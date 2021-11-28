@@ -1,0 +1,40 @@
+<div class="content">
+
+    <div class="content_fixed @CssClass @HeaderCssClass">
+        @Header
+    </div>
+
+    <div class="content_expand @CssClass @ContentCssClass">
+        @Content
+    </div>
+
+    <div class="content_fixed @CssClass @FooterCssClass">
+        @Footer
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string CssClass { get; set; }
+    
+    [Parameter]
+    public string HeaderCssClass { get; set; }
+    
+    [Parameter]
+    public RenderFragment Header { get; set; }
+
+    [Parameter]
+    public string ContentCssClass { get; set; }
+    
+    [Parameter]
+    public RenderFragment Content { get; set; }
+
+    [Parameter]
+    public string FooterCssClass { get; set; }
+    
+    [Parameter]
+    public RenderFragment Footer { get; set; }
+
+}

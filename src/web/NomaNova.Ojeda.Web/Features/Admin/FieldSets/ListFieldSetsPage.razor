@@ -5,81 +5,99 @@
 @inject ITimeKeeper _timeKeeper
 @inject OjedaClient _ojeda
 
-<OjedaBreadcrumb Data="@_breadcrumbItems"/>
+<ExpandablePage
+    CssClass="px-3"
+    HeaderCssClass="pt-3">
 
-<h3>Field Sets</h3>
+    <Header>
 
-<div class="d-flex justify-content-between my-3">
+        <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-    <div class="d-flex">
-        <div style="width: 350px;">
-            <Search OnValueChanged="@OnSearchAsync"></Search>
-        </div>
+        <PageHeader Title="Field Sets">
+            <Toolbar>
+                <div class="d-flex align-items-center me-3">
+                    <Spinner IsLoading="@IsLoading"/>
+                </div>
 
-        <div class="ms-2">
-            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Field Set"/>
-        </div>
+                <div class="me-3" style="width: 350px;">
+                    <Search OnValueChanged="@OnSearchAsync"></Search>
+                </div>
 
-    </div>
+                <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Field Set"/>
 
-    <Spinner IsLoading="@IsLoading"/>
+            </Toolbar>
+        </PageHeader>
 
-</div>
+    </Header>
 
-@if (Items == null)
-{
-    <p class="text-muted fst-italic">Loading...</p>
-}
-else if (!Items.Any())
-{
-    if (string.IsNullOrEmpty(SearchQuery))
-    {
-        <p class="text-muted fst-italic">No items available.</p>
-    }
-    else
-    {
-        <p class="text-muted fst-italic">No search results.</p>
-    }
-}
-else
-{
-    <ActionsTableTemplate TItem="FieldSetDto"
-                          Items="@Items"
-                          EditItemCallBack="@OnEdit"
-                          DeleteItemCallBack="@OnDelete">
-        <TableHeader>
-            <th>Name</th>
-            <th>Description</th>
-            <th># Fields</th>
-            <th>Last Updated</th>
-        </TableHeader>
-        <RowTemplate Context="fieldSet">
-            <td>@fieldSet.Name</td>
-            <td>
-                <Description Value="@fieldSet.Description"/>
-            </td>
-            <td>@fieldSet.Fields.Count</td>
-            <td>@fieldSet.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
-        </RowTemplate>
-    </ActionsTableTemplate>
+    <Content>
 
-    <div class="my-4">
-        <OjedaPager
-            PageCount="@PageCount"
-            CurrentPage="@CurrentPage"
-            PageSize="@PageSize"
-            TotalCount="@TotalCount"
-            OnPageChanged="@OnPageChanged"
-            OnPageSizeChanged="@OnPageSizeChanged"/>
-    </div>
-}
+        @if (Items == null)
+        {
+            <p class="text-muted fst-italic">Loading...</p>
+        }
+        else if (!Items.Any())
+        {
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                <p class="text-muted fst-italic">No items available.</p>
+            }
+            else
+            {
+                <p class="text-muted fst-italic">No search results.</p>
+            }
+        }
+        else
+        {
+            <ActionsTableTemplate TItem="FieldSetDto"
+                                  Items="@Items"
+                                  EditItemCallBack="@OnEdit"
+                                  DeleteItemCallBack="@OnDelete">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th># Fields</th>
+                    <th>Last Updated</th>
+                </TableHeader>
+                <RowTemplate Context="fieldSet">
+                    <td>@fieldSet.Name</td>
+                    <td>
+                        <Description Value="@fieldSet.Description"/>
+                    </td>
+                    <td>@fieldSet.Fields.Count</td>
+                    <td>@fieldSet.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
+                </RowTemplate>
+            </ActionsTableTemplate>
+        }
+
+    </Content>
+
+    <Footer>
+
+        @if (!(Items == null || !Items.Any()))
+        {
+            <div class="my-3">
+                <OjedaPager
+                    PageCount="@PageCount"
+                    CurrentPage="@CurrentPage"
+                    PageSize="@PageSize"
+                    TotalCount="@TotalCount"
+                    OnPageChanged="@OnPageChanged"
+                    OnPageSizeChanged="@OnPageSizeChanged"/>
+            </div>
+        }
+
+    </Footer>
+
+</ExpandablePage>
+
 
 @code {
 
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new() {Text = "Admin", Url = "/admin"},
-        new() {Text = "Field Sets"}
+        new() { Text = "Admin", Url = "/admin" },
+        new() { Text = "Field Sets" }
     };
 
     protected override string Path => "/admin/field-sets";

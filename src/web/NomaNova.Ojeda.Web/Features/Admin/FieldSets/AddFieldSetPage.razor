@@ -2,111 +2,130 @@
 @layout AdminLayout
 @inherits FieldSetPage<CreateFieldSetDto, CreateFieldSetFieldDto>
 
-<OjedaBreadcrumb Data="@_breadcrumbItems"/>
+<ExpandablePage
+    HeaderCssClass="mx-3 pt-3 ojeda-form"
+    ContentCssClass="px-3"
+    FooterCssClass="mx-3 ojeda-form">
 
-<h3 class="mb-3">Add Field Set</h3>
+    <Header>
 
-<EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
+        <OjedaBreadcrumb Data="@_breadcrumbItems"/>
+        <PageHeader Title="Add Field Set"/>
 
-    <FluentValidationValidator DisableAssemblyScanning="@true"/>
-    <ServerSideFluentValidation @ref="ServerValidation"/>
+    </Header>
 
-    <div class="ojeda-form mb-4">
+    <Content>
 
-        <FormSection Title="General">
-        
-        <!-- Name -->
-        <OjedaFormField ForId="fieldset-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertFieldSet.Name)">
-            <OjedaInputText @bind-Value="UpsertFieldSet.Name" class="form-control" id="fieldset-name" disabled="@IsSubmitting"/>
-        </OjedaFormField>
+        <EditForm id="form-add-field-set" EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-        <!-- Description -->
-        <OjedaFormField ForId="fieldset-description" Label="Description" ValidateFor="@(() => UpsertFieldSet.Description)">
-            <OjedaInputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
-        </OjedaFormField>
+            <FluentValidationValidator DisableAssemblyScanning="@true"/>
+            <ServerSideFluentValidation @ref="ServerValidation"/>
 
-        </FormSection>
-        
-        <FormSection Title="Fields">
-        
-        <!-- Fields -->
-        <div class="mb-3">
-            <div class="d-flex justify-content-between">
-                <label class="form-label">Fields*</label>
-                <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
+            <div class="ojeda-form">
+
+                <FormSection Title="General" CssClass="mb-3">
+
+                    <!-- Name -->
+                    <OjedaFormField ForId="fieldset-name" Label="Name" IsRequired="true" ValidateFor="@(() => UpsertFieldSet.Name)">
+                        <OjedaInputText @bind-Value="UpsertFieldSet.Name" class="form-control" id="fieldset-name" disabled="@IsSubmitting"/>
+                    </OjedaFormField>
+
+                    <!-- Description -->
+                    <OjedaFormField ForId="fieldset-description" Label="Description" ValidateFor="@(() => UpsertFieldSet.Description)">
+                        <OjedaInputText @bind-Value="UpsertFieldSet.Description" class="form-control" id="fieldset-description" disabled="@IsSubmitting"/>
+                    </OjedaFormField>
+
+                </FormSection>
+
+                <FormSection Title="Fields">
+
+                    <!-- Fields -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label">Fields*</label>
+                            <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
+                        </div>
+
+                        <div>
+                            @if (UpsertFieldSet.Fields?.Count > 0)
+                            {
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th class="py-2" colspan="2">Order</th>
+                                        <th class="py-2">Name</th>
+                                        <th class="py-2">Is Required</th>
+                                        <th class="py-2">Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var fieldSetField in UpsertFieldSet.Fields)
+                                    {
+                                        <tr>
+                                            <!-- Order -->
+                                            <td class="pb-2 pr-0">
+                                                <ItemOrderHandler Type="@OrderType.Up"
+                                                                  IsEnabled="@(fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)"
+                                                                  OnClick="@(() => OnMoveItemUp(fieldSetField))"/>
+                                            </td>
+                                            <td class="pb-2 pr-0">
+                                                <ItemOrderHandler Type="@OrderType.Down"
+                                                                  IsEnabled="@(fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)"
+                                                                  OnClick="@(() => OnMoveItemDown(fieldSetField))"/>
+                                            </td>
+                                            <!-- Name -->
+                                            <td class="pb-2 pr-3">@(GetFieldName(fieldSetField.Id))</td>
+                                            <!-- Is Required -->
+                                            <td class="pb-2 pr-3">
+                                                <InputCheckbox @bind-Value="fieldSetField.IsRequired" id="@($"{fieldSetField.Id}-is-required")" disabled="@IsSubmitting"/>
+                                            </td>
+                                            <!-- Delete -->
+                                            <td class="pb-2 pr-3">
+                                                <ItemDeleteHandler OnClick="@(() => OnRemoveItem(fieldSetField))"/>
+                                            </td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p class="text-muted fst-italic">Use the link on the right to start adding fields.</p>
+                            }
+                            <ValidationMessage For="@(() => UpsertFieldSet.Fields)"></ValidationMessage>
+                        </div>
+                    </div>
+
+                </FormSection>
+
             </div>
 
-            <div>
-                @if (UpsertFieldSet.Fields?.Count > 0)
-                {
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="py-2" colspan="2">Order</th>
-                            <th class="py-2">Name</th>
-                            <th class="py-2">Is Required</th>
-                            <th class="py-2">Delete</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var fieldSetField in UpsertFieldSet.Fields)
-                        {
-                            <tr>
-                                <!-- Order -->
-                                <td class="pb-2 pr-0">
-                                    <ItemOrderHandler Type="@OrderType.Up"
-                                                      IsEnabled="@(fieldSetField.Order != 1 && UpsertFieldSet.Fields.Count > 1)"
-                                                      OnClick="@(() => OnMoveItemUp(fieldSetField))"/>
-                                </td>
-                                <td class="pb-2 pr-0">
-                                    <ItemOrderHandler Type="@OrderType.Down"
-                                                      IsEnabled="@(fieldSetField.Order != UpsertFieldSet.Fields.Count && UpsertFieldSet.Fields.Count > 1)"
-                                                      OnClick="@(() => OnMoveItemDown(fieldSetField))"/>
-                                </td>
-                                <!-- Name -->
-                                <td class="pb-2 pr-3">@(GetFieldName(fieldSetField.Id))</td>
-                                <!-- Is Required -->
-                                <td class="pb-2 pr-3">
-                                    <InputCheckbox @bind-Value="fieldSetField.IsRequired" id="@($"{fieldSetField.Id}-is-required")" disabled="@IsSubmitting"/>
-                                </td>
-                                <!-- Delete -->
-                                <td class="pb-2 pr-3">
-                                    <ItemDeleteHandler OnClick="@(() => OnRemoveItem(fieldSetField))"/>
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <p class="text-muted fst-italic">Use the link on the right to start adding fields.</p>
-                }
-                <ValidationMessage For="@(() => UpsertFieldSet.Fields)"></ValidationMessage>
-            </div>
-        </div>
+        </EditForm>
 
-        </FormSection>
-        
-            <OjedaFormFooter
-                CssClass="my-4"
-                Alignment="@FormFooterAlignment.End"
-                IsSubmitting="@IsSubmitting"
-                OnCancel="@OnCancel"
-                OnReset="@OnReset"/>
-        
-    </div>
+    </Content>
 
-</EditForm>
+    <Footer>
+
+        <OjedaFormFooter
+            CssClass="my-3"
+            Alignment="@FormFooterAlignment.End"
+            Form="form-add-field-set"
+            IsSubmitting="@IsSubmitting"
+            OnCancel="@OnCancel"
+            OnReset="@OnReset"/>
+
+    </Footer>
+
+</ExpandablePage>
 
 
 @code {
 
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new() {Text = "Admin", Url = "/admin"},
-        new() {Text = "Field Sets", Url = "/admin/field-sets"},
-        new() {Text = "Add"}
+        new() { Text = "Admin", Url = "/admin" },
+        new() { Text = "Field Sets", Url = "/admin/field-sets" },
+        new() { Text = "Add" }
     };
 
     protected override CreateFieldSetDto UpsertFieldSet { get; set; }

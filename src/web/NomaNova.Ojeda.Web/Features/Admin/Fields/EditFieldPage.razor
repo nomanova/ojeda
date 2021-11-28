@@ -2,117 +2,139 @@
 @layout AdminLayout
 @inherits FieldPage
 
-<OjedaBreadcrumb Data="@_breadcrumbItems"/>
+<ExpandablePage
+    HeaderCssClass="mx-3 pt-3 ojeda-form"
+    ContentCssClass="px-3"
+    FooterCssClass="mx-3 ojeda-form">
 
-<h3 class="mb-3">Edit Field</h3>
+    <Header>
 
-<OjedaLoader IsLoading="_isLoading">
+        <OjedaBreadcrumb Data="@_breadcrumbItems"/>
+        <PageHeader Title="Edit Field"/>
 
-    <EditForm EditContext="EditContext" OnValidSubmit="OnSubmitForm">
+    </Header>
 
-        <FluentValidationValidator DisableAssemblyScanning="@true"/>
-        <ServerSideFluentValidation @ref="ServerValidation"/>
+    <Content>
 
-        <div class="ojeda-form mb-4">
+        <OjedaLoader IsLoading="_isLoading">
 
-            <FormSection Title="General">
-            
-            <!-- Name -->
-            <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _updateField.Name)">
-                <OjedaInputText @bind-Value="_updateField.Name" class="form-control" id="field-name" disabled="@IsSubmitting"/>
-            </OjedaFormField>
+            <EditForm id="form-edit-field" EditContext="EditContext" OnValidSubmit="OnSubmitForm">
 
-            <!-- Description -->
-            <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _updateField.Description)"
-                            HelpText="Optional, will be used as hint for the field input control.">
-                <OjedaInputText @bind-Value="_updateField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
-            </OjedaFormField>
+                <FluentValidationValidator DisableAssemblyScanning="@true"/>
+                <ServerSideFluentValidation @ref="ServerValidation"/>
 
-            </FormSection>
-            
-            <FormSection Title="Properties">
-            
-            <!-- Type -->
-            <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
-                <InputSelect @bind-Value="_updateField.Properties.Type" @oninput="OnTypeChange" class="form-control" id="field-type" disabled="@IsSubmitting">
-                    @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
-                    {
-                        <option value="@type">@type</option>
-                    }
-                </InputSelect>
-            </OjedaFormField>
+                <div class="ojeda-form">
 
-        <!-- Type: Text -->
-        @if (_updateField.Properties.Type == FieldTypeDto.Text)
-        {
-            var textData = (TextFieldPropertiesDto) _updateField.Properties;
+                    <FormSection Title="General" CssClass="mb-3">
 
-            <OjedaFormField ForId="field-text-minLength" Label="Minimum Length" ValidateFor="@(() => textData.MinLength)"
-                            HelpText="Optional, will validate the minimum input length.">
-                <OjedaInputNumber 
-                    @bind-Value="textData.MinLength" 
-                     DisplayName="Minimum Length" 
-                     ParsingErrorMessage="The {0} field must be integer."
-                     class="form-control" 
-                     id="field-text-minLength" 
-                     disabled="@IsSubmitting"/>
-            </OjedaFormField>
+                        <!-- Name -->
+                        <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _updateField.Name)">
+                            <OjedaInputText @bind-Value="_updateField.Name" class="form-control" id="field-name" disabled="@IsSubmitting"/>
+                        </OjedaFormField>
 
-            <OjedaFormField ForId="field-text-maxLength" Label="Maximum Length" ValidateFor="@(() => textData.MaxLength)"
-                            HelpText="Optional, will validate the maximum input length.">
-                <OjedaInputNumber 
-                    @bind-Value="textData.MaxLength" 
-                     DisplayName="Maximum Length" 
-                     ParsingErrorMessage="The {0} field must be integer."
-                     class="form-control" 
-                     id="field-text-maxLength" 
-                     disabled="@IsSubmitting"/>
-            </OjedaFormField>
-        }
+                        <!-- Description -->
+                        <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _updateField.Description)"
+                                        HelpText="Optional, will be used as hint for the field input control.">
+                            <OjedaInputText @bind-Value="_updateField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
+                        </OjedaFormField>
 
-        <!-- Type: Number -->
-        @if (_updateField.Properties.Type == FieldTypeDto.Number)
-        {
-            var numberData = (NumberFieldPropertiesDto) _updateField.Properties;
-            
-            <OjedaFormField ForId="field-text-withDecimals" Label="Allow Decimals" ValidateFor="@(() => numberData.WithDecimals)"
-                            HelpText="Determines if decimal numbers are allowed.">
-                <InputCheckbox @bind-Value="numberData.WithDecimals" DisplayName="Allow Decimals" id="field-text-withDecimals" disabled="@IsSubmitting"/>
-            </OjedaFormField>
-            
-            <OjedaFormField ForId="field-text-minValue" Label="Minimum Value" ValidateFor="@(() => numberData.MinValue)"
-                            HelpText="Optional, will validate the minimum input value.">
-                <OjedaInputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
-            </OjedaFormField>
-            
-            <OjedaFormField ForId="field-text-maxValue" Label="Maximum Value" ValidateFor="@(() => numberData.MaxValue)"
-                            HelpText="Optional, will validate the maximum input value.">
-                <OjedaInputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
-            </OjedaFormField>
-        }
-            
-            </FormSection>
-        
-                    <OjedaFormFooter
-                        CssClass="my-4"
-                        Alignment="@FormFooterAlignment.End"
-                        IsSubmitting="@IsSubmitting"
-                        OnCancel="@OnCancel"
-                        OnReset="@OnReset"/>
-            
-        </div>
-        
-    </EditForm>
+                    </FormSection>
 
-</OjedaLoader>
+                    <FormSection Title="Properties">
+
+                        <!-- Type -->
+                        <OjedaFormField ForId="field-type" Label="Type" IsRequired="true">
+                            <InputSelect @bind-Value="_updateField.Properties.Type" @oninput="OnTypeChange" class="form-control" id="field-type" disabled="@IsSubmitting">
+                                @foreach (var type in Enum.GetValues(typeof(FieldTypeDto)))
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            </InputSelect>
+                        </OjedaFormField>
+
+                        <!-- Type: Text -->
+                        @if (_updateField.Properties.Type == FieldTypeDto.Text)
+                        {
+                            var textData = (TextFieldPropertiesDto)_updateField.Properties;
+
+                            <OjedaFormField ForId="field-text-minLength" Label="Minimum Length" ValidateFor="@(() => textData.MinLength)"
+                                            HelpText="Optional, will validate the minimum input length.">
+                                <OjedaInputNumber
+                                    @bind-Value="textData.MinLength"
+                                    DisplayName="Minimum Length"
+                                    ParsingErrorMessage="The {0} field must be integer."
+                                    class="form-control"
+                                    id="field-text-minLength"
+                                    disabled="@IsSubmitting"/>
+                            </OjedaFormField>
+
+                            <OjedaFormField ForId="field-text-maxLength" Label="Maximum Length" ValidateFor="@(() => textData.MaxLength)"
+                                            HelpText="Optional, will validate the maximum input length.">
+                                <OjedaInputNumber
+                                    @bind-Value="textData.MaxLength"
+                                    DisplayName="Maximum Length"
+                                    ParsingErrorMessage="The {0} field must be integer."
+                                    class="form-control"
+                                    id="field-text-maxLength"
+                                    disabled="@IsSubmitting"/>
+                            </OjedaFormField>
+                        }
+
+                        <!-- Type: Number -->
+                        @if (_updateField.Properties.Type == FieldTypeDto.Number)
+                        {
+                            var numberData = (NumberFieldPropertiesDto)_updateField.Properties;
+
+                            <OjedaFormField ForId="field-text-withDecimals" Label="Allow Decimals" ValidateFor="@(() => numberData.WithDecimals)"
+                                            HelpText="Determines if decimal numbers are allowed.">
+                                <InputCheckbox @bind-Value="numberData.WithDecimals" DisplayName="Allow Decimals" id="field-text-withDecimals" disabled="@IsSubmitting"/>
+                            </OjedaFormField>
+
+                            <OjedaFormField ForId="field-text-minValue" Label="Minimum Value" ValidateFor="@(() => numberData.MinValue)"
+                                            HelpText="Optional, will validate the minimum input value.">
+                                <OjedaInputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
+                            </OjedaFormField>
+
+                            <OjedaFormField ForId="field-text-maxValue" Label="Maximum Value" ValidateFor="@(() => numberData.MaxValue)"
+                                            HelpText="Optional, will validate the maximum input value.">
+                                <OjedaInputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
+                            </OjedaFormField>
+                        }
+
+                    </FormSection>
+
+                </div>
+
+            </EditForm>
+
+        </OjedaLoader>
+
+    </Content>
+
+    <Footer>
+
+        <OjedaFormFooter
+            CssClass="my-3"
+            Alignment="@FormFooterAlignment.End"
+            Form="form-edit-field"
+            IsSubmitting="@IsSubmitting"
+            OnCancel="@OnCancel"
+            OnReset="@OnReset"/>
+
+
+    </Footer>
+
+
+</ExpandablePage>
+
 
 @code {
 
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new() {Text = "Admin", Url = "/admin"},
-        new() {Text = "Fields", Url = "/admin/fields"},
-        new() {Text = "Edit"}
+        new() { Text = "Admin", Url = "/admin" },
+        new() { Text = "Fields", Url = "/admin/fields" },
+        new() { Text = "Edit" }
     };
 
     protected override string ReturnPath => "/admin/fields";
@@ -160,9 +182,10 @@
         EditContext = new EditContext(_updateField);
         EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
-    
+
     protected override void SetFieldProperties(FieldPropertiesDto fieldProperties)
     {
         _updateField.Properties = fieldProperties;
     }
+
 }

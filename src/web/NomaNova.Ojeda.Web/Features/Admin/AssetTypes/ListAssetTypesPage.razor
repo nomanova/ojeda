@@ -5,80 +5,97 @@
 @inject ITimeKeeper _timeKeeper
 @inject OjedaClient _ojeda
 
-<OjedaBreadcrumb Data="@_breadcrumbItems"/>
+<ExpandablePage
+    CssClass="px-3"
+    HeaderCssClass="pt-3">
 
-<h3>Asset Types</h3>
+    <Header>
 
-<div class="d-flex justify-content-between my-3">
+        <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-    <div class="d-flex">
-        <div style="width: 350px;">
-            <Search OnValueChanged="@OnSearchAsync"></Search>
-        </div>
+        <PageHeader Title="Asset Types">
+            <Toolbar>
+                <div class="d-flex align-items-center me-3">
+                    <Spinner IsLoading="@IsLoading"/>
+                </div>
 
-        <div class="ms-2">
-            <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Type"/>
-        </div>
+                <div class="me-3" style="width: 350px;">
+                    <Search OnValueChanged="@OnSearchAsync"></Search>
+                </div>
 
-    </div>
+                <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Type"/>
 
-    <Spinner IsLoading="@IsLoading"/>
-</div>
+            </Toolbar>
+        </PageHeader>
 
-@if (Items == null)
-{
-    <p class="text-muted fst-italic">Loading...</p>
-}
-else if (!Items.Any())
-{
-    if (string.IsNullOrEmpty(SearchQuery))
-    {
-        <p class="text-muted fst-italic">No items available.</p>
-    }
-    else
-    {
-        <p class="text-muted fst-italic">No search results.</p>
-    }
-}
-else
-{
-    <ActionsTableTemplate TItem="AssetTypeDto"
-                          Items="@Items"
-                          EditItemCallBack="@OnEdit"
-                          DeleteItemCallBack="@OnDelete">
-        <TableHeader>
-            <th>Name</th>
-            <th>Description</th>
-            <th># Field Sets</th>
-            <th>Last Updated</th>
-        </TableHeader>
-        <RowTemplate Context="assetType">
-            <td>@assetType.Name</td>
-            <td>
-                <Description Value="@assetType.Description"/>
-            </td>
-            <td>@assetType.FieldSets.Count</td>
-            <td>@assetType.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
-        </RowTemplate>
-    </ActionsTableTemplate>
+    </Header>
 
-    <div class="my-4">
-        <OjedaPager
-            PageCount="@PageCount"
-            CurrentPage="@CurrentPage"
-            PageSize="@PageSize"
-            TotalCount="@TotalCount"
-            OnPageChanged="@OnPageChanged"
-            OnPageSizeChanged="@OnPageSizeChanged"/>
-    </div>
-}
+    <Content>
+
+        @if (Items == null)
+        {
+            <p class="text-muted fst-italic">Loading...</p>
+        }
+        else if (!Items.Any())
+        {
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                <p class="text-muted fst-italic">No items available.</p>
+            }
+            else
+            {
+                <p class="text-muted fst-italic">No search results.</p>
+            }
+        }
+        else
+        {
+            <ActionsTableTemplate TItem="AssetTypeDto"
+                                  Items="@Items"
+                                  EditItemCallBack="@OnEdit"
+                                  DeleteItemCallBack="@OnDelete">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th># Field Sets</th>
+                    <th>Last Updated</th>
+                </TableHeader>
+                <RowTemplate Context="assetType">
+                    <td>@assetType.Name</td>
+                    <td>
+                        <Description Value="@assetType.Description"/>
+                    </td>
+                    <td>@assetType.FieldSets.Count</td>
+                    <td>@assetType.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
+                </RowTemplate>
+            </ActionsTableTemplate>
+        }
+    </Content>
+
+    <Footer>
+
+        @if (!(Items == null || !Items.Any()))
+        {
+            <div class="my-3">
+                <OjedaPager
+                    PageCount="@PageCount"
+                    CurrentPage="@CurrentPage"
+                    PageSize="@PageSize"
+                    TotalCount="@TotalCount"
+                    OnPageChanged="@OnPageChanged"
+                    OnPageSizeChanged="@OnPageSizeChanged"/>
+            </div>
+        }
+
+    </Footer>
+
+</ExpandablePage>
 
 @code {
 
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
-        new() {Text = "Admin", Url = "/admin"},
-        new() {Text = "Asset Types"}
+        new() { Text = "Admin", Url = "/admin" },
+        new() { Text = "Asset Types" }
     };
 
     protected override string Path => "/admin/asset-types";

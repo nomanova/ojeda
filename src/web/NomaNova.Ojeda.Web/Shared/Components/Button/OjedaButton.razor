@@ -1,4 +1,4 @@
-<button class="@(GetButtonClass())" type="@(GetButtonType())" @onclick="OnClick" disabled="@IsDisabled">
+<button class="@(GetButtonClass())" type="@(GetButtonType())" form="@Form" @onclick="OnClick" disabled="@IsDisabled">
     @if (IsLoading)
     {
         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -12,6 +12,9 @@
     [Parameter]
     public string Text { get; set; }
 
+    [Parameter]
+    public string Form { get; set; }
+    
     [Parameter]
     public ButtonStyle Style { get; set; } = ButtonStyle.NotSet;
 

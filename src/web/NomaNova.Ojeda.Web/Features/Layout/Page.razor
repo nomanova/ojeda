@@ -1,8 +1,17 @@
-<div id="page" class="p-3" style="flex: 1 0 auto; overflow-y: auto;">
-    @ChildContent
+<div class="page">
+    <div class="page-body">
+        @ChildContent
+    </div>
+    <div class="page-footer bg-light">
+        <div class="page-footer-text text-muted">
+            NomaNova &bull; Ojeda &bull; v1.0.0 &bull; build 1 &bull; 1 Jan 2021
+        </div>
+    </div>
 </div>
 
 @code {
-    [Parameter] 
+
+    [Parameter]
     public RenderFragment ChildContent { get; set; }
+
 }

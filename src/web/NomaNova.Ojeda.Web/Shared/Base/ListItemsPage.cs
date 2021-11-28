@@ -83,6 +83,8 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             {
                 await GetItemsAsync(SearchQuery, CurrentPage - 1, PageSize);
             }
+            
+            StateHasChanged();
         }
         
         protected async Task OnPageChanged(int pageNumber)

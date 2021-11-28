@@ -4,68 +4,102 @@
 @inject OjedaClient _ojeda
 @inject NavigationManager _navManager
 
-<div class="d-flex justify-content-between mt-2 mb-4">
-    <div class="d-flex align-items-center">
-        <h3 class="m-0">Assets</h3>
-    </div>
-    <div class="d-flex">
-        <div class="d-flex align-items-center me-3">
-            <Spinner IsLoading="@IsLoading"/>
-        </div>
-        <div class="me-3" style="width: 350px;">
-            <Search OnValueChanged="@OnSearchAsync"></Search>
-        </div>
-        <ViewSelector OnViewModeChanged="@OnViewModeChanged"/>
-        <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button>
-    </div>
-</div>
+<ExpandablePage
+    CssClass="px-3">
 
-@if (Items == null)
-{
-    <p class="text-muted fst-italic">Loading...</p>
-}
-else if (!Items.Any())
-{
-    if (string.IsNullOrEmpty(SearchQuery))
-    {
-        <p class="text-muted fst-italic">No assets available.</p>
-    }
-    else
-    {
-        <p class="text-muted fst-italic">No search results.</p>
-    }
-}
-else
-{
-    <ViewSwitcher ViewMode="_viewMode">
-        <GridTemplate>
-            <div class="asset-grid">
-                @foreach (var asset in Items)
-                {
-                    <div class="asset-item">
-                        <AssetCard Asset="@asset" OnSelected="@(() => OnShowAsset(asset))"/>
+    <Header>
+
+        <PageHeader Title="Assets">
+            <Toolbar>
+                <div class="d-flex align-items-center me-3">
+                    <Spinner IsLoading="@IsLoading"/>
+                </div>
+                <div class="me-3" style="width: 350px;">
+                    <Search OnValueChanged="@OnSearchAsync"></Search>
+                </div>
+                <ViewSelector OnViewModeChanged="@OnViewModeChanged"/>
+                <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button>
+            </Toolbar>
+        </PageHeader>
+
+    </Header>
+
+    <Content>
+
+        @if (Items == null)
+        {
+            <p class="text-muted fst-italic">Loading...</p>
+        }
+        else if (!Items.Any())
+        {
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                <p class="text-muted fst-italic">No assets available.</p>
+            }
+            else
+            {
+                <p class="text-muted fst-italic">No search results.</p>
+            }
+        }
+        else
+        {
+            <ViewSwitcher ViewMode="_viewMode">
+                <GridTemplate>
+                    <div class="asset-grid pt-2 pb-3">
+                        @foreach (var asset in Items)
+                        {
+                            <div class="asset-item">
+                                <AssetCard Asset="@asset" OnSelected="@(() => OnShowAsset(asset))"/>
+                            </div>
+                        }
                     </div>
-                }
-            </div>
-        </GridTemplate>
-        <TableTemplate>
-            <OjedaTable TItem="AssetSummaryDto" 
-                        DataItems="@Items" 
-                        Columns="@_columnDefinitions" 
-                        OnItemSelected="OnShowAsset" />
-        </TableTemplate>
-    </ViewSwitcher>
+                </GridTemplate>
+                <TableTemplate>
+                    <OjedaTable TItem="AssetSummaryDto"
+                                DataItems="@Items"
+                                Columns="@_columnDefinitions"
+                                OnItemSelected="OnShowAsset"/>
+                </TableTemplate>
+            </ViewSwitcher>
+        }
 
-    <div class="mt-4 mb-4">
-        <OjedaPager
-            PageCount="@PageCount"
-            CurrentPage="@CurrentPage"
-            PageSize="@PageSize"
-            TotalCount="@TotalCount"
-            OnPageChanged="@OnPageChanged"
-            OnPageSizeChanged="@OnPageSizeChanged"/>
-    </div>
-}
+    </Content>
+
+    <Footer>
+
+        @if (!(Items == null || !Items.Any()))
+        {
+            <div class="my-3">
+                <OjedaPager
+                    PageCount="@PageCount"
+                    CurrentPage="@CurrentPage"
+                    PageSize="@PageSize"
+                    TotalCount="@TotalCount"
+                    OnPageChanged="@OnPageChanged"
+                    OnPageSizeChanged="@OnPageSizeChanged"/>
+            </div>
+        }
+
+    </Footer>
+
+</ExpandablePage>
+
+
+@* <div class="d-flex justify-content-between mt-2 mb-4"> *@
+@*     <div class="d-flex align-items-center"> *@
+@*         <h3 class="m-0">Assets</h3> *@
+@*     </div> *@
+@*     <div class="d-flex"> *@
+@*         <div class="d-flex align-items-center me-3"> *@
+@*             <Spinner IsLoading="@IsLoading"/> *@
+@*         </div> *@
+@*         <div class="me-3" style="width: 350px;"> *@
+@*             <Search OnValueChanged="@OnSearchAsync"></Search> *@
+@*         </div> *@
+@*         <ViewSelector OnViewModeChanged="@OnViewModeChanged"/> *@
+@*         <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button> *@
+@*     </div> *@
+@* </div> *@
 
 @code {
 
@@ -83,9 +117,9 @@ else
 
             _columnDefinitions.AddRange(new[]
             {
-                new ColumnDefinition {DataField = "Name", Caption = "Name"},
-                new ColumnDefinition {DataField = "AssetType.Name", Caption = "Type"},
-                new ColumnDefinition {DataField = "UpdatedAt", Caption = "Last Updated", DataType = DataType.RelativeDateTime, Alignment = Alignment.Right}
+                new ColumnDefinition { DataField = "Name", Caption = "Name" },
+                new ColumnDefinition { DataField = "AssetType.Name", Caption = "Type" },
+                new ColumnDefinition { DataField = "UpdatedAt", Caption = "Last Updated", DataType = DataType.RelativeDateTime, Alignment = Alignment.Right }
             });
         }
     }
@@ -97,7 +131,7 @@ else
 
         if (!result.Cancelled)
         {
-            var assetType = (AssetTypeDto) result.Data;
+            var assetType = (AssetTypeDto)result.Data;
             _navManager.NavigateTo($"/assets/add?assetTypeId={assetType.Id}");
         }
     }

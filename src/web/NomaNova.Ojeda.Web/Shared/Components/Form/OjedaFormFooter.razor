@@ -6,6 +6,7 @@
         <OjedaButton
             Style="@ButtonStyle.Primary"
             Type="@ButtonType.Submit"
+            Form="@Form"
             IsDisabled="IsSubmitting"
             IsLoading="IsSubmitting"
             Text="Submit"/>
@@ -55,6 +56,7 @@
         <OjedaButton
             Style="@ButtonStyle.Primary"
             Type="@ButtonType.Submit"
+            Form="@Form"
             IsDisabled="IsSubmitting"
             IsLoading="IsSubmitting"
             Text="Submit"/>
@@ -76,6 +78,9 @@
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
+    [Parameter]
+    public string Form { get; set; }
+    
     [Parameter]
     public string CssClass { get; set; }
 
