@@ -1,0 +1,7 @@
+.content_fixed {
+    flex: none;
+}
+
+.content_expand {
+    overflow-y: auto;
+}

@@ -97,6 +97,8 @@ namespace NomaNova.Ojeda.Services.Assets
             });
             
             assetDto.Id = id;
+            assetDto.Name = asset.Name;
+            assetDto.UpdatedAt = asset.UpdatedAt;
 
             return assetDto;
         }

@@ -1,0 +1,17 @@
+<div class="content_expand px-3">
+    @Content
+</div>
+
+<div class="content_fixed px-3">
+    @Footer
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment Content { get; set; }
+
+    [Parameter]
+    public RenderFragment Footer { get; set; }
+
+}

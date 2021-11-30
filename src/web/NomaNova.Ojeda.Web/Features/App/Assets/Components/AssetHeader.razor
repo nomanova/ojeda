@@ -1,0 +1,86 @@
+@inject ITimeKeeper _timeKeeper
+
+<div class="d-flex">
+
+    <!-- Image -->
+    <div class="p-3 d-flex">
+
+        <div class="image d-flex align-items-center justify-content-center">
+            <i class="fs-6 bi-box" style="font-size: 90px !important; color: rgba(206, 212, 218, 0.5);"></i>
+        </div>
+
+    </div>
+
+    <!-- Details -->
+
+    <div class="pe-3 py-3 d-flex flex-grow-1 justify-content-between">
+
+        <div class="d-flex flex-column justify-content-between">
+            <div class="d-flex flex-column">
+                <h3 class="m-0">@_title</h3>
+                <span class="mt-1 tag">@_tag</span>
+            </div>
+
+            <div class="d-flex flex-column">
+                <span class="asset-type">@_assetType</span>
+                <span class="last-updated">@_lastUpdated</span>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column">
+
+            <div class="d-flex">
+
+                <div class="d-flex align-items-center">
+                    <Spinner IsLoading="@IsLoading"/>
+                </div>
+
+                <div class="ms-3">
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="asset-actions-more" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="asset-actions-more">
+                            <li>
+                                <a class="dropdown-item" role="button" @onclick="@OnDelete">Delete</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+    
+    [Parameter]
+    public AssetDto AssetDto { get; set; }
+
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+    
+    private string _title;
+    private string _tag;
+    private string _assetType;
+    private string _lastUpdated;
+
+    protected override void OnParametersSet()
+    {
+        if (AssetDto != null)
+        {
+            _title = AssetDto.Name;
+            _tag = "123456789"; // TODO
+            _assetType = AssetDto.AssetType.Name;
+            _lastUpdated = $"Last updated: {AssetDto.UpdatedAt.ToRelativeTime(_timeKeeper)}";
+        }
+    }
+
+}

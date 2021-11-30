@@ -1,0 +1,214 @@
+@inherits UpsertAssetPage
+
+<AssetTab>
+
+    <Content>
+
+        <div class="ojeda-form">
+
+            <EditForm id="form-edit-asset" EditContext="_editContext" OnValidSubmit="@OnSubmitForm">
+
+                <AssetFluentValidationValidator Asset="@Asset"/>
+                <ServerSideFluentValidation @ref="_serverValidation"/>
+
+                @for(var i = 0; i < _updateAsset.FieldSets.Count; i++)
+                {
+                    var fieldSet = _updateAsset.FieldSets[i];
+                    
+                    var formSectionClass = "mb-3";
+                    
+                    if (i == _updateAsset.FieldSets.Count - 1)
+                    {
+                        formSectionClass = "";
+                    }
+                    
+                    <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))" CssClass="@formSectionClass">
+                        @foreach (var field in fieldSet.Fields)
+                        {
+                            var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
+
+                            <div class="mb-3">
+                                <label for="@hash" class="form-label">@(GetFieldLabel(fieldSet.Id, field.Id))</label>
+
+                                @{
+                                    var fieldDataType = GetFieldDataType(fieldSet.Id, field.Id);
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.String)
+                                {
+                                    var fieldData = (StringFieldDataDto)field.Data;
+
+                                    <OjedaInputText @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                    placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.Long)
+                                {
+                                    var fieldData = (LongFieldDataDto)field.Data;
+
+                                    <OjedaInputNumber @bind-Value="fieldData.Value"
+                                                      ParsingErrorMessage="Value must be integer."
+                                                      class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                      placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.Double)
+                                {
+                                    var fieldData = (DoubleFieldDataDto)field.Data;
+
+                                    <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                      placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+                            </div>
+                        }
+                    </FormSection>
+                }
+
+            </EditForm>
+
+        </div>
+
+
+    </Content>
+
+    <Footer>
+
+        <div class="my-3">
+
+            <!-- Submit -->
+            <OjedaButton
+                Style="@ButtonStyle.Primary"
+                Type="@ButtonType.Submit"
+                Form="form-edit-asset"
+                IsDisabled="@IsUpdateDisabled()"
+                IsLoading="_isSubmitting"
+                Text="Update"/>
+
+            <!-- Reset -->
+            <OjedaButton
+                Style="@ButtonStyle.Secondary" 
+                IsDisabled="@IsUpdateDisabled()"
+                Text="Reset"
+                OnClick="@OnReset"/>
+
+        </div>
+
+    </Footer>
+
+</AssetTab>
+
+
+@code {
+
+    private UpdateAssetDto _updateAsset = new();
+
+    private EditContext _editContext;
+
+    private ServerSideFluentValidation _serverValidation;
+
+    private bool _isSubmitting;
+    private bool _isModified;
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public AssetDto AssetDto { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (AssetDto == null)
+        {
+            return;
+        }
+
+        Asset = AssetDto;
+        Init();
+    }
+
+    private async Task OnSubmitForm()
+    {
+        Console.WriteLine("On Submit Form");
+
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        _serverValidation.ClearErrors();
+
+        var result = await Ojeda.AssetsService.UpdateAsync(Asset.Id, _updateAsset);
+
+        if (result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
+        {
+            _serverValidation.DisplayErrors(result.Error.ValidationErrors);
+        }
+        else if (!result.Success)
+        {
+            ToastService.ShowError(result.Error.Stringify("Could not submit asset."));
+        }
+        else
+        {
+            InitEditContext();
+        }
+
+        _isSubmitting = false;
+    }
+
+    private void Init()
+    {
+        _updateAsset = new UpdateAssetDto
+        {
+            Name = Asset.Name,
+            AssetTypeId = Asset.AssetType.Id,
+            FieldSets = Asset.FieldSets.Select(fs => new UpdateAssetFieldSetDto
+            {
+                Id = fs.Id,
+                Fields = fs.Fields.Select(f => new UpdateAssetFieldDto
+                {
+                    Id = f.Id,
+                    Data = f.Data.Copy()
+                }).ToList()
+            }).ToList()
+        };
+
+        InitEditContext();
+    }
+
+    private void InitEditContext()
+    {
+        _editContext = new EditContext(_updateAsset);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+
+        _isModified = false;
+        _editContext.OnFieldChanged += OnFieldChanged;
+    }
+
+    private void OnFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        _isModified = _editContext.IsModified();
+    }
+
+    private bool IsUpdateDisabled()
+    {
+        return !_isModified || _isSubmitting;
+    }
+
+    private void OnReset()
+    {
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        Init();
+    }
+
+}

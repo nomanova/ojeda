@@ -153,7 +153,7 @@
         }
         else
         {
-            ToastService.ShowError($"Could not load field set. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError(result.Error.Stringify("Could not load field set."));
             NavManager.NavigateTo(ReturnPath);
         }
 

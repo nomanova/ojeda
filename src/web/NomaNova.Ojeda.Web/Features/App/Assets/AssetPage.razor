@@ -4,23 +4,35 @@
 @inject NavigationManager _navManager
 @inject IToastService _toastService
 
-<div class="d-flex justify-content-between mt-2 mb-3">
-    <div class="d-flex align-items-center">
-        <h3 class="m-0">Asset</h3>
-    </div>
-    <div class="d-flex">
-        <OjedaButton
-            Text="Delete"
-            Style="@ButtonStyle.Danger"
-            OnClick="OnDelete"/>
-    </div>
-</div>
+<div class="content">
 
-<TabControl>
-    <TabPage Text="Fields">
-        <EditAssetPage AssetId="@AssetId"/>
-    </TabPage>
-</TabControl>
+    <div class="content_fixed">
+
+        <AssetHeader
+            IsLoading="@_isLoading"
+            AssetDto="@_asset"
+            OnDelete="@OnDelete"/>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs px-3 mb-3">
+
+            <!-- Fields -->
+            <li class="nav-item">
+                <button class="nav-link @(_activeTab == "Fields" ? "active" : "")" @onclick="@(() => ActivateTab("Fields"))">Fields</button>
+            </li>
+
+        </ul>
+
+    </div>
+
+    <OjedaLoader IsLoading="@_isLoading" CssClass="px-3">
+        @if (_activeTab == "Fields")
+        {
+            <FieldsAssetTab AssetDto="@_asset"/>
+        }
+    </OjedaLoader>
+
+</div>
 
 @code {
 
@@ -29,6 +41,36 @@
 
     [Parameter]
     public string AssetId { get; set; }
+
+    private bool _isLoading;
+    private AssetDto _asset;
+
+    private string _activeTab = "Fields";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        var result = await _ojeda.AssetsService.GetByIdAsync(AssetId);
+
+        if (result.Success)
+        {
+            _asset = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            _toastService.ShowError(result.Error.Stringify("Could not load asset."));
+            _navManager.NavigateTo("/assets");
+        }
+
+        _isLoading = false;
+    }
+
+    void ActivateTab(string tab)
+    {
+        _activeTab = tab;
+    }
 
     private async Task OnDelete()
     {

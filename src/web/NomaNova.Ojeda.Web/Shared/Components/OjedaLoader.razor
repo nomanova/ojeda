@@ -1,6 +1,8 @@
 @if (IsLoading)
 {
-    <p class="text-muted fst-italic">Loading...</p>
+    <div class="@CssClass">
+        <p class="text-muted fst-italic">Loading...</p>
+    </div>
 }
 else
 {
@@ -14,5 +16,8 @@ else
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
 
 }
