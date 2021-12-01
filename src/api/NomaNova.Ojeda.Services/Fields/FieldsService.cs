@@ -105,7 +105,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<DeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<DryRunDeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -114,7 +114,7 @@ namespace NomaNova.Ojeda.Services.Fields
                 throw new NotFoundException();
             }
 
-            var deleteFieldDto = new DeleteFieldDto();
+            var deleteFieldDto = new DryRunDeleteFieldDto();
             
             // Fetch impacted field sets
             var fieldSets = await _fieldSetRepository.GetAllAsync(query =>

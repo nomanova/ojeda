@@ -41,8 +41,7 @@
 
                     <!-- Field Sets -->
                     <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <label class="form-label">Field Sets*</label>
+                        <div class="d-flex mb-2">
                             <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddFieldSet">Add Field Set</a>
                         </div>
                         <div>
@@ -81,7 +80,7 @@
                             }
                             else
                             {
-                                <p class="text-muted fst-italic">Use the link on the right to start adding field sets.</p>
+                                <p class="text-muted fst-italic">Use the link above to start adding field sets.</p>
                             }
                             <ValidationMessage For="@(() => UpsertAssetType.FieldSets)"></ValidationMessage>
                         </div>

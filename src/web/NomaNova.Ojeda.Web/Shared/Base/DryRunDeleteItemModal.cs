@@ -23,7 +23,7 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             IsLoading = true;
             IsDisabled = true;
 
-            var result = await DeleteDryRunAsync();
+            var result = await DryRunDeleteAsync();
 
             if (result.Success)
             {
@@ -39,7 +39,7 @@ namespace NomaNova.Ojeda.Web.Shared.Base
             IsLoading = false;
         }
 
-        protected abstract Task<OjedaDataResult<T>> DeleteDryRunAsync();
+        protected abstract Task<OjedaDataResult<T>> DryRunDeleteAsync();
 
         protected abstract string GetText(T data);
     }

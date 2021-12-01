@@ -13,7 +13,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace NomaNova.Ojeda.Api.Controllers
 {
     [ApiController]
-    [Route("api/fieldsets")]
+    [Route("api/field-sets")]
     public class FieldSetsController : ApiController
     {
         private const string Tag = "Field Sets";
@@ -107,18 +107,31 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <summary>
         /// Delete field set
         /// </summary>
-        /// <param name="dryRun">When true only the impact of deletion will be calculated.</param>
         [HttpDelete("{id}")]
         [SwaggerOperation(Tags = new[] {Tag})]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(DeleteFieldSetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(
             [FromRoute] string id,
-            [FromQuery] bool dryRun,
             CancellationToken cancellationToken = default)
         {
-            var deleteFieldSetDto = await _fieldSetsService.DeleteAsync(id, dryRun, cancellationToken);
+            await _fieldSetsService.DeleteAsync(id, false, cancellationToken);
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Delete field set (dry run)
+        /// </summary>
+        [HttpDelete("{id}/dry-run")]
+        [SwaggerOperation(Tags = new[] {Tag})]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(DryRunDeleteFieldSetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DryRunDelete(
+            [FromRoute] string id,
+            CancellationToken cancellationToken = default)
+        {
+            var deleteFieldSetDto = await _fieldSetsService.DeleteAsync(id, true, cancellationToken);
             return Ok(deleteFieldSetDto);
         }
     }

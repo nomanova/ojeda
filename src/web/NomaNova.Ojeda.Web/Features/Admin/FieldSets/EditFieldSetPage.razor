@@ -43,8 +43,7 @@
 
                         <!-- Fields -->
                         <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <label class="form-label">Fields*</label>
+                            <div class="d-flex mb-2">
                                 <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddField">Add Field</a>
                             </div>
 
@@ -92,7 +91,7 @@
                                 }
                                 else
                                 {
-                                    <p class="text-muted fst-italic">Use the link on the right to start adding fields.</p>
+                                    <p class="text-muted fst-italic">Use the link above to start adding fields.</p>
                                 }
                                 <ValidationMessage For="@(() => UpsertFieldSet.Fields)"></ValidationMessage>
                             </div>

@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
-using NomaNova.Ojeda.Models;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 
@@ -13,7 +11,7 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
 {
     internal class FieldSetsService : BaseService, IFieldSetsService
     {
-        private const string BasePath = "api/fieldsets";
+        private const string BasePath = "api/field-sets";
         
         public FieldSetsService(OjedaHttpClient httpClient) : base(httpClient)
         {
@@ -60,15 +58,16 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             return await SendForDataAsync<FieldSetDto>(HttpMethod.Put, path, fieldSet, cancellationToken);
         }
         
-        public async Task<OjedaDataResult<DeleteFieldSetDto>> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken)
         {
-            var qsb = QueryStringBuilder.New();
-            
-            qsb.Add("dryRun" , dryRun);
-            
-            var path = $"{BasePath}/{id}{qsb.Build()}";
-
-            return await SendForDataAsync<DeleteFieldSetDto>(HttpMethod.Delete, path, null, cancellationToken);
+            var path = $"{BasePath}/{id}";
+            return await SendAsync(HttpMethod.Delete, path, null, cancellationToken);
+        }
+        
+        public async Task<OjedaDataResult<DryRunDeleteFieldSetDto>> DryRunDeleteAsync(string id, CancellationToken cancellationToken)
+        {
+            var path = $"{BasePath}/{id}/dry-run";
+            return await SendForDataAsync<DryRunDeleteFieldSetDto>(HttpMethod.Delete, path, null, cancellationToken);
         }
     }
 }

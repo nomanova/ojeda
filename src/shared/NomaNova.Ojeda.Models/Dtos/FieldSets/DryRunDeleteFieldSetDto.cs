@@ -4,7 +4,7 @@ using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 
 namespace NomaNova.Ojeda.Models.Dtos.FieldSets
 {
-    public class DeleteFieldSetDto
+    public class DryRunDeleteFieldSetDto
     {
         public List<AssetTypeSummaryDto> AssetTypes { get; set; }
         

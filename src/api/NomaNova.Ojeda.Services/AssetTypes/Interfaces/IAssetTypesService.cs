@@ -24,6 +24,6 @@ namespace NomaNova.Ojeda.Services.AssetTypes.Interfaces
         Task<AssetTypeDto> UpdateAsync(
             string id, UpdateAssetTypeDto assetTypeDto, CancellationToken cancellationToken = default);
         
-        Task<DeleteAssetTypeDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken = default);
+        Task<DryRunDeleteAssetTypeDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken = default);
     }
 }

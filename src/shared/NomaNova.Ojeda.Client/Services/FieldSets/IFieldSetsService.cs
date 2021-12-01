@@ -30,7 +30,9 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             UpdateFieldSetDto fieldSet,
             CancellationToken cancellationToken = default);
 
-        Task<OjedaDataResult<DeleteFieldSetDto>> DeleteAsync(
-            string id, bool dryRun = false, CancellationToken cancellationToken = default);
+        Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);
+
+        Task<OjedaDataResult<DryRunDeleteFieldSetDto>> DryRunDeleteAsync(string id,
+            CancellationToken cancellationToken = default);
     }
 }

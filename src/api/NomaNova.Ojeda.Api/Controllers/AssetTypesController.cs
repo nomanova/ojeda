@@ -12,7 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace NomaNova.Ojeda.Api.Controllers
 {
     [ApiController]
-    [Route("api/assettypes")]
+    [Route("api/asset-types")]
     public class AssetTypesController : ApiController
     {
         private const string Tag = "Asset Types";
@@ -104,18 +104,31 @@ namespace NomaNova.Ojeda.Api.Controllers
         /// <summary>
         /// Delete asset type
         /// </summary>
-        /// <param name="dryRun">When true only the impact of deletion will be calculated.</param>
         [HttpDelete("{id}")]
         [SwaggerOperation(Tags = new[] {Tag})]
-        [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(DeleteAssetTypeDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(
-            [FromRoute] string id, 
-            [FromQuery] bool dryRun,
+            [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
-            var deleteAssetTypeDto = await _assetTypesService.DeleteAsync(id, dryRun, cancellationToken);
+            await _assetTypesService.DeleteAsync(id, false, cancellationToken);
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Delete asset type (dry run)
+        /// </summary>
+        [HttpDelete("{id}/dry-run")]
+        [SwaggerOperation(Tags = new[] {Tag})]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(DryRunDeleteAssetTypeDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DryRunDelete(
+            [FromRoute] string id,
+            CancellationToken cancellationToken = default)
+        {
+            var deleteAssetTypeDto = await _assetTypesService.DeleteAsync(id, true, cancellationToken);
             return Ok(deleteAssetTypeDto);
         }
     }

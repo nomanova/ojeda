@@ -135,7 +135,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             return _mapper.Map<AssetTypeDto>(assetType);
         }
         
-        public async Task<DeleteAssetTypeDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<DryRunDeleteAssetTypeDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
         {
             var assetType = await _assetTypesRepository.GetByIdAsync(id, cancellationToken);
 
@@ -144,7 +144,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 throw new NotFoundException();
             }
 
-            var deleteAssetTypeDto = new DeleteAssetTypeDto();
+            var deleteAssetTypeDto = new DryRunDeleteAssetTypeDto();
             
             // Fetch impacted assets
             var assets = await _assetsRepository.GetAllAsync(query =>

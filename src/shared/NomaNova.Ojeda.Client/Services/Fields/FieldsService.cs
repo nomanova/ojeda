@@ -60,15 +60,16 @@ namespace NomaNova.Ojeda.Client.Services.Fields
             return await SendForDataAsync<FieldDto>(HttpMethod.Put, path, field, cancellationToken);
         }
 
-        public async Task<OjedaDataResult<DeleteFieldDto>> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken)
         {
-            var qsb = QueryStringBuilder.New();
-            
-            qsb.Add("dryRun" , dryRun);
-            
-            var path = $"{BasePath}/{id}{qsb.Build()}";
-            
-            return await SendForDataAsync<DeleteFieldDto>(HttpMethod.Delete, path, null, cancellationToken);
+            var path = $"{BasePath}/{id}";
+            return await SendAsync(HttpMethod.Delete, path, null, cancellationToken);
+        }
+        
+        public async Task<OjedaDataResult<DryRunDeleteFieldDto>> DryRunDeleteAsync(string id, CancellationToken cancellationToken)
+        {
+            var path = $"{BasePath}/{id}/dry-run";
+            return await SendForDataAsync<DryRunDeleteFieldDto>(HttpMethod.Delete, path, null, cancellationToken);
         }
     }
 }

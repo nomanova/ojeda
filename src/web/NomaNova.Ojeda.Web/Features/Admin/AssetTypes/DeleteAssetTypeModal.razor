@@ -1,5 +1,5 @@
 @using System.Text
-@inherits DryRunDeleteItemModal<DeleteAssetTypeDto>
+@inherits DryRunDeleteItemModal<DryRunDeleteAssetTypeDto>
 
 @inject OjedaClient _ojeda
 
@@ -18,12 +18,12 @@
         return await _ojeda.AssetTypesService.DeleteAsync(Id);
     }
     
-    protected override async Task<OjedaDataResult<DeleteAssetTypeDto>> DeleteDryRunAsync()
+    protected override async Task<OjedaDataResult<DryRunDeleteAssetTypeDto>> DryRunDeleteAsync()
     {
-        return await _ojeda.AssetTypesService.DeleteAsync(Id, true);
+        return await _ojeda.AssetTypesService.DryRunDeleteAsync(Id);
     }
 
-    protected override string GetText(DeleteAssetTypeDto data)
+    protected override string GetText(DryRunDeleteAssetTypeDto data)
     {
         var text = new StringBuilder();
 

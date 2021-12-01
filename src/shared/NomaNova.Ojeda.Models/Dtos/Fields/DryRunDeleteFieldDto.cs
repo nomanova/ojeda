@@ -4,7 +4,7 @@ using NomaNova.Ojeda.Models.Dtos.FieldSets;
 
 namespace NomaNova.Ojeda.Models.Dtos.Fields
 {
-    public class DeleteFieldDto
+    public class DryRunDeleteFieldDto
     {
         public List<FieldSetSummaryDto> FieldSets { get; set; }
 
