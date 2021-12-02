@@ -103,7 +103,27 @@ namespace NomaNova.Ojeda.Api.Controllers
             var fieldSetDto = await _fieldSetsService.UpdateAsync(id, updateFieldSetDto, cancellationToken);
             return Ok(fieldSetDto);
         }
-        
+
+        /// <summary>
+        /// Update field set (dry-run)
+        /// </summary>
+        [HttpPut("{id}/dry-run")]
+        [SwaggerOperation(Tags = new[] { Tag })]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(DryRunUpdateFieldSetDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DryRunUpdate(
+            [FromRoute] string id,
+            [FromBody] UpdateFieldSetDto updateFieldSetDto,
+            CancellationToken cancellationToken = default)
+        {
+            var dryRunUpdateFieldSetDto =
+                await _fieldSetsService.DryRunUpdateAsync(id, updateFieldSetDto, cancellationToken);
+            return Ok(dryRunUpdateFieldSetDto);
+        }
+
         /// <summary>
         /// Delete field set
         /// </summary>
@@ -131,8 +151,8 @@ namespace NomaNova.Ojeda.Api.Controllers
             [FromRoute] string id,
             CancellationToken cancellationToken = default)
         {
-            var deleteFieldSetDto = await _fieldSetsService.DeleteAsync(id, true, cancellationToken);
-            return Ok(deleteFieldSetDto);
+            var dryRunDeleteFieldSetDto = await _fieldSetsService.DeleteAsync(id, true, cancellationToken);
+            return Ok(dryRunDeleteFieldSetDto);
         }
     }
 }

@@ -17,6 +17,6 @@ namespace NomaNova.Ojeda.Core.Domain.Assets
 
         public Field Field { get; set; }
 
-        public byte[] Value { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -64,7 +64,7 @@ namespace NomaNova.Ojeda.Services.Assets
             var fields = await GetFieldsAsync(fieldSets, cancellationToken);
             
             return AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, 
-                (_, _, fieldProperties) => _fieldDataConverter.FromBytes(null, fieldProperties));
+                (_, _, fieldProperties) => _fieldDataConverter.FromStorage(null, fieldProperties));
         }
 
         public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -91,9 +91,9 @@ namespace NomaNova.Ojeda.Services.Assets
             var assetDto = AssetTypeToAssetDtoAsync(assetType, fieldSets, fields, (fieldSetId, fieldId, fieldData) =>
             {
                 var fieldValue = fieldValues.FirstOrDefault(_ => _.FieldSetId.Equals(fieldSetId) && _.FieldId.Equals(fieldId));
-                var byteValue = fieldValue?.Value;
+                var value = fieldValue?.Value;
 
-                return _fieldDataConverter.FromBytes(byteValue, fieldData);
+                return _fieldDataConverter.FromStorage(value, fieldData);
             });
             
             assetDto.Id = id;
@@ -158,7 +158,7 @@ namespace NomaNova.Ojeda.Services.Assets
                         AssetId = asset.Id,
                         FieldSetId = dbFieldSet.Id,
                         FieldId = dbField.Id,
-                        Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties)
+                        Value = _fieldDataConverter.ToStorage(dtoField.Data, dbField.Properties)
                     };
                     
                     asset.FieldValues.Add(fieldValue);
@@ -214,7 +214,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
                     if (existingFieldValue != null)
                     {
-                        existingFieldValue.Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties);
+                        existingFieldValue.Value = _fieldDataConverter.ToStorage(dtoField.Data, dbField.Properties);
                         updatedFieldValues.Add(existingFieldValue);
                     }
                     else
@@ -226,7 +226,7 @@ namespace NomaNova.Ojeda.Services.Assets
                             AssetId = asset.Id,
                             FieldSetId = dbFieldSet.Id,
                             FieldId = dbField.Id,
-                            Value = _fieldDataConverter.ToBytes(dtoField.Data, dbField.Properties)
+                            Value = _fieldDataConverter.ToStorage(dtoField.Data, dbField.Properties)
                         };
                         
                         updatedFieldValues.Add(newFieldValue);

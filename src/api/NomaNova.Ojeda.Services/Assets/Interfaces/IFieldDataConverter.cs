@@ -5,9 +5,9 @@ namespace NomaNova.Ojeda.Services.Assets.Interfaces
 {
     public interface IFieldDataConverter
     {
-        byte[] ToBytes(FieldDataDto data, FieldProperties fieldProperties);
+        string ToStorage(FieldDataDto data, FieldProperties fieldProperties);
 
-        FieldDataDto FromBytes(byte[] value, FieldProperties fieldProperties);
+        FieldDataDto FromStorage(string value, FieldProperties fieldProperties);
 
         FieldDataTypeDto GetMatchingDataType(FieldProperties fieldProperties);
     }

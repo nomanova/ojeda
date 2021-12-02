@@ -24,7 +24,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
     public class FieldSetsService : BaseService, IFieldSetsService
     {
         private readonly IMapper _mapper;
-        private readonly IRepository<Field> _fieldsRepository; 
+        private readonly IRepository<Field> _fieldsRepository;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<AssetType> _assetTypeRepository;
         private readonly IRepository<Asset> _assetsRepository;
@@ -42,7 +42,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             _assetTypeRepository = assetTypeRepository;
             _assetsRepository = assetsRepository;
         }
-        
+
         public async Task<FieldSetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, query =>
@@ -58,7 +58,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             }
 
             var fieldSetDto = _mapper.Map<FieldSetDto>(fieldSet);
-            
+
             fieldSetDto.Fields = fieldSetDto.Fields
                 .OrderBy(_ => _.Order)
                 .ThenBy(_ => _.Field.Name)
@@ -68,11 +68,11 @@ namespace NomaNova.Ojeda.Services.FieldSets
         }
 
         public async Task<PaginatedListDto<FieldSetDto>> GetAsync(
-            string searchQuery, 
-            string orderBy, 
+            string searchQuery,
+            string orderBy,
             bool orderAsc,
-            IList<string> excludedIds, 
-            int pageNumber, 
+            IList<string> excludedIds,
+            int pageNumber,
             int pageSize,
             CancellationToken cancellationToken)
         {
@@ -80,7 +80,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             {
                 orderBy = nameof(FieldSet.Name);
             }
-            
+
             var paginatedFieldSets = await _fieldSetsRepository.GetAllPaginatedAsync(
                 searchQuery, query =>
                 {
@@ -88,56 +88,42 @@ namespace NomaNova.Ojeda.Services.FieldSets
                     {
                         query = query.Where(e => !excludedIds.Contains(e.Id));
                     }
-                    
+
                     return query
                         .Include(s => s.FieldSetFields)
                         .ThenInclude(f => f.Field);
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
-            
+
             var paginatedFieldSetsDto = _mapper.Map<PaginatedListDto<FieldSetDto>>(paginatedFieldSets);
             paginatedFieldSetsDto.Items = paginatedFieldSets.Select(f => _mapper.Map<FieldSetDto>(f)).ToList();
-            
+
             return paginatedFieldSetsDto;
         }
 
         public async Task<FieldSetDto> CreateAsync(
             CreateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
-            await ValidateAndThrowAsync(new CreateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository), 
+            await ValidateAndThrowAsync(new CreateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository),
                 fieldSetDto, cancellationToken);
 
             var fieldSetId = Guid.NewGuid().ToString();
 
             var fieldSet = _mapper.Map<FieldSet>(fieldSetDto);
             fieldSet.Id = fieldSetId;
-            
+
             fieldSet.FieldSetFields = fieldSetDto.Fields.Select(f => _mapper.Map<FieldSetField>(f, opt =>
-                opt.AfterMap((_, dest) =>
-                {
-                    dest.FieldSetId = fieldSetId;
-                }))).ToList();
+                opt.AfterMap((_, dest) => { dest.FieldSetId = fieldSetId; }))).ToList();
 
             fieldSet = await _fieldSetsRepository.InsertAsync(fieldSet, cancellationToken);
-            
+
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
         public async Task<FieldSetDto> UpdateAsync(
             string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
-            var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, query =>
-            {
-                return query.Include(s => s.FieldSetFields);
-            }, cancellationToken);
+            var fieldSet = await PrepareUpdateAsync(id, fieldSetDto, cancellationToken);
 
-            if (fieldSet == null)
-            {
-                throw new NotFoundException();
-            }
-
-            await ValidateAndThrowAsync(new UpdateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, id), 
-                fieldSetDto, cancellationToken);
-            
             fieldSet = _mapper.Map(fieldSetDto, fieldSet);
             fieldSet.Id = id;
 
@@ -149,7 +135,37 @@ namespace NomaNova.Ojeda.Services.FieldSets
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
 
-        public async Task<DryRunDeleteFieldSetDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<DryRunUpdateFieldSetDto> DryRunUpdateAsync(
+            string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
+        {
+            var fieldSet = await PrepareUpdateAsync(id, fieldSetDto, cancellationToken);
+
+            // Determine removed fields
+            var dbFieldIds = fieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+            var dtoFieldIds = fieldSetDto.Fields.Select(_ => _.Id).ToList();
+
+            var removedFieldIds = dbFieldIds.Where(db => dtoFieldIds.All(dto => dto != db)).ToList();
+
+            // Fetch impacted assets
+            var assets = await _assetsRepository.GetAllAsync(query =>
+            {
+                return query.Where(_ =>
+                    _.FieldValues.Any(fv => fv.FieldSetId == id &&
+                                            removedFieldIds.Contains(fv.FieldId) &&
+                                            fv.Value != null)
+                );
+            }, cancellationToken);
+
+            var updateFieldSetDto = new DryRunUpdateFieldSetDto
+            {
+                Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList()
+            };
+
+            return updateFieldSetDto;
+        }
+
+        public async Task<DryRunDeleteFieldSetDto> DeleteAsync(string id, bool dryRun,
+            CancellationToken cancellationToken)
         {
             var fieldSet = await _fieldSetsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -159,20 +175,22 @@ namespace NomaNova.Ojeda.Services.FieldSets
             }
 
             var deleteFieldSetDto = new DryRunDeleteFieldSetDto();
-            
+
             // Fetch impacted asset types
-            var assetTypes = await _assetTypeRepository.GetAllAsync(query =>
-            {
-                return query.Where(_ => _.AssetTypeFieldSets.Select(atf => atf.FieldSetId).Contains(id));
-            }, cancellationToken);
+            var assetTypes = await _assetTypeRepository.GetAllAsync(
+                query => { return query.Where(_ => _.AssetTypeFieldSets.Select(atf => atf.FieldSetId).Contains(id)); },
+                cancellationToken);
 
             deleteFieldSetDto.AssetTypes = assetTypes.Select(_ => _mapper.Map<AssetTypeSummaryDto>(_)).ToList();
-            
+
             // Fetch impacted assets
-            var assets = await _assetsRepository.GetAllAsync(query =>
-            {
-                return query.Where(_ => _.FieldValues.Select(fv => fv.FieldSetId).Contains(id));
-            }, cancellationToken);
+            var assets = await _assetsRepository.GetAllAsync(
+                query =>
+                {
+                    return query.Where(_ =>
+                        _.FieldValues.Any(fv => fv.FieldSetId == id && fv.Value != null));
+                },
+                cancellationToken);
 
             deleteFieldSetDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
 
@@ -183,6 +201,24 @@ namespace NomaNova.Ojeda.Services.FieldSets
 
             await _fieldSetsRepository.DeleteAsync(fieldSet, cancellationToken);
             return deleteFieldSetDto;
+        }
+
+        private async Task<FieldSet> PrepareUpdateAsync(
+            string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
+        {
+            var fieldSet = await _fieldSetsRepository.GetByIdAsync(id,
+                query => { return query.Include(s => s.FieldSetFields); }, cancellationToken);
+
+            if (fieldSet == null)
+            {
+                throw new NotFoundException();
+            }
+
+            await ValidateAndThrowAsync(
+                new UpdateFieldSetDtoBusinessValidator(_fieldsRepository, _fieldSetsRepository, id),
+                fieldSetDto, cancellationToken);
+
+            return fieldSet;
         }
     }
 }

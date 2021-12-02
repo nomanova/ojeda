@@ -125,10 +125,13 @@ namespace NomaNova.Ojeda.Services.Fields
             deleteFieldDto.FieldSets = fieldSets.Select(_ => _mapper.Map<FieldSetSummaryDto>(_)).ToList();
             
             // Fetch impacted assets
-            var assets = await _assetsRepository.GetAllAsync(query =>
-            {
-                return query.Where(_ => _.FieldValues.Select(fv => fv.FieldId).Contains(id));
-            }, cancellationToken);
+            var assets = await _assetsRepository.GetAllAsync(
+                query =>
+                {
+                    return query.Where(_ =>
+                        _.FieldValues.Any(fv => fv.FieldId == id && fv.Value != null));
+                },
+                cancellationToken);
             
             deleteFieldDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
 
