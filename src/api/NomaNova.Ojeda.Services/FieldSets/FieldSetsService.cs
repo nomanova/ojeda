@@ -11,8 +11,6 @@ using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models.Dtos.Assets;
-using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.FieldSets.Interfaces;
@@ -156,9 +154,10 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 );
             }, cancellationToken);
 
+            // Map dto
             var updateFieldSetDto = new DryRunUpdateFieldSetDto
             {
-                Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList()
+                Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList()
             };
 
             return updateFieldSetDto;
@@ -181,7 +180,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 query => { return query.Where(_ => _.AssetTypeFieldSets.Select(atf => atf.FieldSetId).Contains(id)); },
                 cancellationToken);
 
-            deleteFieldSetDto.AssetTypes = assetTypes.Select(_ => _mapper.Map<AssetTypeSummaryDto>(_)).ToList();
+            deleteFieldSetDto.AssetTypes = assetTypes.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
 
             // Fetch impacted assets
             var assets = await _assetsRepository.GetAllAsync(
@@ -192,7 +191,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 },
                 cancellationToken);
 
-            deleteFieldSetDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
+            deleteFieldSetDto.Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
 
             if (dryRun)
             {

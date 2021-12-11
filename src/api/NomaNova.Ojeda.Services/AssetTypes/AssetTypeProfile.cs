@@ -11,6 +11,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         public AssetTypeProfile()
         {
             // Domain -> Dto
+            CreateMap<AssetType, NamedEntityDto>();
             CreateMap<AssetType, AssetTypeSummaryDto>();
             CreateMap<AssetType, AssetTypeDto>()
                 .ForMember(dest => dest.FieldSets, opt => opt.MapFrom(src => src.AssetTypeFieldSets));

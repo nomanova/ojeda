@@ -1,13 +1,12 @@
 using System.Collections.Generic;
-using NomaNova.Ojeda.Models.Dtos.Assets;
-using NomaNova.Ojeda.Models.Dtos.AssetTypes;
+using NomaNova.Ojeda.Models.Shared;
 
 namespace NomaNova.Ojeda.Models.Dtos.FieldSets
 {
     public class DryRunDeleteFieldSetDto
     {
-        public List<AssetTypeSummaryDto> AssetTypes { get; set; }
+        public List<NamedEntityDto> AssetTypes { get; set; }
         
-        public List<AssetSummaryDto> Assets { get; set; }
+        public List<NamedEntityDto> Assets { get; set; }
     }
 }

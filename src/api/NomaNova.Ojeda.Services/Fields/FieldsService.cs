@@ -9,9 +9,7 @@ using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Repositories;
-using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Fields;
-using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.Fields.Interfaces;
 using NomaNova.Ojeda.Services.Fields.Validators;
@@ -122,7 +120,7 @@ namespace NomaNova.Ojeda.Services.Fields
                 return query.Where(_ => _.FieldSetFields.Select(fsf => fsf.FieldId).Contains(id));
             }, cancellationToken);
             
-            deleteFieldDto.FieldSets = fieldSets.Select(_ => _mapper.Map<FieldSetSummaryDto>(_)).ToList();
+            deleteFieldDto.FieldSets = fieldSets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
             
             // Fetch impacted assets
             var assets = await _assetsRepository.GetAllAsync(
@@ -133,7 +131,7 @@ namespace NomaNova.Ojeda.Services.Fields
                 },
                 cancellationToken);
             
-            deleteFieldDto.Assets = assets.Select(_ => _mapper.Map<AssetSummaryDto>(_)).ToList();
+            deleteFieldDto.Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
 
             if (dryRun)
             {

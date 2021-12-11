@@ -57,7 +57,15 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<FieldSetDto>(HttpMethod.Put, path, fieldSet, cancellationToken);
         }
-        
+
+
+        public async Task<OjedaDataResult<DryRunUpdateFieldSetDto>> DryRunUpdateAsync(string id,
+            UpdateFieldSetDto fieldSet, CancellationToken cancellationToken)
+        {
+            var path = $"{BasePath}/{id}/dry-run";
+            return await SendForDataAsync<DryRunUpdateFieldSetDto>(HttpMethod.Put, path, fieldSet, cancellationToken);
+        }
+
         public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken)
         {
             var path = $"{BasePath}/{id}";

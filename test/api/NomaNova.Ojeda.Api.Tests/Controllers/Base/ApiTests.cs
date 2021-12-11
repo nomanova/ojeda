@@ -4,19 +4,27 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NomaNova.Ojeda.Data.Context;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
+using Xunit;
 
 namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
 {
-    public class ApiTests
+    [Collection(nameof(ApiTests))]
+    public class ApiTests : IDisposable
     {
         private const string TestEnvironment = Constants.EnvTest;
         private const string ApiServerUrl = "http://localhost:60000";
 
-        protected readonly TestServer ApiServer;
+        private readonly TestServer _apiServer;
+        private DbContext _dbContext;
+
         protected readonly HttpClient ApiClient;
+
+        protected DbContext DatabaseContext => _dbContext ??= GetService<DatabaseContext>();
 
         protected ApiTests()
         {
@@ -29,7 +37,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
                 .UseUrls(ApiServerUrl)
                 .UseEnvironment(TestEnvironment)
                 .UseContentRoot(sutPath)
-                .ConfigureAppConfiguration((context, config) =>
+                .ConfigureAppConfiguration((_, config) =>
                 {
                     config.AddJsonFile(
                         $"{testPath}/appsettings.json", false, false
@@ -38,10 +46,15 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
                 .UseStartup<Startup>()
                 .ConfigureTestServices(RegisterServices);
 
-            ApiServer = new TestServer(apiBuilder);
-            ApiClient = ApiServer.CreateClient();
+            _apiServer = new TestServer(apiBuilder);
+            ApiClient = _apiServer.CreateClient();
         }
 
+        public void Dispose()
+        {
+            GetService<DatabaseContext>().Database.EnsureDeleted();
+        }
+        
         protected virtual void RegisterServices(IServiceCollection services)
         {
             // NOP - override in subclass(es) as needed
@@ -49,7 +62,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
 
         protected TService GetService<TService>()
         {
-            return (TService) ApiServer.Host.Services.GetService(typeof(TService));
+            return (TService) _apiServer.Host.Services.GetService(typeof(TService));
         }
 
         protected async Task<T> GetPayloadAsync<T>(HttpResponseMessage response)

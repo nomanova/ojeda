@@ -11,6 +11,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
         public FieldSetProfile()
         {
             // Domain -> Dto
+            CreateMap<FieldSet, NamedEntityDto>();
             CreateMap<FieldSet, FieldSetSummaryDto>();
             CreateMap<FieldSet, FieldSetDto>()
                 .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.FieldSetFields));

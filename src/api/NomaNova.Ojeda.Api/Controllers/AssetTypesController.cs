@@ -102,6 +102,26 @@ namespace NomaNova.Ojeda.Api.Controllers
         }
 
         /// <summary>
+        /// Update asset type (dry-run)
+        /// </summary>
+        [HttpPut("{id}/dry-run")]
+        [SwaggerOperation(Tags = new[] { Tag })]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(DryRunUpdateAssetTypeDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DryRunUpdate(
+            [FromRoute] string id,
+            [FromBody] UpdateAssetTypeDto updateAssetTypeDto,
+            CancellationToken cancellationToken = default)
+        {
+            var dryRunUpdateAssetTypeDto =
+                await _assetTypesService.DryRunUpdateAsync(id, updateAssetTypeDto, cancellationToken);
+            return Ok(dryRunUpdateAssetTypeDto);
+        }
+
+        /// <summary>
         /// Delete asset type
         /// </summary>
         [HttpDelete("{id}")]

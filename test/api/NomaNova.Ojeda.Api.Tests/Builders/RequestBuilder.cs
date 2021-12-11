@@ -3,7 +3,7 @@ using System.Net.Mime;
 using System.Text;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
 
-namespace NomaNova.Ojeda.Api.Tests.Controllers.Base
+namespace NomaNova.Ojeda.Api.Tests.Builders
 {
     public class RequestBuilder
     {
