@@ -27,6 +27,8 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: nomanova/ojeda-api
+          flavor: |
+            latest=true
           tags: |
             type=sha
 
