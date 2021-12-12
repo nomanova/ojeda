@@ -2,7 +2,8 @@ name: Build API
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - 'main'
     paths:
       - 'src/api/**'
       - 'src/shared/**'
@@ -19,3 +20,46 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v2
+      
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: nomanova/ojeda-api
+          tag-sha: true
+          tag-edge: false
+          tag-latest: true
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          tags: ${{ steps.docker_meta.outputs.tags }} 
+          file: ./Api.Dockerfile
+
+      - name: Push image
+        uses: docker/build-push-action@v2
+        with:
+          push: github.event_name != 'pull_request'
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          file: ./Api.Dockerfile
+
+
+
+
+
+
+
+
