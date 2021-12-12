@@ -4,7 +4,7 @@ Open-Source IT and Enterprise Asset Management
 
 | Ojeda Api  | Ojeda Web |
 | ------------- | ------------- |
-| ![Build Api](https://github.com/nomanova/ojeda/actions/workflows/build_api.yml/badge.svg?branch=main) | ![Build Web](https://github.com/nomanova/ojeda/actions/workflows/build_web.yml/badge.svg?branch=main) |
+| [![Build Api](https://github.com/nomanova/ojeda/actions/workflows/build_api.yml/badge.svg?branch=main)](https://github.com/nomanova/ojeda/actions/workflows/build_api.yml) | [![Build Web](https://github.com/nomanova/ojeda/actions/workflows/build_web.yml/badge.svg?branch=main)](https://github.com/nomanova/ojeda/actions/workflows/build_web.yml) |
 | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nomanova_ojeda_api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nomanova_ojeda_api) | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nomanova_ojeda_web&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nomanova_ojeda_web) |
 | [Dockerhub](https://hub.docker.com/r/nomanova/ojeda-api) | [Dockerhub](https://hub.docker.com/r/nomanova/ojeda-web) |
 
