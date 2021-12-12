@@ -1,15 +1,15 @@
-name: Build Api
+name: Build Web
 
 on:
   push:
     branches:
       - 'main'
     paths:
-      - 'src/api/**'
+      - 'src/web/**'
       - 'src/shared/**'
-      - 'test/api/**'
-      - 'Api.Dockerfile'
-      - '.github/workflows/build_api.yml'
+      - 'test/web/**'
+      - 'Web.Dockerfile'
+      - '.github/workflows/build_web.yml'
 
 jobs:
 
@@ -26,7 +26,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v3
         with:
-          images: nomanova/ojeda-api
+          images: nomanova/ojeda-web
           tags: |
             type=sha
 
@@ -47,11 +47,11 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           tags: ${{ steps.docker_meta.outputs.tags }} 
-          file: ./Api.Dockerfile
+          file: ./Web.Dockerfile
 
       - name: Push image
         uses: docker/build-push-action@v2
         with:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
-          file: ./Api.Dockerfile
+          file: ./Web.Dockerfile
