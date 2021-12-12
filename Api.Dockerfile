@@ -3,8 +3,28 @@
 #############################################
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS dotnet-builder
 
-# Project
+ARG SONAR_PROJECT_KEY=nomanova_ojeda_api
+ARG SONAR_OGRANIZAION_KEY=nomanova
+ARG SONAR_HOST_URL=https://sonarcloud.io
+ARG SONAR_TOKEN
+
 WORKDIR /workdir
+
+# Install Sonar Scanner, Coverlet and Java
+RUN apt-get update && apt-get install -y openjdk-11-jdk
+RUN dotnet tool install --global dotnet-sonarscanner
+RUN dotnet tool install --global coverlet.console
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Start Sonar Scanner
+RUN dotnet sonarscanner begin \
+  /k:"$SONAR_PROJECT_KEY" \
+  /o:"$SONAR_OGRANIZAION_KEY" \
+  /n:"ojeda - api" \
+  /d:sonar.host.url="$SONAR_HOST_URL" \
+  /d:sonar.login="$SONAR_TOKEN" \
+  /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+  /d:sonar.coverage.exclusions="**Tests*.cs"
 
 # Restore
 COPY src/shared/NomaNova.Ojeda.Utils/NomaNova.Ojeda.Utils.csproj ./src/shared/NomaNova.Ojeda.Utils/
@@ -36,15 +56,22 @@ COPY . .
 
 # Run tests
 WORKDIR ./test/shared/NomaNova.Ojeda.Utils.Tests
-RUN dotnet test --collect:"XPlat Code Coverage"
+RUN dotnet test \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=opencover
 WORKDIR ../../..
 
 WORKDIR ./test/api/NomaNova.Ojeda.Api.Tests
-RUN dotnet test --collect:"XPlat Code Coverage"
+RUN dotnet test \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=opencover
 WORKDIR ../../..
 
 # Publish
 RUN dotnet publish src/api/NomaNova.Ojeda.Api/NomaNova.Ojeda.Api.csproj -c Release -o /publish
+
+# End Sonar Scanner
+RUN dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
 
 #############################################
 # Runtime Stage
