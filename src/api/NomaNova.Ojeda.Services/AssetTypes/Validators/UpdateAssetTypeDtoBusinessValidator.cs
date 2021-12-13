@@ -20,7 +20,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes.Validators
                 .SetValidator(new UpdateAssetTypeFieldSetDtoBusinessValidator(fieldSetsRepository));
         }
         
-        private class UpdateAssetTypeFieldSetDtoBusinessValidator : CompositeValidator<UpdateAssetTypeFieldSetDto>
+        private sealed class UpdateAssetTypeFieldSetDtoBusinessValidator : CompositeValidator<UpdateAssetTypeFieldSetDto>
         {
             public UpdateAssetTypeFieldSetDtoBusinessValidator(IRepository<FieldSet> fieldSetsRepository)
             {

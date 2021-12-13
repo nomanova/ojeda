@@ -3,12 +3,12 @@
 
 @inject OjedaClient _ojeda
 
-<DeleteItemModalTemplate
+<ActionModalTemplate
     Text="@Text"
     IsLoading="@IsLoading"
     IsDisabled="@IsDisabled"
     Error="@Error"
-    DeleteCallBack="@OnDeleteAsync"
+    ActionCallBack="@OnDeleteAsync"
     CancelCallBack="@OnCancelAsync"/>
 
 @code {
@@ -31,17 +31,18 @@
 
         if (data.AssetTypes.Count > 0)
         {
-            text.AppendLine($"<p>This field set is included in <b>{data.AssetTypes.Count} asset type(s)</b>, from which it will be removed.</p>");
+            text.AppendLine(data.AssetTypes.Count == 1 ?
+                "<p>This field set will be removed from <b>1 asset type</b>.</p>" :
+                $"<p>This field set will be removed from <b>{data.AssetTypes.Count} asset types</b>.</p>");
         }
 
         if (data.Assets.Count > 0)
         {
-            text.AppendLine($"<p>This field set has fields with an assigned value in <b>{data.Assets.Count} asset(s)</b>. Any value(s) will be lost.</p>");
-        }
-
-        if (data.AssetTypes.Count > 0 || data.Assets.Count > 0)
-        {
-            text.AppendLine("<p>This change is <b>irreversible</b>!</p>");
+            text.AppendLine(data.Assets.Count == 1 ? 
+                "<p>There is <b>1 impacted asset</b>.</p>" : 
+                $"<p>There are <b>{data.Assets.Count} impacted assets</b>.</p>");
+        
+            text.AppendLine("<p>All linked field values will be <b>irreversibly deleted</b>.</p>");
         }
 
         return text.ToString();

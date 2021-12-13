@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NomaNova.Ojeda.Core;
@@ -29,15 +30,15 @@ namespace NomaNova.Ojeda.Data.Repositories
             _options = options.Value;
         }
         
-        public async Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             return await _context.Set<TEntity>().FindAsync(new object[] {id}, cancellationToken);
         }
 
         public async Task<TEntity> GetByIdAsync(
             string id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> func, 
-            CancellationToken cancellationToken)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null, 
+            CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().Where(e => e.Id.Equals(id));
             
@@ -47,7 +48,7 @@ namespace NomaNova.Ojeda.Data.Repositories
         }
 
         public async Task<List<TEntity>> GetAllAsync(
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> func, CancellationToken cancellationToken)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null, CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
             
@@ -63,7 +64,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             IList<string> excludedIds,
             int pageNumber, 
             int pageSize,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
 
@@ -84,7 +85,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             Func<IQueryable<TEntity>, IQueryable<TEntity>> func,
             string orderBy, bool orderAsc,
             int pageNumber, int pageSize,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
             
@@ -97,7 +98,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             return await PaginatedList<TEntity>.CreateAsync(queryable, pageNumber, pageSize, cancellationToken);
         }
 
-        public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken)
+        public async Task<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
             {
@@ -118,7 +119,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             return entity;
         }
 
-        public async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken cancellationToken)
+        public async Task<TEntity> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
             {
@@ -136,7 +137,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             return entity;
         }
 
-        public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken)
+        public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             if (entity == null)
             {
@@ -144,6 +145,17 @@ namespace NomaNova.Ojeda.Data.Repositories
             }
 
             _context.Set<TEntity>().Remove(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        
+        public async Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException(nameof(entities)); 
+            }
+
+            _context.Set<TEntity>().RemoveRange(entities);
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

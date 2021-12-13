@@ -17,14 +17,14 @@
 
         <div>
             <OjedaButton
-                OnClick="CancelCallBack"
+                OnClick="@CancelCallBack"
                 Text="Cancel"
                 IsDisabled="@IsLoading"/>
             <span class="ps-2"></span>
             <OjedaButton
-                Style="@ButtonStyle.Danger"
-                OnClick="DeleteCallBack"
-                Text="Delete"
+                Style="@ActionButtonStyle"
+                OnClick="@ActionCallBack"
+                Text="@ActionButtonText"
                 IsDisabled="@(IsDisabled || IsLoading)"/>
         </div>
 
@@ -44,12 +44,18 @@
     public bool IsLoading { get; set; }
 
     [Parameter]
+    public ButtonStyle ActionButtonStyle { get; set; } = ButtonStyle.Danger;
+
+    [Parameter]
+    public string ActionButtonText { get; set; } = "Delete";
+    
+    [Parameter]
     public bool IsDisabled { get; set; }
 
     [Parameter]
     public EventCallback CancelCallBack { get; set; }
 
     [Parameter]
-    public EventCallback DeleteCallBack { get; set; }
+    public EventCallback ActionCallBack { get; set; }
 
 }

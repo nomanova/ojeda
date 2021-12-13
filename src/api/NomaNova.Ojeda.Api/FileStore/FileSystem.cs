@@ -16,27 +16,27 @@ namespace NomaNova.Ojeda.Api.FileStore
             _options = options.Value;
         }
 
-        public async Task WriteTextAsync(string path, string contents, CancellationToken cancellationToken)
+        public async Task WriteTextAsync(string path, string contents, CancellationToken cancellationToken = default)
         {
             await File.WriteAllTextAsync(Path.Combine(_options.HomeDirectory, path), contents, cancellationToken);
         }
 
-        public async Task WriteBytesAsync(string path, byte[] bytes, CancellationToken cancellationToken)
+        public async Task WriteBytesAsync(string path, byte[] bytes, CancellationToken cancellationToken = default)
         {
             await File.WriteAllBytesAsync(path, bytes, cancellationToken);
         }
 
-        public async Task<string> ReadTextAsync(string path, CancellationToken cancellationToken)
+        public async Task<string> ReadTextAsync(string path, CancellationToken cancellationToken = default)
         {
             return await File.ReadAllTextAsync(Path.Combine(_options.HomeDirectory, path), cancellationToken);
         }
         
-        public async Task<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken)
+        public async Task<byte[]> ReadBytesAsync(string path, CancellationToken cancellationToken = default)
         {
             return await File.ReadAllBytesAsync(Path.Combine(_options.HomeDirectory, path), cancellationToken);
         }
 
-        public async Task DeleteAsync(string path, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string path, CancellationToken cancellationToken = default)
         {
             var absPath = Path.Combine(_options.HomeDirectory, path);
 

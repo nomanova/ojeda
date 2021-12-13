@@ -6,7 +6,7 @@ namespace NomaNova.Ojeda.Utils.Extensions
     {
         public static bool HasElements<T>(this ICollection<T> input)
         {
-            return input != null && input.Count > 0;
+            return input is { Count: > 0 };
         }
     }
 }

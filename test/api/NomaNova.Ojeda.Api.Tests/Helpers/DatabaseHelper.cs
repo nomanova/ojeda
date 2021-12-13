@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,24 @@ namespace NomaNova.Ojeda.Api.Tests.Helpers
 
             if (item != null)
             {
-                // Ensure latest version is fetched,
-                // even when different scopes are used.
+                // Ensure latest version is fetched, even when different scopes are used.
                 await context.Entry(item).ReloadAsync();
             }
 
             return item;
+        }
+
+        public static async Task<IList<T>> GetAll<T>(DbContext context) where T : BaseEntity
+        {
+            var items = await context.Set<T>().ToListAsync();
+
+            foreach (var item in items)
+            {
+                // Ensure latest versions are fetched, even when different scopes are used.
+                await context.Entry(item).ReloadAsync();
+            }
+            
+            return items;
         }
 
         public static async Task Add<T>(DbContext context, T item) where T : class

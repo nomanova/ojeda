@@ -14,8 +14,8 @@ namespace NomaNova.Ojeda.Data.Repositories
 
         Task<TEntity> GetByIdAsync(
             string id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> func,
-            CancellationToken cancellationToken);
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
+            CancellationToken cancellationToken = default);
         
         Task<List<TEntity>> GetAllAsync(
             Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
@@ -47,5 +47,8 @@ namespace NomaNova.Ojeda.Data.Repositories
 
         Task DeleteAsync(
             TEntity entity, CancellationToken cancellationToken = default);
+        
+        Task DeleteRangeAsync(
+            IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
     }
 }

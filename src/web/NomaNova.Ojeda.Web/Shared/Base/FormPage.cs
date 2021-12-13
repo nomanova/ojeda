@@ -60,6 +60,13 @@ namespace NomaNova.Ojeda.Web.Shared.Base
 
             var result = await OnSubmitEntity();
 
+            if (result == null)
+            {
+                // Submission cancelled
+                IsSubmitting = false;
+                return;
+            }
+
             if(result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
             {
                 ServerValidation.DisplayErrors(result.Error.ValidationErrors);

@@ -19,8 +19,8 @@ namespace NomaNova.Ojeda.Client.Services.Assets
             string query = null,
             string orderBy = null,
             bool orderAsc = true,
-            int pageNumber = 1,
-            int pageSize = 10,
+            int pageNumber = Constants.DefaultPageNumber,
+            int pageSize = Constants.DefaultPageSize,
             CancellationToken cancellationToken = default);
         
         Task<OjedaDataResult<AssetDto>> CreateAsync(

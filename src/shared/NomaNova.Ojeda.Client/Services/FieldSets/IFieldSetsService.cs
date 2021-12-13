@@ -17,8 +17,8 @@ namespace NomaNova.Ojeda.Client.Services.FieldSets
             string orderBy = null, 
             bool orderAsc = true,
             IEnumerable<string> excludedIds = null,
-            int pageNumber = 1, 
-            int pageSize = 10,
+            int pageNumber = Constants.DefaultPageNumber, 
+            int pageSize = Constants.DefaultPageSize,
             CancellationToken cancellationToken = default);
 
         Task<OjedaDataResult<FieldSetDto>> CreateAsync(

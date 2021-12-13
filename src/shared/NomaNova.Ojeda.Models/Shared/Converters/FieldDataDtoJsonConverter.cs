@@ -23,7 +23,7 @@ namespace NomaNova.Ojeda.Models.Shared.Converters
 
             if (fieldData == null)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(reader));
             }
 
             return fieldData.Type switch

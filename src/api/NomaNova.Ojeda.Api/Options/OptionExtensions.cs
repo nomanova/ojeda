@@ -31,7 +31,7 @@ namespace NomaNova.Ojeda.Api.Options
             var count = configErrors.Length;
             var configType = typeof(T).FullName;
             
-            throw new ApplicationException(
+            throw new ArgumentException(
                 $"{configType} configuration has {count} error(s): {aggregatedErrors}");
         }
         

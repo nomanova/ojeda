@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
+using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
@@ -35,7 +35,7 @@ namespace NomaNova.Ojeda.Services.Fields
             _assetsRepository = assetsRepository;
         }
 
-        public async Task<FieldDto> GetByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<FieldDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -54,7 +54,7 @@ namespace NomaNova.Ojeda.Services.Fields
             IList<string> excludedIds, 
             int pageNumber, 
             int pageSize, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(orderBy))
             {
@@ -70,7 +70,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return paginatedFieldsDto;
         }
 
-        public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken)
+        public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken = default)
         {
             await ValidateAndThrowAsync(new CreateFieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
 
@@ -83,7 +83,7 @@ namespace NomaNova.Ojeda.Services.Fields
         }
 
         public async Task<FieldDto> UpdateAsync(string id, UpdateFieldDto fieldDto,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -103,7 +103,7 @@ namespace NomaNova.Ojeda.Services.Fields
             return _mapper.Map<FieldDto>(field);
         }
 
-        public async Task<DryRunDeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken)
+        public async Task<DryRunDeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken = default)
         {
             var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
 

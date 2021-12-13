@@ -124,6 +124,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IRepository<FieldSet>, EntityRepository<FieldSet>>();
             services.TryAddScoped<IRepository<AssetType>, EntityRepository<AssetType>>();
             services.TryAddScoped<IRepository<Asset>, EntityRepository<Asset>>();
+            services.TryAddScoped<IRepository<FieldValue>, EntityRepository<FieldValue>>();
         }
 
         private void AddFileStore(IServiceCollection services)

@@ -18,7 +18,7 @@ namespace NomaNova.Ojeda.Api.Utils
                 return true;
             }
 
-            return directory.Equals(string.Empty) || Directory.Exists(directory);
+            return string.IsNullOrEmpty(directory) || Directory.Exists(directory);
         }
     }
 }

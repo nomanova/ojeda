@@ -1,7 +1,8 @@
 using System;
 
-namespace NomaNova.Ojeda.Api.Exceptions
+namespace NomaNova.Ojeda.Core.Exceptions
 {
+    [Serializable]
     public class NotFoundException : Exception
     {
     }

@@ -207,7 +207,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
 
             var fieldSet = await new FieldSetBuilder()
-                .AddField(field)
+                .WithField(field)
                 .Build(DatabaseContext);
             
             var request = new RequestBuilder(HttpMethod.Delete, $"/api/fields/{field.Id}/dry-run")
@@ -235,15 +235,15 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
             
             var fieldSet = await new FieldSetBuilder()
-                .AddField(field)
+                .WithField(field)
                 .Build(DatabaseContext);
 
             var assetType = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
 
             var asset = await new AssetBuilder(assetType.Id)
-                .AddFieldValue(field, fieldSet, "123")
+                .WithFieldValue(field, fieldSet, "123")
                 .Build(DatabaseContext);
             
             await new AssetBuilder(assetType.Id)

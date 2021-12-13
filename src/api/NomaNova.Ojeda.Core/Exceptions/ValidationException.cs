@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace NomaNova.Ojeda.Core.Exceptions
 {
+    [Serializable]
     public class ValidationException : Exception
     {
         public Dictionary<string, List<string>> ValidationErrors { get; }

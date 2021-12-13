@@ -31,7 +31,7 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
-        public FieldSetBuilder AddField(Field field, bool isRequired = false)
+        public FieldSetBuilder WithField(Field field, bool isRequired = false)
         {
             _fieldSetFields.Add(new FieldSetField
             {
@@ -43,11 +43,11 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
-        public FieldSetBuilder AddFields(params Field[] fields)
+        public FieldSetBuilder WithFields(params Field[] fields)
         {
             foreach (var field in fields)
             {
-                AddField(field);
+                WithField(field);
             }
 
             return this;

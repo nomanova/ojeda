@@ -6,6 +6,7 @@ using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
 using NomaNova.Ojeda.Data.Context.Configurations;
 using NomaNova.Ojeda.Data.Context.Interfaces;
+using NomaNova.Ojeda.Data.Exceptions;
 using NomaNova.Ojeda.Data.Seeders;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
 
@@ -49,7 +50,7 @@ namespace NomaNova.Ojeda.Data.Context
             
             if (!this.AllMigrationsApplied())
             {
-                throw new Exception("Could not apply all database migrations.");
+                throw new DatabaseException("Could not apply all database migrations.");
             }
         }
 
@@ -60,16 +61,16 @@ namespace NomaNova.Ojeda.Data.Context
             AssetTypesSeeder.Seed(this, _timeKeeper).Wait();
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
             
-            builder.ApplyConfiguration(new FieldEntityTypeConfiguration(_serializer));
-            builder.ApplyConfiguration(new FieldSetEntityTypeConfiguration());
-            builder.ApplyConfiguration(new FieldSetFieldEntityTypeConfiguration());
-            builder.ApplyConfiguration(new AssetTypeFieldSetEntityTypeConfiguration());
-            builder.ApplyConfiguration(new AssetEntityTypeConfiguration());
-            builder.ApplyConfiguration(new FieldValueEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new FieldEntityTypeConfiguration(_serializer));
+            modelBuilder.ApplyConfiguration(new FieldSetEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new FieldSetFieldEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetTypeFieldSetEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new FieldValueEntityTypeConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

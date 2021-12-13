@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Core;
+using NomaNova.Ojeda.Data.Exceptions;
 using NomaNova.Ojeda.Data.Options;
 
 namespace NomaNova.Ojeda.Data
@@ -41,7 +42,7 @@ namespace NomaNova.Ojeda.Data
             if (databaseType == DatabaseType.Postgresql)
             {
                 efLikeMethod = typeof(NpgsqlDbFunctionsExtensions).GetMethod("ILike", 
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                    BindingFlags.Static | BindingFlags.Public,
                     null, 
                     new[] { typeof(DbFunctions), typeof(string), typeof(string) },
                     null
@@ -50,7 +51,7 @@ namespace NomaNova.Ojeda.Data
             else
             {
                 efLikeMethod = typeof(DbFunctionsExtensions).GetMethod("Like",
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic,
+                    BindingFlags.Static | BindingFlags.Public,
                     null,
                     new[] { typeof(DbFunctions), typeof(string), typeof(string) },
                     null);
@@ -58,7 +59,7 @@ namespace NomaNova.Ojeda.Data
 
             if (efLikeMethod == null)
             {
-                throw new Exception("Cannot find EF 'ILike/Like' method.");
+                throw new DatabaseException("Cannot find EF 'ILike/Like' method.");
             }
 
             // Create search pattern

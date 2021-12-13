@@ -1,0 +1,27 @@
+@using System.Text
+@inherits ConfirmationModal<DryRunUpdateFieldSetDto>
+
+<ActionModalTemplate
+    Text="@Text"
+    ActionButtonText="Confirm"
+    ActionCallBack="@OnConfirmAsync"
+    CancelCallBack="@OnCancelAsync"/>
+
+@code {
+
+    protected override string GetText(DryRunUpdateFieldSetDto item)
+    {
+        var text = new StringBuilder();
+        
+        text.AppendLine("<p>One or more fields were removed, are you sure you want to continue?</p>");
+
+        text.AppendLine(item.Assets.Count == 1 ? 
+            "<p>There is <b>1 impacted asset</b>.</p>" : 
+            $"<p>There are <b>{item.Assets.Count} impacted assets</b>.</p>");
+        
+        text.AppendLine("<p>All linked field values will be irreversibly deleted.</p>");
+
+        return text.ToString();
+    }
+
+}

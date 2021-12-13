@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
+using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Dtos.Assets.Base;
@@ -47,7 +47,7 @@ namespace NomaNova.Ojeda.Services.Assets
             _fieldDataConverter = fieldDataConverter;
         }
 
-        public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken)
+        public async Task<AssetDto> GetByAssetTypeAsync(string assetTypeId, CancellationToken cancellationToken = default)
         {
             var assetType = await _assetTypesRepository.GetByIdAsync(assetTypeId, query =>
             {
@@ -67,7 +67,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 (_, _, fieldProperties) => _fieldDataConverter.FromStorage(null, fieldProperties));
         }
 
-        public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
+        public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             var asset = await _assetsRepository.GetByIdAsync(id, query =>
             {
@@ -109,7 +109,7 @@ namespace NomaNova.Ojeda.Services.Assets
             bool orderAsc,
             int pageNumber, 
             int pageSize, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(orderBy))
             {
@@ -128,7 +128,7 @@ namespace NomaNova.Ojeda.Services.Assets
             return paginatedAssetsDto;
         }
 
-        public async Task<AssetDto> CreateAsync(CreateAssetDto assetDto, CancellationToken cancellationToken)
+        public async Task<AssetDto> CreateAsync(CreateAssetDto assetDto, CancellationToken cancellationToken = default)
         {
             // Validate
             var (dbFieldSets, dbFields) = await ValidateUpsertAsync(assetDto, cancellationToken);
@@ -172,7 +172,7 @@ namespace NomaNova.Ojeda.Services.Assets
         }
 
         public async Task<AssetDto> UpdateAsync(string id, UpdateAssetDto assetDto,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             // Fetch
             var asset = await _assetsRepository.GetByIdAsync(id, query =>
@@ -242,7 +242,7 @@ namespace NomaNova.Ojeda.Services.Assets
             return await GetByIdAsync(asset.Id, cancellationToken);
         }
         
-        public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+        public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
             var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);
 
@@ -273,7 +273,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 
                 if (fieldSet == null)
                 {
-                    throw new Exception($"Field set {fieldSetId} does not belong to asset type {assetTypeFieldSet.AssetTypeId}");
+                    throw new ArgumentException($"Field set {fieldSetId} does not belong to asset type {assetTypeFieldSet.AssetTypeId}");
                 }
                 
                 var fieldSetDto = _mapper.Map<AssetFieldSetDto>(fieldSet);
@@ -286,7 +286,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     
                     if (field == null)
                     {
-                        throw new Exception($"Field {fieldId} does not belong to field set {fieldSetField.FieldSetId}");
+                        throw new ArgumentException($"Field {fieldId} does not belong to field set {fieldSetField.FieldSetId}");
                     }
 
                     var fieldDto = _mapper.Map<AssetFieldDto>(field);

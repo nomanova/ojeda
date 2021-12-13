@@ -71,7 +71,6 @@ namespace NomaNova.Ojeda.Web.Shared.Validation
         {
             Console.WriteLine($"Validating field: {fieldIdentifier.Model}");
 
-            //var model = editContext.Model;
             var model = fieldIdentifier.Model;
             
             var properties = new[] {fieldIdentifier.FieldName};

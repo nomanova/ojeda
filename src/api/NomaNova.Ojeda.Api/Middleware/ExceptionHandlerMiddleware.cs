@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Utils.Services.Interfaces;

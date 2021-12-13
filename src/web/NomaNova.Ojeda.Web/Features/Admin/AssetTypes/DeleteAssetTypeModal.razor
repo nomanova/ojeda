@@ -3,12 +3,12 @@
 
 @inject OjedaClient _ojeda
 
-<DeleteItemModalTemplate
+<ActionModalTemplate
     Text="@Text"
     IsLoading="@IsLoading"
     IsDisabled="@IsDisabled"
     Error="@Error"
-    DeleteCallBack="@OnDeleteAsync"
+    ActionCallBack="@OnDeleteAsync"
     CancelCallBack="@OnCancelAsync"/>
 
 @code {
@@ -31,8 +31,11 @@
 
         if (data.Assets.Count > 0)
         {
-            text.AppendLine($"<p>This asset type is used by <b>{data.Assets.Count} asset(s)</b>. All linked assets and related data will be deleted.</p>");
-            text.AppendLine("<p>This change is <b>irreversible</b>!</p>");
+            text.AppendLine(data.Assets.Count == 1 ?
+                "<p>This asset type is used by <b>1 asset</b>.</p>" :
+                $"<p>This asset type is used by <b>{data.Assets.Count} assets</b>.</p>");
+
+            text.AppendLine("<p>All linked assets and related data will be <b>irreversibly deleted</b>.</p>");
         }
 
         return text.ToString();

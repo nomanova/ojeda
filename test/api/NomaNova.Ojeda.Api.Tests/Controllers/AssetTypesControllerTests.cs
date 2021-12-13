@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using NomaNova.Ojeda.Api.Tests.Builders;
 using NomaNova.Ojeda.Api.Tests.Controllers.Base;
 using NomaNova.Ojeda.Api.Tests.Factories;
+using NomaNova.Ojeda.Api.Tests.Fixtures;
 using NomaNova.Ojeda.Api.Tests.Helpers;
+using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Shared;
@@ -127,7 +129,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
 
             var assetType = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
 
             var updateAssetTypeDto = AssetTypeFactory.NewRandomUpdateDto(fieldSet.Id);
@@ -150,6 +152,32 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
         }
 
         [Fact]
+        public async Task Update_WhenFieldSetIsRemoved_ImpactedAssetFieldValuesShouldBeRemoved_1()
+        {
+            // Arrange
+            var fixture = await DefaultAssetFixture.Create(DatabaseContext);
+            
+            var updateAssetTypeDto = AssetTypeFactory.NewRandomUpdateDto(fixture.FieldSet1.Id); // Remove field set 2 from asset type 1
+            
+            var request = new RequestBuilder(HttpMethod.Put, $"/api/asset-types/{fixture.AssetType1.Id}")
+                .WithPayload(GetService<ISerializer>(), updateAssetTypeDto)
+                .Build();
+            
+            // Act
+            var response = await ApiClient.SendAsync(request);
+            
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            
+            var fieldValues = await DatabaseHelper.GetAll<FieldValue>(DatabaseContext);
+            
+            Assert.Equal(2, fieldValues.Count(_ => _.AssetId == fixture.Asset1.Id));
+            Assert.Equal(2, fieldValues.Count(_ => _.AssetId == fixture.Asset2.Id));
+            Assert.Equal(4, fieldValues.Count(_ => _.AssetId == fixture.Asset3.Id));
+            Assert.Equal(4, fieldValues.Count(_ => _.AssetId == fixture.Asset4.Id));
+        }
+
+        [Fact]
         public async Task DryRunUpdate_WhenNoFieldSetsRemoved_ShouldReturnOkEmpty()
         {
             // Arrange
@@ -157,15 +185,15 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
             
             var fieldSet = await new FieldSetBuilder()
-                .AddField(field)
+                .WithField(field)
                 .Build(DatabaseContext);
             
             var assetType = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
             
             await new AssetBuilder(assetType.Id)
-                .AddFieldValue(field, fieldSet, "123")
+                .WithFieldValue(field, fieldSet, "123")
                 .Build(DatabaseContext);
             
             var updateAssetTypeDto = AssetTypeFactory.NewRandomUpdateDto(fieldSet.Id);
@@ -202,31 +230,31 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
             
             var fieldSet1 = await new FieldSetBuilder()
                 .WithName("Field Set 1")
-                .AddFields(field1, field2)
+                .WithFields(field1, field2)
                 .Build(DatabaseContext);
             
             var fieldSet2 = await new FieldSetBuilder()
                 .WithName("Field Set 2")
-                .AddFields(field2, field3)
+                .WithFields(field2, field3)
                 .Build(DatabaseContext);
             
             var assetType = await new AssetTypeBuilder()
-                .AddFieldSets(fieldSet1, fieldSet2)
+                .WithFieldSets(fieldSet1, fieldSet2)
                 .Build(DatabaseContext);
 
             await new AssetBuilder(assetType.Id)
                 .WithName("Asset 1")
-                .AddFieldValue(field1, fieldSet1, "123")
+                .WithFieldValue(field1, fieldSet1, "123")
                 .Build(DatabaseContext);
             
             var asset2 = await new AssetBuilder(assetType.Id)
                 .WithName("Asset 2")
-                .AddFieldValue(field3, fieldSet2, "123")
+                .WithFieldValue(field3, fieldSet2, "123")
                 .Build(DatabaseContext);
             
             await new AssetBuilder(assetType.Id)
                 .WithName("Asset 3")
-                .AddFieldValue(field3, fieldSet2, null)
+                .WithFieldValue(field3, fieldSet2, null)
                 .Build(DatabaseContext);
             
             var updateAssetTypeDto = AssetTypeFactory.NewRandomUpdateDto(fieldSet1.Id);
@@ -255,7 +283,7 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
             
             var assetType = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
             
             var request = new RequestBuilder(HttpMethod.Delete, $"/api/asset-types/{assetType.Id}")
@@ -315,15 +343,15 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
                 .Build(DatabaseContext);
             
             var fieldSet = await new FieldSetBuilder()
-                .AddField(field)
+                .WithField(field)
                 .Build(DatabaseContext);
             
             var assetType1 = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
             
             var assetType2 = await new AssetTypeBuilder()
-                .AddFieldSet(fieldSet)
+                .WithFieldSet(fieldSet)
                 .Build(DatabaseContext);
             
             var asset1 = await new AssetBuilder(assetType1.Id)

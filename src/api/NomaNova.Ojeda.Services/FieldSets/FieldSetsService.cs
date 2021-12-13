@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using NomaNova.Ojeda.Api.Exceptions;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
+using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
@@ -26,19 +26,22 @@ namespace NomaNova.Ojeda.Services.FieldSets
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<AssetType> _assetTypeRepository;
         private readonly IRepository<Asset> _assetsRepository;
+        private readonly IRepository<FieldValue> _fieldValueRepository;
 
         public FieldSetsService(
             IMapper mapper,
             IRepository<Field> fieldsRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<AssetType> assetTypeRepository,
-            IRepository<Asset> assetsRepository)
+            IRepository<Asset> assetsRepository,
+            IRepository<FieldValue> fieldValueRepository)
         {
             _mapper = mapper;
             _fieldsRepository = fieldsRepository;
             _fieldSetsRepository = fieldSetsRepository;
             _assetTypeRepository = assetTypeRepository;
             _assetsRepository = assetsRepository;
+            _fieldValueRepository = fieldValueRepository;
         }
 
         public async Task<FieldSetDto> GetByIdAsync(string id, CancellationToken cancellationToken)
@@ -121,6 +124,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             string id, UpdateFieldSetDto fieldSetDto, CancellationToken cancellationToken)
         {
             var fieldSet = await PrepareUpdateAsync(id, fieldSetDto, cancellationToken);
+            var removedFieldIds = GetRemovedFieldIds(fieldSet, fieldSetDto);
 
             fieldSet = _mapper.Map(fieldSetDto, fieldSet);
             fieldSet.Id = id;
@@ -129,6 +133,17 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 opt.AfterMap((_, dest) => dest.FieldSetId = id))).ToList();
 
             fieldSet = await _fieldSetsRepository.UpdateAsync(fieldSet, cancellationToken);
+
+            // Delete any impacted field values
+            if (removedFieldIds.HasElements())
+            {
+                var fieldValues = await _fieldValueRepository.GetAllAsync(query =>
+                {
+                    return query.Where(_ => _.FieldSetId == id && removedFieldIds.Contains(_.FieldId));
+                }, cancellationToken);
+
+                await _fieldValueRepository.DeleteRangeAsync(fieldValues, cancellationToken);
+            }
 
             return _mapper.Map<FieldSetDto>(fieldSet);
         }
@@ -139,10 +154,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             var fieldSet = await PrepareUpdateAsync(id, fieldSetDto, cancellationToken);
 
             // Determine removed fields
-            var dbFieldIds = fieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
-            var dtoFieldIds = fieldSetDto.Fields.Select(_ => _.Id).ToList();
-
-            var removedFieldIds = dbFieldIds.Where(db => dtoFieldIds.All(dto => dto != db)).ToList();
+            var removedFieldIds = GetRemovedFieldIds(fieldSet, fieldSetDto);
 
             // Fetch impacted assets
             var assets = await _assetsRepository.GetAllAsync(query =>
@@ -218,6 +230,14 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 fieldSetDto, cancellationToken);
 
             return fieldSet;
+        }
+
+        private static List<string> GetRemovedFieldIds(FieldSet dbFieldSet, UpdateFieldSetDto dtoFieldSet)
+        {
+            var dbFieldIds = dbFieldSet.FieldSetFields.Select(_ => _.FieldId).ToList();
+            var dtoFieldIds = dtoFieldSet.Fields.Select(_ => _.Id).ToList();
+
+            return dbFieldIds.Where(db => dtoFieldIds.All(dto => dto != db)).ToList();
         }
     }
 }

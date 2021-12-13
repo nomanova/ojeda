@@ -161,6 +161,30 @@
 
     protected override async Task<OjedaDataResult<FieldSetDto>> OnSubmitEntity()
     {
+        var dryRunResult = await Ojeda.FieldSetsService.DryRunUpdateAsync(_fieldSet.Id, UpsertFieldSet);
+
+        if (!dryRunResult.Success)
+        {
+            return OjedaDataResult<FieldSetDto>.ForFailure(dryRunResult.StatusCode, dryRunResult.Error);
+        }
+
+        var dryRunData = dryRunResult.Data;
+
+        if (dryRunData.Assets.HasElements())
+        {
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(UpdateFieldSetModal.Item), dryRunData);
+            
+            var updateFieldSetModal = Modal.Show<UpdateFieldSetModal>("Field Removal", parameters, Constants.DefaultModalOptions);
+            
+            var result = await updateFieldSetModal.Result;
+
+            if (result.Cancelled)
+            {
+                return null;
+            }
+        }
+
         return await Ojeda.FieldSetsService.UpdateAsync(_fieldSet.Id, UpsertFieldSet);
     }
 

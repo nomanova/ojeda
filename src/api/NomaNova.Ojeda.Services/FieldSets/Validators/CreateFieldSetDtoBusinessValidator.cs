@@ -19,7 +19,7 @@ namespace NomaNova.Ojeda.Services.FieldSets.Validators
                 .SetValidator(new CreateFieldSetFieldDtoBusinessValidator(fieldsRepository));
         }
         
-        private class CreateFieldSetFieldDtoBusinessValidator : CompositeValidator<CreateFieldSetFieldDto>
+        private sealed class CreateFieldSetFieldDtoBusinessValidator : CompositeValidator<CreateFieldSetFieldDto>
         {
             public CreateFieldSetFieldDtoBusinessValidator(IRepository<Field> fieldsRepository)
             {

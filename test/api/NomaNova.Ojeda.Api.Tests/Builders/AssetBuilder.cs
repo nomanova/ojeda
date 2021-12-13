@@ -27,7 +27,7 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
-        public AssetBuilder AddFieldValue(Field field, FieldSet fieldSet, string value)
+        public AssetBuilder WithFieldValue(Field field, FieldSet fieldSet, string value)
         {
             _fieldValues.Add(new FieldValue
             {

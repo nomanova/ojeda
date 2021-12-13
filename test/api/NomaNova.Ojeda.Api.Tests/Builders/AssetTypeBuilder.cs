@@ -31,7 +31,7 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
-        public AssetTypeBuilder AddFieldSet(FieldSet fieldSet)
+        public AssetTypeBuilder WithFieldSet(FieldSet fieldSet)
         {
             _assetTypeFieldSets.Add(new AssetTypeFieldSet
             {
@@ -42,11 +42,11 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
-        public AssetTypeBuilder AddFieldSets(params FieldSet[] fieldSets)
+        public AssetTypeBuilder WithFieldSets(params FieldSet[] fieldSets)
         {
             foreach (var fieldSet in fieldSets)
             {
-                AddFieldSet(fieldSet);
+                WithFieldSet(fieldSet);
             }
 
             return this;
