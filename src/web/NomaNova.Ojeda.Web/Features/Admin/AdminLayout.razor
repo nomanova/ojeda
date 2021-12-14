@@ -1,37 +1,39 @@
 @inherits LayoutComponentBase
 
-<Toasts />
+<Toasts/>
 
 <div>
-    
-        <!-- header -->
-        <Header></Header>
-    
-        <!-- content -->
-        <div id="content" class="d-flex" style="height: calc(100vh - 60px);">
-                
-            <!-- sidebar -->
-            <Sidebar>
-                <div>
-                    <!-- Assets -->
-                    <div class="text-uppercase text-muted mb-2">Assets</div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/asset-types">Asset Types</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/field-sets">Field Sets</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/fields">Fields</a>
-                        </li>
-                    </ul>
-                </div>
-            </Sidebar>
-                
-            <!-- page -->
-            <Page>@Body</Page>
-                
-        </div>
-        
+
+    <!-- header -->
+    <Header></Header>
+
+    <!-- content -->
+    <div id="content" class="d-flex" style="height: calc(100vh - 60px);">
+
+        <!-- sidebar -->
+        <Sidebar>
+
+            <SidebarSection Title="Assets">
+
+                <SidebarButton
+                    Title="Asset Types"
+                    Link="/admin/asset-types" />
+
+                <SidebarButton
+                    Title="Field Sets"
+                    Link="/admin/field-sets"/>
+
+                <SidebarButton
+                    Title="Fields"
+                    Link="/admin/fields"/>
+
+            </SidebarSection>
+
+        </Sidebar>
+
+        <!-- page -->
+        <Page>@Body</Page>
+
+    </div>
+
 </div>

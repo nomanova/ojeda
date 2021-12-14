@@ -1,0 +1,11 @@
+.nav-link {
+    transition: .5s;
+}
+
+.nav-active {
+    background-color: #52525210 !important
+}
+
+.nav-link:hover {
+    background-color: #52525210 !important
+}

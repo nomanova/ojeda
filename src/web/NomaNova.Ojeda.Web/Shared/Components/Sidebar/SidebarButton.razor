@@ -1,0 +1,47 @@
+@implements IDisposable
+@inject NavigationManager _navManager
+
+<li class="nav-item">
+    <a class="nav-link @(IsActive ? "nav-active" : "")" href="@Link">@Title</a>
+</li>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Link { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _navManager.LocationChanged += LocationChanged;
+        SetActive();
+    }
+
+    private void LocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        SetActive();
+    }
+
+    void IDisposable.Dispose()
+    {
+        _navManager.LocationChanged -= LocationChanged;
+    }
+
+    private void SetActive()
+    {
+        var path = _navManager.ToBaseRelativePath(_navManager.Uri);
+        IsActive = path.StartsWith(NormalizedLink(), StringComparison.InvariantCultureIgnoreCase);
+        StateHasChanged();
+    }
+
+    private string NormalizedLink()
+    {
+        return Link.StartsWith("/") ? Link[1..] : Link;
+    }
+
+}

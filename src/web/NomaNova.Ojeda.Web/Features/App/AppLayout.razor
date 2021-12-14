@@ -1,9 +1,9 @@
 @inherits LayoutComponentBase
 
-<Toasts />
+<Toasts/>
 
 <div>
-    
+
     <!-- header -->
     <Header>
         <ul class="list-unstyled m-0">
@@ -17,21 +17,23 @@
 
     <!-- content -->
     <div id="page" class="d-flex" style="height: calc(100vh - 60px);">
-        
+
         <!-- sidebar -->
         <Sidebar>
-            <div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/assets">Assets</a>
-                    </li>
-                </ul>
-            </div>
+
+            <SidebarSection>
+
+                <SidebarButton
+                    Title="Assets"
+                    Link="/assets"/>
+
+            </SidebarSection>
+
         </Sidebar>
 
         <!-- page -->
         <Page>@Body</Page>
-        
+
     </div>
 
 </div>
