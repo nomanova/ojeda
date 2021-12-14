@@ -59,11 +59,7 @@ namespace NomaNova.Ojeda.Services.FieldSets
             }
 
             var fieldSetDto = _mapper.Map<FieldSetDto>(fieldSet);
-
-            fieldSetDto.Fields = fieldSetDto.Fields
-                .OrderBy(_ => _.Order)
-                .ThenBy(_ => _.Field.Name)
-                .ToList();
+            EnsureNormalizedFieldOrder(fieldSetDto);
 
             return fieldSetDto;
         }
@@ -96,7 +92,12 @@ namespace NomaNova.Ojeda.Services.FieldSets
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
             var paginatedFieldSetsDto = _mapper.Map<PaginatedListDto<FieldSetDto>>(paginatedFieldSets);
-            paginatedFieldSetsDto.Items = paginatedFieldSets.Select(f => _mapper.Map<FieldSetDto>(f)).ToList();
+            paginatedFieldSetsDto.Items = paginatedFieldSets.Select(f =>
+            {
+                var fieldSetDto = _mapper.Map<FieldSetDto>(f);
+                EnsureNormalizedFieldOrder(fieldSetDto);
+                return fieldSetDto;
+            }).ToList();
 
             return paginatedFieldSetsDto;
         }
@@ -238,6 +239,19 @@ namespace NomaNova.Ojeda.Services.FieldSets
             var dtoFieldIds = dtoFieldSet.Fields.Select(_ => _.Id).ToList();
 
             return dbFieldIds.Where(db => dtoFieldIds.All(dto => dto != db)).ToList();
+        }
+
+        private static void EnsureNormalizedFieldOrder(FieldSetDto fieldSetDto)
+        {
+            fieldSetDto.Fields = fieldSetDto.Fields
+                .OrderBy(_ => _.Order)
+                .ThenBy(_ => _.Field.Name)
+                .ToList();
+            
+            for (var i = 0; i < fieldSetDto.Fields.Count; i++)
+            {
+                fieldSetDto.Fields[i].Order = i + 1;
+            }
         }
     }
 }

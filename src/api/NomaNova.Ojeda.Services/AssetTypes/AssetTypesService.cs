@@ -55,11 +55,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             }
 
             var assetTypeDto = _mapper.Map<AssetTypeDto>(assetType);
-
-            assetTypeDto.FieldSets = assetTypeDto.FieldSets
-                .OrderBy(_ => _.Order)
-                .ThenBy(_ => _.FieldSet.Name)
-                .ToList();
+            EnsureNormalizedFieldSetOrder(assetTypeDto);
 
             return assetTypeDto;
         }
@@ -86,7 +82,12 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
             var paginatedAssetTypesDto = _mapper.Map<PaginatedListDto<AssetTypeDto>>(paginatedAssetTypes);
-            paginatedAssetTypesDto.Items = paginatedAssetTypes.Select(f => _mapper.Map<AssetTypeDto>(f)).ToList();
+            paginatedAssetTypesDto.Items = paginatedAssetTypes.Select(f =>
+            {
+                var assetTypeDto = _mapper.Map<AssetTypeDto>(f);
+                EnsureNormalizedFieldSetOrder(assetTypeDto);
+                return assetTypeDto;
+            }).ToList();
 
             return paginatedAssetTypesDto;
         }
@@ -218,6 +219,19 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             var dtoFieldSetIds = dtoAssetType.FieldSets.Select(_ => _.Id).ToList();
 
             return dbFieldSetIds.Where(db => dtoFieldSetIds.All(dto => dto != db)).ToList();
+        }
+
+        private static void EnsureNormalizedFieldSetOrder(AssetTypeDto assetTypeDto)
+        {
+            assetTypeDto.FieldSets = assetTypeDto.FieldSets
+                .OrderBy(_ => _.Order)
+                .ThenBy(_ => _.FieldSet.Name)
+                .ToList();
+
+            for (var i = 0; i < assetTypeDto.FieldSets.Count; i++)
+            {
+                assetTypeDto.FieldSets[i].Order = i + 1;
+            }
         }
     }
 }
