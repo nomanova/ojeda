@@ -69,18 +69,13 @@ namespace NomaNova.Ojeda.Web.Shared.Validation
             bool disableAssemblyScanning,
             IValidator validator = null)
         {
-            Console.WriteLine($"Validating field: {fieldIdentifier.Model}");
-
             var model = fieldIdentifier.Model;
             
             var properties = new[] {fieldIdentifier.FieldName};
             var context = new ValidationContext<object>(model, new PropertyChain(), new MemberNameValidatorSelector(properties));
 
             validator ??= GetValidatorForModel(serviceProvider, model, disableAssemblyScanning);
-            
-            Console.WriteLine($"Model: {model}");
-            Console.WriteLine($"Validator: {validator}");
-            
+
             if (validator != null)
             {
                 var validationResults = await validator.ValidateAsync(context);

@@ -2,9 +2,11 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using NomaNova.Ojeda.Api.Tests.Builders;
 using NomaNova.Ojeda.Api.Tests.Controllers.Base;
 using NomaNova.Ojeda.Api.Tests.Factories;
+using NomaNova.Ojeda.Api.Tests.Fixtures;
 using NomaNova.Ojeda.Api.Tests.Helpers;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Models.Dtos.Assets;
@@ -183,6 +185,51 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
             
             Assert.NotNull(updatedAsset);
             Assert.Equal(updatedAsset.Name, updateAssetDto.Name);
+        }
+
+        [Fact]
+        public async Task Patch_WhenValidAndExists_ShouldReturnNoContent()
+        {
+            // Arrange
+            var fixture = await DefaultAssetFixture.Create(DatabaseContext);
+
+            var patchDto = new JsonPatchDocument<PatchAssetDto>();
+            patchDto.Replace(_ => _.Name, "Updated Name");
+
+            var request = new RequestBuilder(HttpMethod.Patch, $"/api/assets/{fixture.Asset1.Id}")
+                .WithPayload(GetService<ISerializer>(), patchDto)
+                .Build();
+
+            // Act
+            var response = await ApiClient.SendAsync(request);
+            
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            
+            var updatedAsset = await DatabaseHelper.Get<Asset>(DatabaseContext, fixture.Asset1.Id);
+            
+            Assert.NotNull(updatedAsset);
+            Assert.Equal("Updated Name", updatedAsset.Name);
+        }
+
+        [Fact]
+        public async Task Patch_WhenInvalidAndExists_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var fixture = await DefaultAssetFixture.Create(DatabaseContext);
+
+            var patchDto = new JsonPatchDocument<PatchAssetDto>();
+            patchDto.Replace(_ => _.Name, "");
+
+            var request = new RequestBuilder(HttpMethod.Patch, $"/api/assets/{fixture.Asset1.Id}")
+                .WithPayload(GetService<ISerializer>(), patchDto)
+                .Build();
+
+            // Act
+            var response = await ApiClient.SendAsync(request);
+            
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]

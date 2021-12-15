@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Models.Dtos.Assets;
 using NomaNova.Ojeda.Models.Shared;
@@ -30,6 +31,9 @@ namespace NomaNova.Ojeda.Client.Services.Assets
             string id, UpdateAssetDto asset,
             CancellationToken cancellationToken = default);
 
+        Task<OjedaResult> PatchAsync(string id, JsonPatchDocument<PatchAssetDto> patch,
+            CancellationToken cancellationToken = default);
+        
         Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);
     }
 }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
@@ -241,7 +242,30 @@ namespace NomaNova.Ojeda.Services.Assets
             // Return
             return await GetByIdAsync(asset.Id, cancellationToken);
         }
-        
+
+        public async Task PatchAsync(string id, JsonPatchDocument<PatchAssetDto> patch, 
+            CancellationToken cancellationToken = default)
+        {
+            // Fetch
+            var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);
+            
+            if (asset == null)
+            {
+                throw new NotFoundException();
+            }
+            
+            // Patch
+            var patchAssetDto = _mapper.Map<PatchAssetDto>(asset);
+            patch.ApplyTo(patchAssetDto);
+
+            // Validate
+            await ValidateAndThrowAsync(new NamedFieldValidator(), patchAssetDto, cancellationToken);
+            
+            // Update
+            asset = _mapper.Map(patchAssetDto, asset);
+            await _assetsRepository.UpdateAsync(asset, cancellationToken);
+        }
+
         public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
             var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);

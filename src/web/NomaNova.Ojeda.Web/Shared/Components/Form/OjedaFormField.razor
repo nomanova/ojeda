@@ -1,7 +1,10 @@
 @using System.Linq.Expressions
 
-<div class="mb-3">
-    <label for="@ForId" class="form-label">@(GetLabel())</label>
+<div class="mb-3 @CssClass">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@ForId" class="form-label">@(GetLabel())</label>
+    }
     @ChildContent
     @if (!string.IsNullOrEmpty(HelpText))
     {
@@ -29,7 +32,10 @@
 
     [Parameter]
     public Expression<Func<object>> ValidateFor { get; set; }
-    
+
+    [Parameter]
+    public string CssClass { get; set; }
+
     [Parameter]
     public RenderFragment ChildContent { get; set; }
     

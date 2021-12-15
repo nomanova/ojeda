@@ -1,8 +1,7 @@
 .image {
     width: 150px;
     height: 150px;
-    background-color: #e9ecef;
-    border: 1px solid rgba(0,0,0,.125);
+    border: 1px solid #dee2e6;
     border-radius: .25rem;
 }
 
@@ -27,4 +26,26 @@
 
 .dropdown-toggle::after {
     content: none !important;
+}
+
+.edit-name {
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: #52525225;
+    transition: .5s;
+}
+
+.edit-name:hover {
+    color: #525252;
+}
+
+.edit-tag {
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #52525225;
+    transition: .5s; 
+}
+
+.edit-tag:hover {
+    color: #525252;
 }

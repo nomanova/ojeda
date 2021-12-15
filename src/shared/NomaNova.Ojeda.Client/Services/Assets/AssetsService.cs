@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 using NomaNova.Ojeda.Client.Results;
 using NomaNova.Ojeda.Client.Utils;
 using NomaNova.Ojeda.Models.Dtos.Assets;
@@ -73,6 +74,13 @@ namespace NomaNova.Ojeda.Client.Services.Assets
         {
             var path = $"{BasePath}/{id}";
             return await SendForDataAsync<AssetDto>(HttpMethod.Put, path, asset, cancellationToken);
+        }
+
+        public async Task<OjedaResult> PatchAsync(string id, JsonPatchDocument<PatchAssetDto> patch,
+            CancellationToken cancellationToken = default)
+        {
+            var path = $"{BasePath}/{id}";  
+            return await SendAsync(HttpMethod.Patch, path, patch, cancellationToken);
         }
 
         public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default)

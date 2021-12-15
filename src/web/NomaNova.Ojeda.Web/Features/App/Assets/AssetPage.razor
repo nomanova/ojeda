@@ -3,6 +3,7 @@
 @inject OjedaClient _ojeda
 @inject NavigationManager _navManager
 @inject IToastService _toastService
+@inject ITimeKeeper _timeKeeper
 
 <div class="content">
 
@@ -11,7 +12,9 @@
         <AssetHeader
             IsLoading="@_isLoading"
             AssetDto="@_asset"
-            OnDelete="@OnDelete"/>
+            OnDelete="@OnDelete"
+            OnEditName="@OnEditName"
+            OnEditTag="@OnEditTag" />
 
         <!-- Tabs -->
         <ul class="nav nav-tabs px-3 mb-3">
@@ -28,7 +31,7 @@
     <OjedaLoader IsLoading="@_isLoading" CssClass="px-3">
         @if (_activeTab == "Fields")
         {
-            <FieldsAssetTab AssetDto="@_asset"/>
+            <FieldsAssetTab AssetDto="@_asset" OnFieldsUpdated="@OnFieldsUpdated"/>
         }
     </OjedaLoader>
 
@@ -86,4 +89,31 @@
         }
     }
 
+    private void OnFieldsUpdated()
+    {
+        _asset.UpdatedAt = _timeKeeper.UtcNow;
+    }
+
+    private async Task OnEditName()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add("Id", AssetId);
+        parameters.Add("Name", _asset.Name);
+        
+        var editNameModal = Modal.Show<EditNameModal>("Edit Asset Name", parameters, Constants.DefaultModalOptions);
+        var result = await editNameModal.Result;
+        
+        if (!result.Cancelled)
+        {
+            _asset.Name = (string)result.Data;
+            _asset.UpdatedAt = _timeKeeper.UtcNow;
+            StateHasChanged();
+        }
+    }
+
+    private void OnEditTag()
+    {
+        Console.WriteLine("Editing tag");
+    }
+    
 }

@@ -11,17 +11,17 @@
                 <AssetFluentValidationValidator Asset="@Asset"/>
                 <ServerSideFluentValidation @ref="_serverValidation"/>
 
-                @for(var i = 0; i < _updateAsset.FieldSets.Count; i++)
+                @for (var i = 0; i < _updateAsset.FieldSets.Count; i++)
                 {
                     var fieldSet = _updateAsset.FieldSets[i];
-                    
+
                     var formSectionClass = "mb-3";
-                    
+
                     if (i == _updateAsset.FieldSets.Count - 1)
                     {
                         formSectionClass = "";
                     }
-                    
+
                     <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))" CssClass="@formSectionClass">
                         @foreach (var field in fieldSet.Fields)
                         {
@@ -92,7 +92,7 @@
 
             <!-- Reset -->
             <OjedaButton
-                Style="@ButtonStyle.Secondary" 
+                Style="@ButtonStyle.Secondary"
                 IsDisabled="@IsUpdateDisabled()"
                 Text="Reset"
                 OnClick="@OnReset"/>
@@ -121,6 +121,9 @@
     [Parameter]
     public AssetDto AssetDto { get; set; }
 
+    [Parameter]
+    public EventCallback OnFieldsUpdated { get; set; }
+
     protected override void OnParametersSet()
     {
         if (AssetDto == null)
@@ -134,8 +137,6 @@
 
     private async Task OnSubmitForm()
     {
-        Console.WriteLine("On Submit Form");
-
         if (_isSubmitting)
         {
             return;
@@ -156,6 +157,7 @@
         }
         else
         {
+            await OnFieldsUpdated.InvokeAsync();
             InitEditContext();
         }
 
@@ -164,22 +166,29 @@
 
     private void Init()
     {
-        _updateAsset = new UpdateAssetDto
+        if (_isModified)
         {
-            Name = Asset.Name,
-            AssetTypeId = Asset.AssetType.Id,
-            FieldSets = Asset.FieldSets.Select(fs => new UpdateAssetFieldSetDto
+            _updateAsset.Name = Asset.Name;
+        }
+        else
+        {
+            _updateAsset = new UpdateAssetDto
             {
-                Id = fs.Id,
-                Fields = fs.Fields.Select(f => new UpdateAssetFieldDto
+                Name = Asset.Name,
+                AssetTypeId = Asset.AssetType.Id,
+                FieldSets = Asset.FieldSets.Select(fs => new UpdateAssetFieldSetDto
                 {
-                    Id = f.Id,
-                    Data = f.Data.Copy()
+                    Id = fs.Id,
+                    Fields = fs.Fields.Select(f => new UpdateAssetFieldDto
+                    {
+                        Id = f.Id,
+                        Data = f.Data.Copy()
+                    }).ToList()
                 }).ToList()
-            }).ToList()
-        };
+            };
 
-        InitEditContext();
+            InitEditContext();
+        }
     }
 
     private void InitEditContext()

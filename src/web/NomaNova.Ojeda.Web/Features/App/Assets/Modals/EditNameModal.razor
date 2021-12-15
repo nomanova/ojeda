@@ -1,0 +1,114 @@
+@inject OjedaClient _ojeda
+@inject IToastService _toastService
+
+<div class="d-flex flex-column justify-content-between">
+
+    <div class="mb-3" style="height: 200px; overflow-y: auto;">
+
+        <EditForm id="form-asset-edit-name" EditContext="_editContext" OnValidSubmit="OnSubmitForm">
+
+            <FluentValidationValidator/>
+            <ServerSideFluentValidation @ref="_serverValidation"/>
+
+            <OjedaFormField ForId="asset-name" CssClass="mt-2 mx-1" ValidateFor="@(() => _patchAsset.Name)">
+                <OjedaInputText @bind-Value="_patchAsset.Name" class="form-control" id="asset-name" disabled="@_isSubmitting"/>
+            </OjedaFormField>
+
+        </EditForm>
+
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <div class="d-flex align-items-center"></div>
+
+        <div>
+            <OjedaButton
+                OnClick="@OnCancel"
+                Text="Cancel"
+                IsDisabled="@_isSubmitting"/>
+            <span class="ps-2"></span>
+            <OjedaButton
+                Style="@ButtonStyle.Primary"
+                Type="@ButtonType.Submit"
+                Form="form-asset-edit-name"
+                IsDisabled="_isSubmitting"
+                IsLoading="_isSubmitting"
+                Text="Submit"/>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    private PatchAssetDto _patchAsset;
+
+    private EditContext _editContext;
+    private ServerSideFluentValidation _serverValidation;
+
+    private bool _isSubmitting;
+
+    private async Task OnCancel()
+    {
+        await ModalInstance.CancelAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        _patchAsset = new PatchAssetDto
+        {
+            Name = Name
+        };
+
+        _editContext = new EditContext(_patchAsset);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
+    private async Task OnSubmitForm()
+    {
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        _serverValidation.ClearErrors();
+
+        var patchDto = new JsonPatchDocument<PatchAssetDto>();
+        patchDto.Replace(_ => _.Name, _patchAsset.Name);
+
+        var result = await _ojeda.AssetsService.PatchAsync(Id, patchDto);
+
+        if (result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
+        {
+            _serverValidation.DisplayErrors(result.Error.ValidationErrors);
+        }
+        else if (!result.Success)
+        {
+            _toastService.ShowError(result.Error.Stringify("Could not update name."));
+        }
+        else
+        {
+            await ModalInstance.CloseAsync(ModalResult.Ok(_patchAsset.Name));
+        }
+
+        _isSubmitting = false;
+    }
+
+}

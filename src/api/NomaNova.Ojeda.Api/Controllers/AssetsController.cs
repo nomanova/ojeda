@@ -2,6 +2,7 @@ using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.Assets;
@@ -108,7 +109,25 @@ namespace NomaNova.Ojeda.Api.Controllers
             var assetDto = await _assetsService.UpdateAsync(id, updateAssetDto, cancellationToken);
             return Ok(assetDto);
         }
-        
+
+        /// <summary>
+        /// Patch asset
+        /// </summary>
+        [HttpPatch("{id}")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType( StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ErrorDto),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Patch(
+            [FromRoute] string id,
+            [FromBody] JsonPatchDocument<PatchAssetDto> patch,
+            CancellationToken cancellationToken = default)
+        {
+            await _assetsService.PatchAsync(id, patch, cancellationToken);
+            return NoContent();
+        }
+
         /// <summary>
         /// Delete asset
         /// </summary>

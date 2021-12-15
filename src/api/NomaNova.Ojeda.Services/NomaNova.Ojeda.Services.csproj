@@ -5,6 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Asp.Net -->
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="5.0.13" />
         <!-- Automapper -->
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
         <!-- FluentValidation -->

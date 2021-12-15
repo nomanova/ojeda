@@ -1,8 +1,7 @@
 .image {
     width: 150px;
     height: 150px;
-    background-color: #e9ecef;
-    border: 1px solid rgba(0,0,0,.125);
+    border: 1px solid #dee2e6;
     border-radius: .25rem;
 }
 
