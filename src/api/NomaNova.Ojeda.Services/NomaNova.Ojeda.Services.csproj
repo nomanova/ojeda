@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
         <!-- Asp.Net -->
-        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="5.0.13" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="6.0.1" />
         <!-- Automapper -->
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
         <!-- FluentValidation -->

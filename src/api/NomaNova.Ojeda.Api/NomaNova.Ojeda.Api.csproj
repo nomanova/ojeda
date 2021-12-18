@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <ProjectGuid>{31616EFA-5528-4189-B1D2-7EB97CAAEA2D}</ProjectGuid>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>1701;1702;1591;1573</NoWarn>
     </PropertyGroup>
@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <!-- Asp.Net -->
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.1" />
         <!-- Serilog -->
         <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.2.0-dev-00272" />

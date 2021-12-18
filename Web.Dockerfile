@@ -1,7 +1,7 @@
 #############################################
 # Build Stage (Dotnet)
 #############################################
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS dotnet-builder
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS dotnet-builder
 
 ARG SONAR_PROJECT_KEY=nomanova_ojeda_web
 ARG SONAR_OGRANIZAION_KEY=nomanova

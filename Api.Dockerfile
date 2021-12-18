@@ -1,7 +1,7 @@
 #############################################
 # Build Stage (Dotnet)
 #############################################
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS dotnet-builder
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS dotnet-builder
 
 ARG SONAR_PROJECT_KEY=nomanova_ojeda_api
 ARG SONAR_OGRANIZAION_KEY=nomanova
@@ -76,7 +76,7 @@ RUN dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
 #############################################
 # Runtime Stage
 #############################################
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
 COPY --from=dotnet-builder /publish /publish
 
