@@ -18,11 +18,9 @@ using NomaNova.Ojeda.Utils.Extensions;
 
 namespace NomaNova.Ojeda.Services.AssetTypes
 {
-    public class AssetTypesService : BaseService, IAssetTypesService
+    public class AssetTypesService : BaseService<AssetType>, IAssetTypesService
     {
-        private readonly IMapper _mapper;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
-        private readonly IRepository<AssetType> _assetTypesRepository;
         private readonly IRepository<Asset> _assetsRepository;
         private readonly IRepository<FieldValue> _fieldValueRepository;
 
@@ -31,18 +29,16 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<AssetType> assetTypesRepository,
             IRepository<Asset> assetsRepository,
-            IRepository<FieldValue> fieldValueRepository)
+            IRepository<FieldValue> fieldValueRepository) : base(mapper, assetTypesRepository)
         {
-            _mapper = mapper;
             _fieldSetsRepository = fieldSetsRepository;
-            _assetTypesRepository = assetTypesRepository;
             _assetsRepository = assetsRepository;
             _fieldValueRepository = fieldValueRepository;
         }
 
         public async Task<AssetTypeDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            var assetType = await _assetTypesRepository.GetByIdAsync(id, query =>
+            var assetType = await Repository.GetByIdAsync(id, query =>
             {
                 return query
                     .Include(c => c.AssetTypeFieldSets)
@@ -54,7 +50,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 throw new NotFoundException();
             }
 
-            var assetTypeDto = _mapper.Map<AssetTypeDto>(assetType);
+            var assetTypeDto = Mapper.Map<AssetTypeDto>(assetType);
             EnsureNormalizedFieldSetOrder(assetTypeDto);
 
             return assetTypeDto;
@@ -73,7 +69,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 orderBy = nameof(FieldSet.Name);
             }
 
-            var paginatedAssetTypes = await _assetTypesRepository.GetAllPaginatedAsync(
+            var paginatedAssetTypes = await Repository.GetAllPaginatedAsync(
                 searchQuery, query =>
                 {
                     return query
@@ -81,10 +77,10 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                         .ThenInclude(f => f.FieldSet);
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
-            var paginatedAssetTypesDto = _mapper.Map<PaginatedListDto<AssetTypeDto>>(paginatedAssetTypes);
+            var paginatedAssetTypesDto = Mapper.Map<PaginatedListDto<AssetTypeDto>>(paginatedAssetTypes);
             paginatedAssetTypesDto.Items = paginatedAssetTypes.Select(f =>
             {
-                var assetTypeDto = _mapper.Map<AssetTypeDto>(f);
+                var assetTypeDto = Mapper.Map<AssetTypeDto>(f);
                 EnsureNormalizedFieldSetOrder(assetTypeDto);
                 return assetTypeDto;
             }).ToList();
@@ -96,20 +92,20 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             CreateAssetTypeDto assetTypeDto, CancellationToken cancellationToken = default)
         {
             await ValidateAndThrowAsync(
-                new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, _assetTypesRepository), assetTypeDto,
+                new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, Repository), assetTypeDto,
                 cancellationToken);
 
             var assetTypeId = Guid.NewGuid().ToString();
 
-            var assetType = _mapper.Map<AssetType>(assetTypeDto);
+            var assetType = Mapper.Map<AssetType>(assetTypeDto);
             assetType.Id = assetTypeId;
 
-            assetType.AssetTypeFieldSets = assetTypeDto.FieldSets.Select(f => _mapper.Map<AssetTypeFieldSet>(f, opt =>
+            assetType.AssetTypeFieldSets = assetTypeDto.FieldSets.Select(f => Mapper.Map<AssetTypeFieldSet>(f, opt =>
                 opt.AfterMap((_, dest) => { dest.AssetTypeId = assetTypeId; }))).ToList();
 
-            assetType = await _assetTypesRepository.InsertAsync(assetType, cancellationToken);
+            assetType = await Repository.InsertAsync(assetType, cancellationToken);
 
-            return _mapper.Map<AssetTypeDto>(assetType);
+            return Mapper.Map<AssetTypeDto>(assetType);
         }
 
         public async Task<AssetTypeDto> UpdateAsync(
@@ -118,13 +114,13 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             var assetType = await PrepareUpdateAsync(id, assetTypeDto, cancellationToken);
             var removedFieldSetIds = GetRemovedFieldSetIds(assetType, assetTypeDto);
             
-            assetType = _mapper.Map(assetTypeDto, assetType);
+            assetType = Mapper.Map(assetTypeDto, assetType);
             assetType.Id = id;
 
-            assetType.AssetTypeFieldSets = assetTypeDto.FieldSets.Select(f => _mapper.Map<AssetTypeFieldSet>(f, opt =>
+            assetType.AssetTypeFieldSets = assetTypeDto.FieldSets.Select(f => Mapper.Map<AssetTypeFieldSet>(f, opt =>
                 opt.AfterMap((_, dest) => dest.AssetTypeId = id))).ToList();
 
-            assetType = await _assetTypesRepository.UpdateAsync(assetType, cancellationToken);
+            assetType = await Repository.UpdateAsync(assetType, cancellationToken);
 
             // Delete any impacted field values
             if (removedFieldSetIds.HasElements())
@@ -139,7 +135,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 await _fieldValueRepository.DeleteRangeAsync(fieldValues, cancellationToken);
             }
 
-            return _mapper.Map<AssetTypeDto>(assetType);
+            return Mapper.Map<AssetTypeDto>(assetType);
         }
 
         public async Task<DryRunUpdateAssetTypeDto> DryRunUpdateAsync(
@@ -163,7 +159,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             // Map dto
             var updateAssetTypeDto = new DryRunUpdateAssetTypeDto
             {
-                Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList()
+                Assets = assets.Select(_ => Mapper.Map<NamedEntityDto>(_)).ToList()
             };
 
             return updateAssetTypeDto;
@@ -172,7 +168,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         public async Task<DryRunDeleteAssetTypeDto> DeleteAsync(string id, bool dryRun,
             CancellationToken cancellationToken = default)
         {
-            var assetType = await _assetTypesRepository.GetByIdAsync(id, cancellationToken);
+            var assetType = await Repository.GetByIdAsync(id, cancellationToken);
 
             if (assetType == null)
             {
@@ -185,21 +181,21 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             var assets = await _assetsRepository.GetAllAsync(query => { return query.Where(_ => _.AssetTypeId == id); },
                 cancellationToken);
 
-            deleteAssetTypeDto.Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
+            deleteAssetTypeDto.Assets = assets.Select(_ => Mapper.Map<NamedEntityDto>(_)).ToList();
 
             if (dryRun)
             {
                 return deleteAssetTypeDto;
             }
 
-            await _assetTypesRepository.DeleteAsync(assetType, cancellationToken);
+            await Repository.DeleteAsync(assetType, cancellationToken);
             return deleteAssetTypeDto;
         }
 
         private async Task<AssetType> PrepareUpdateAsync(
             string id, UpdateAssetTypeDto assetTypeDto, CancellationToken cancellationToken)
         {
-            var assetType = await _assetTypesRepository.GetByIdAsync(id,
+            var assetType = await Repository.GetByIdAsync(id,
                 query => { return query.Include(s => s.AssetTypeFieldSets); }, cancellationToken);
 
             if (assetType == null)
@@ -208,7 +204,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             }
 
             await ValidateAndThrowAsync(new UpdateAssetTypeDtoBusinessValidator(
-                _fieldSetsRepository, _assetTypesRepository, id), assetTypeDto, cancellationToken);
+                _fieldSetsRepository, Repository, id), assetTypeDto, cancellationToken);
 
             return assetType;
         }

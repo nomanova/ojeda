@@ -23,10 +23,8 @@ using ValidationException = NomaNova.Ojeda.Core.Exceptions.ValidationException;
 
 namespace NomaNova.Ojeda.Services.Assets
 {
-    public class AssetsService : BaseService, IAssetsService
+    public class AssetsService : BaseService<Asset>, IAssetsService
     {
-        private readonly IMapper _mapper;
-        private readonly IRepository<Asset> _assetsRepository;
         private readonly IRepository<AssetType> _assetTypesRepository;
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Field> _fieldsRepository;
@@ -38,10 +36,8 @@ namespace NomaNova.Ojeda.Services.Assets
             IRepository<AssetType> assetTypesRepository,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<Field> fieldsRepository,
-            IFieldDataConverter fieldDataConverter)
+            IFieldDataConverter fieldDataConverter) : base(mapper, assetsRepository)
         {
-            _mapper = mapper;
-            _assetsRepository = assetsRepository;
             _assetTypesRepository = assetTypesRepository;
             _fieldSetsRepository = fieldSetsRepository;
             _fieldsRepository = fieldsRepository;
@@ -70,7 +66,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
         public async Task<AssetDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            var asset = await _assetsRepository.GetByIdAsync(id, query =>
+            var asset = await Repository.GetByIdAsync(id, query =>
             {
                 return query
                     .Include(s => s.AssetType)
@@ -117,14 +113,14 @@ namespace NomaNova.Ojeda.Services.Assets
                 orderBy = nameof(Field.Name);
             }
 
-            var paginatedAssets = await _assetsRepository.GetAllPaginatedAsync(
+            var paginatedAssets = await Repository.GetAllPaginatedAsync(
                 searchQuery, query =>
                 {
                     return query.Include(_ => _.AssetType);
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
-            var paginatedAssetsDto = _mapper.Map<PaginatedListDto<AssetSummaryDto>>(paginatedAssets);
-            paginatedAssetsDto.Items = paginatedAssets.Select(f => _mapper.Map<AssetSummaryDto>(f)).ToList();
+            var paginatedAssetsDto = Mapper.Map<PaginatedListDto<AssetSummaryDto>>(paginatedAssets);
+            paginatedAssetsDto.Items = paginatedAssets.Select(f => Mapper.Map<AssetSummaryDto>(f)).ToList();
 
             return paginatedAssetsDto;
         }
@@ -137,7 +133,7 @@ namespace NomaNova.Ojeda.Services.Assets
             // Store
             var dtoFieldSets = assetDto.FieldSets;
 
-            var asset = _mapper.Map<Asset>(assetDto);
+            var asset = Mapper.Map<Asset>(assetDto);
             
             asset.Id = Guid.NewGuid().ToString();
             asset.FieldValues = new List<FieldValue>();
@@ -166,7 +162,7 @@ namespace NomaNova.Ojeda.Services.Assets
                 }
             }
 
-            await _assetsRepository.InsertAsync(asset, cancellationToken);
+            await Repository.InsertAsync(asset, cancellationToken);
 
             // Return
             return await GetByIdAsync(asset.Id, cancellationToken);
@@ -176,7 +172,7 @@ namespace NomaNova.Ojeda.Services.Assets
             CancellationToken cancellationToken = default)
         {
             // Fetch
-            var asset = await _assetsRepository.GetByIdAsync(id, query =>
+            var asset = await Repository.GetByIdAsync(id, query =>
             {
                 return query.Include(s => s.FieldValues);
             }, cancellationToken);
@@ -193,7 +189,7 @@ namespace NomaNova.Ojeda.Services.Assets
             var dtoFieldSets = assetDto.FieldSets;
             var fieldValues = asset.FieldValues;
 
-            asset = _mapper.Map(assetDto, asset);
+            asset = Mapper.Map(assetDto, asset);
             asset.Id = id;
 
             var updatedFieldValues = new List<FieldValue>();
@@ -237,7 +233,7 @@ namespace NomaNova.Ojeda.Services.Assets
 
             asset.FieldValues = updatedFieldValues;
             
-            await _assetsRepository.UpdateAsync(asset, cancellationToken);
+            await Repository.UpdateAsync(asset, cancellationToken);
             
             // Return
             return await GetByIdAsync(asset.Id, cancellationToken);
@@ -247,7 +243,7 @@ namespace NomaNova.Ojeda.Services.Assets
             CancellationToken cancellationToken = default)
         {
             // Fetch
-            var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);
+            var asset = await Repository.GetByIdAsync(id, cancellationToken);
             
             if (asset == null)
             {
@@ -255,27 +251,27 @@ namespace NomaNova.Ojeda.Services.Assets
             }
             
             // Patch
-            var patchAssetDto = _mapper.Map<PatchAssetDto>(asset);
+            var patchAssetDto = Mapper.Map<PatchAssetDto>(asset);
             patch.ApplyTo(patchAssetDto);
 
             // Validate
             await ValidateAndThrowAsync(new NamedFieldValidator(), patchAssetDto, cancellationToken);
             
             // Update
-            asset = _mapper.Map(patchAssetDto, asset);
-            await _assetsRepository.UpdateAsync(asset, cancellationToken);
+            asset = Mapper.Map(patchAssetDto, asset);
+            await Repository.UpdateAsync(asset, cancellationToken);
         }
 
         public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
         {
-            var asset = await _assetsRepository.GetByIdAsync(id, cancellationToken);
+            var asset = await Repository.GetByIdAsync(id, cancellationToken);
 
             if (asset == null)
             {
                 throw new NotFoundException();
             }
 
-            await _assetsRepository.DeleteAsync(asset, cancellationToken);
+            await Repository.DeleteAsync(asset, cancellationToken);
         }
 
         private AssetDto AssetTypeToAssetDtoAsync(
@@ -287,7 +283,7 @@ namespace NomaNova.Ojeda.Services.Assets
             var assetDto = new AssetDto
             {
                 Id = null,
-                AssetType = _mapper.Map<AssetTypeSummaryDto>(assetType)
+                AssetType = Mapper.Map<AssetTypeSummaryDto>(assetType)
             };
 
             foreach (var assetTypeFieldSet in assetType.AssetTypeFieldSets)
@@ -300,7 +296,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     throw new ArgumentException($"Field set {fieldSetId} does not belong to asset type {assetTypeFieldSet.AssetTypeId}");
                 }
                 
-                var fieldSetDto = _mapper.Map<AssetFieldSetDto>(fieldSet);
+                var fieldSetDto = Mapper.Map<AssetFieldSetDto>(fieldSet);
                 fieldSetDto.Order = assetTypeFieldSet.Order;
 
                 foreach (var fieldSetField in fieldSet.FieldSetFields)
@@ -313,7 +309,7 @@ namespace NomaNova.Ojeda.Services.Assets
                         throw new ArgumentException($"Field {fieldId} does not belong to field set {fieldSetField.FieldSetId}");
                     }
 
-                    var fieldDto = _mapper.Map<AssetFieldDto>(field);
+                    var fieldDto = Mapper.Map<AssetFieldDto>(field);
                     fieldDto.Order = fieldSetField.Order;
                     fieldDto.IsRequired = fieldSetField.IsRequired;
                     
@@ -474,7 +470,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     }
                     else
                     {
-                        var fieldPropertiesResolver = new FieldPropertiesResolver(_mapper, dbField.Properties, dbFieldSetField.IsRequired);
+                        var fieldPropertiesResolver = new FieldPropertiesResolver(Mapper, dbField.Properties, dbFieldSetField.IsRequired);
                         var validator = (IValidator) new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver);
 
                         var context = ValidationContext<object>.CreateWithOptions(dtoField,

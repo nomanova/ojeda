@@ -7,6 +7,12 @@ namespace NomaNova.Ojeda.Web.Shared.Validation
     {
         public override string GetFieldCssClass(EditContext editContext, in FieldIdentifier fieldIdentifier)
         {
+            var propertyInfo = fieldIdentifier.Model.GetType().GetProperty(fieldIdentifier.FieldName);
+            if (propertyInfo != null && propertyInfo.PropertyType == typeof(bool))
+            {
+                return ""; // No validation classes for checkmarks
+            }
+
             var isValid = !editContext.GetValidationMessages(fieldIdentifier).Any();
 
             if (editContext.IsModified(fieldIdentifier))

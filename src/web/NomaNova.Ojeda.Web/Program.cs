@@ -7,6 +7,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NomaNova.Ojeda.Client;
+using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Utils.Services;
@@ -59,6 +60,11 @@ namespace NomaNova.Ojeda.Web
             services.AddTransient<IValidator<UpdateFieldDto>, UpdateFieldDtoFieldValidator>();
             services.AddTransient<IValidator<TextFieldPropertiesDto>, TextFieldPropertiesDtoFieldValidator>();
             services.AddTransient<IValidator<NumberFieldPropertiesDto>, NumberFieldPropertiesDtoFieldValidator>();
+            
+            // Asset Type Ids
+            services.AddTransient<IValidator<CreateAssetIdTypeDto>, CreateAssetIdTypeDtoFieldValidator>();
+            services.AddTransient<IValidator<UpdateAssetIdTypeDto>, UpdateAssetIdTypeDtoFieldValidator>();
+            services.AddTransient<IValidator<Ean13SymbologyPropertiesDto>, Ean13SymbologyPropertiesDtoFieldValidator>();
         }
     }
 }

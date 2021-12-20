@@ -13,6 +13,7 @@ using NomaNova.Ojeda.Api.Options;
 using NomaNova.Ojeda.Api.Options.Application;
 using NomaNova.Ojeda.Api.Options.Framework;
 using NomaNova.Ojeda.Api.Utils;
+using NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
@@ -23,6 +24,8 @@ using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Models.Shared.Converters;
+using NomaNova.Ojeda.Services.AssetIdTypes;
+using NomaNova.Ojeda.Services.AssetIdTypes.Interfaces;
 using NomaNova.Ojeda.Services.Assets;
 using NomaNova.Ojeda.Services.Assets.Interfaces;
 using NomaNova.Ojeda.Services.AssetTypes;
@@ -116,6 +119,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IFieldSetsService, FieldSetsService>();
             services.TryAddScoped<IAssetTypesService, AssetTypesService>();
             services.TryAddScoped<IAssetsService, AssetsService>();
+            services.TryAddScoped<IAssetIdTypesService, AssetIdTypesService>();
         }
 
         private static void AddRepositories(IServiceCollection services)
@@ -125,6 +129,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IRepository<AssetType>, EntityRepository<AssetType>>();
             services.TryAddScoped<IRepository<Asset>, EntityRepository<Asset>>();
             services.TryAddScoped<IRepository<FieldValue>, EntityRepository<FieldValue>>();
+            services.TryAddScoped<IRepository<AssetIdType>, EntityRepository<AssetIdType>>();
         }
 
         private void AddFileStore(IServiceCollection services)

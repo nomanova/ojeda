@@ -16,35 +16,31 @@ using NomaNova.Ojeda.Services.Fields.Validators;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
-    public class FieldsService : BaseService, IFieldsService
+    public class FieldsService : BaseService<Field>, IFieldsService
     {
-        private readonly IMapper _mapper;
-        private readonly IRepository<Field> _fieldsRepository;
-        private readonly IRepository<FieldSet> _fieldSetRepository;
+        private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Asset> _assetsRepository;
         
         public FieldsService(
             IMapper mapper,
             IRepository<Field> fieldsRepository,
             IRepository<FieldSet> fieldSetsRepository,
-            IRepository<Asset> assetsRepository)
+            IRepository<Asset> assetsRepository) : base(mapper, fieldsRepository)
         {
-            _mapper = mapper;
-            _fieldsRepository = fieldsRepository;
-            _fieldSetRepository = fieldSetsRepository;
+            _fieldSetsRepository = fieldSetsRepository;
             _assetsRepository = assetsRepository;
         }
 
         public async Task<FieldDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
+            var field = await Repository.GetByIdAsync(id, cancellationToken);
 
             if (field == null)
             {
                 throw new NotFoundException();
             }
 
-            return _mapper.Map<FieldDto>(field);
+            return Mapper.Map<FieldDto>(field);
         }
 
         public async Task<PaginatedListDto<FieldDto>> GetAsync(
@@ -61,51 +57,51 @@ namespace NomaNova.Ojeda.Services.Fields
                 orderBy = nameof(Field.Name);
             }
 
-            var paginatedFields = await _fieldsRepository.GetAllPaginatedAsync(
+            var paginatedFields = await Repository.GetAllPaginatedAsync(
                 searchQuery, orderBy, orderAsc, excludedIds, pageNumber, pageSize, cancellationToken);
 
-            var paginatedFieldsDto = _mapper.Map<PaginatedListDto<FieldDto>>(paginatedFields);
-            paginatedFieldsDto.Items = paginatedFields.Select(f => _mapper.Map<FieldDto>(f)).ToList();
+            var paginatedFieldsDto = Mapper.Map<PaginatedListDto<FieldDto>>(paginatedFields);
+            paginatedFieldsDto.Items = paginatedFields.Select(f => Mapper.Map<FieldDto>(f)).ToList();
 
             return paginatedFieldsDto;
         }
 
         public async Task<FieldDto> CreateAsync(CreateFieldDto fieldDto, CancellationToken cancellationToken = default)
         {
-            await ValidateAndThrowAsync(new CreateFieldDtoBusinessValidator(_fieldsRepository), fieldDto, cancellationToken);
+            await ValidateAndThrowAsync(new CreateFieldDtoBusinessValidator(Repository), fieldDto, cancellationToken);
 
-            var field = _mapper.Map<Field>(fieldDto);
+            var field = Mapper.Map<Field>(fieldDto);
             field.Id = Guid.NewGuid().ToString();
 
-            field = await _fieldsRepository.InsertAsync(field, cancellationToken);
+            field = await Repository.InsertAsync(field, cancellationToken);
 
-            return _mapper.Map<FieldDto>(field);
+            return Mapper.Map<FieldDto>(field);
         }
 
         public async Task<FieldDto> UpdateAsync(string id, UpdateFieldDto fieldDto,
             CancellationToken cancellationToken = default)
         {
-            var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
+            var field = await Repository.GetByIdAsync(id, cancellationToken);
 
             if (field == null)
             {
                 throw new NotFoundException();
             }
 
-            await ValidateAndThrowAsync(new UpdateFieldDtoBusinessValidator(_fieldsRepository, id), fieldDto, cancellationToken);
+            await ValidateAndThrowAsync(new UpdateFieldDtoBusinessValidator(Repository, id), fieldDto, cancellationToken);
 
-            field = _mapper.Map(fieldDto, field);
+            field = Mapper.Map(fieldDto, field);
             field.Id = id;
-            field.Properties = _mapper.Map<FieldProperties>(fieldDto.Properties);
+            field.Properties = Mapper.Map<FieldProperties>(fieldDto.Properties);
             
-            field = await _fieldsRepository.UpdateAsync(field, cancellationToken);
+            field = await Repository.UpdateAsync(field, cancellationToken);
 
-            return _mapper.Map<FieldDto>(field);
+            return Mapper.Map<FieldDto>(field);
         }
 
         public async Task<DryRunDeleteFieldDto> DeleteAsync(string id, bool dryRun, CancellationToken cancellationToken = default)
         {
-            var field = await _fieldsRepository.GetByIdAsync(id, cancellationToken);
+            var field = await Repository.GetByIdAsync(id, cancellationToken);
 
             if (field == null)
             {
@@ -115,12 +111,12 @@ namespace NomaNova.Ojeda.Services.Fields
             var deleteFieldDto = new DryRunDeleteFieldDto();
             
             // Fetch impacted field sets
-            var fieldSets = await _fieldSetRepository.GetAllAsync(query =>
+            var fieldSets = await _fieldSetsRepository.GetAllAsync(query =>
             {
                 return query.Where(_ => _.FieldSetFields.Select(fsf => fsf.FieldId).Contains(id));
             }, cancellationToken);
             
-            deleteFieldDto.FieldSets = fieldSets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
+            deleteFieldDto.FieldSets = fieldSets.Select(_ => Mapper.Map<NamedEntityDto>(_)).ToList();
             
             // Fetch impacted assets
             var assets = await _assetsRepository.GetAllAsync(
@@ -131,14 +127,14 @@ namespace NomaNova.Ojeda.Services.Fields
                 },
                 cancellationToken);
             
-            deleteFieldDto.Assets = assets.Select(_ => _mapper.Map<NamedEntityDto>(_)).ToList();
+            deleteFieldDto.Assets = assets.Select(_ => Mapper.Map<NamedEntityDto>(_)).ToList();
 
             if (dryRun)
             {
                 return deleteFieldDto;
             }
 
-            await _fieldsRepository.DeleteAsync(field, cancellationToken);
+            await Repository.DeleteAsync(field, cancellationToken);
             return deleteFieldDto;
         }
     }

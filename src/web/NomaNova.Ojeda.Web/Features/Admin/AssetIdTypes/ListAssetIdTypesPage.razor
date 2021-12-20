@@ -1,0 +1,116 @@
+@page "/admin/asset-id-types"
+@layout AdminLayout
+@inherits ListItemsPage<AssetIdTypeDto>
+
+@inject OjedaClient _ojeda
+@inject ITimeKeeper _timeKeeper
+
+<ExpandablePage
+    CssClass="px-3"
+    HeaderCssClass="pt-3">
+
+    <Header>
+
+        <OjedaBreadcrumb Data="@_breadcrumbItems"/>
+
+        <PageHeader Title="Asset Id Types">
+            <Toolbar>
+                <div class="d-flex align-items-center me-3">
+                    <Spinner IsLoading="@IsLoading"/>
+                </div>
+
+                <div class="me-3" style="width: 350px;">
+                    <Search OnValueChanged="@OnSearchAsync"></Search>
+                </div>
+
+                <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Id Type"/>
+            </Toolbar>
+        </PageHeader>
+
+    </Header>
+
+    <Content>
+
+        @if (Items == null)
+        {
+            <p class="text-muted fst-italic">Loading...</p>
+        }
+        else if (!Items.Any())
+        {
+            if (string.IsNullOrEmpty(SearchQuery))
+            {
+                <p class="text-muted fst-italic">No items available.</p>
+            }
+            else
+            {
+                <p class="text-muted fst-italic">No search results.</p>
+            }
+        }
+        else
+        {
+            <ActionsTableTemplate TItem="AssetIdTypeDto"
+                                  Items="@Items"
+                                  EditItemCallBack="@OnEdit"
+                                  DeleteItemCallBack="@OnDelete">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Symbology</th>
+                    <th>Last Updated</th>
+                </TableHeader>
+                <RowTemplate Context="assetIdType">
+                    <td>@assetIdType.Name</td>
+                    <td>
+                        <Description Value="@assetIdType.Description"/>
+                    </td>
+                    <td>@assetIdType.Properties.Symbology.ToString()?.ToUpperInvariant()</td>
+                    <td>@assetIdType.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
+                </RowTemplate>
+            </ActionsTableTemplate>
+        }
+
+    </Content>
+
+    <Footer>
+
+        @if (!(Items == null || !Items.Any()))
+        {
+            <div class="my-3">
+                <OjedaPager
+                    PageCount="@PageCount"
+                    CurrentPage="@CurrentPage"
+                    PageSize="@PageSize"
+                    TotalCount="@TotalCount"
+                    OnPageChanged="@OnPageChanged"
+                    OnPageSizeChanged="@OnPageSizeChanged"/>
+            </div>
+        }
+
+    </Footer>
+
+</ExpandablePage>
+
+
+@code {
+
+    private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
+    {
+        new() { Text = "Admin", Url = "/admin" },
+        new() { Text = "Asset Id Types" }
+    };
+
+    protected override string Path => "/admin/asset-id-types";
+
+    protected override async Task<bool> DeleteItemAsync(AssetIdTypeDto item)
+    {
+        return (await _ojeda.AssetIdTypesService.DeleteAsync(item.Id)).Success;
+    }
+
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetIdTypeDto>>> FetchItemsAsync(string query = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
+    {
+        return await _ojeda.AssetIdTypesService.GetAsync(query, null, true, null, pageNumber, pageSize);
+    }
+
+}

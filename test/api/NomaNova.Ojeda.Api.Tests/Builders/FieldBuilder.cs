@@ -27,6 +27,12 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
+        public FieldBuilder WithProperties(FieldProperties properties)
+        {
+            _field.Properties = properties;
+            return this;
+        }
+        
         public async Task<Field> Build(DbContext context)
         {
             await DatabaseHelper.Add(context, _field);

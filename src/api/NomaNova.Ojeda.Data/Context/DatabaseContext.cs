@@ -1,5 +1,5 @@
-using System;
 using Microsoft.EntityFrameworkCore;
+using NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
@@ -14,6 +14,8 @@ namespace NomaNova.Ojeda.Data.Context
 {
     public class DatabaseContext : DbContext, IDatabaseContext
     {
+        public DbSet<AssetIdType> AssetIdTypes { get; set; }
+
         public DbSet<Field> Fields { get; set; }
 
         public DbSet<FieldSet> FieldSets { get; set; }
@@ -71,6 +73,7 @@ namespace NomaNova.Ojeda.Data.Context
             modelBuilder.ApplyConfiguration(new AssetTypeFieldSetEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new AssetEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new FieldValueEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new AssetIdTypeEntityTypeConfiguration(_serializer));
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

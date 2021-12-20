@@ -32,7 +32,7 @@
 
                     <!-- Description -->
                     <OjedaFormField ForId="field-description" Label="Description" ValidateFor="@(() => _createField.Description)"
-                                    HelpText="Optional, will be used as hint for the field input control.">
+                                    HelpText="Will be used as the hint for the input control, e.g. provide an example field value.">
                         <OjedaInputText @bind-Value="_createField.Description" class="form-control" id="field-description" disabled="@IsSubmitting"/>
                     </OjedaFormField>
 
@@ -56,7 +56,7 @@
                         var textData = (TextFieldPropertiesDto)_createField.Properties;
 
                         <OjedaFormField ForId="field-text-minLength" Label="Minimum Length" ValidateFor="@(() => textData.MinLength)"
-                                        HelpText="Optional, will validate the minimum input length.">
+                                        HelpText="Restrict input to a minimum length.">
                             <OjedaInputNumber
                                 @bind-Value="textData.MinLength"
                                 DisplayName="Minimum Length"
@@ -67,7 +67,7 @@
                         </OjedaFormField>
 
                         <OjedaFormField ForId="field-text-maxLength" Label="Maximum Length" ValidateFor="@(() => textData.MaxLength)"
-                                        HelpText="Optional, will validate the maximum input length.">
+                                        HelpText="Restrict input to a maximum length.">
                             <OjedaInputNumber
                                 @bind-Value="textData.MaxLength"
                                 DisplayName="Maximum Length"
@@ -83,18 +83,20 @@
                     {
                         var numberData = (NumberFieldPropertiesDto)_createField.Properties;
 
-                        <OjedaFormField ForId="field-text-withDecimals" Label="Allow Decimals" ValidateFor="@(() => numberData.WithDecimals)"
-                                        HelpText="Determines if decimal numbers are allowed.">
-                            <InputCheckbox @bind-Value="numberData.WithDecimals" DisplayName="Allow Decimals" id="field-text-withDecimals" disabled="@IsSubmitting"/>
-                        </OjedaFormField>
+                        <div class="form-check form-switch mb-3">
+                            <InputCheckbox @bind-Value="numberData.WithDecimals" class="form-check-input" disabled="@IsSubmitting" id="field-text-withDecimals"/>
+                            <label class="form-check-label" for="field-text-withDecimals">Allow decimal</label>
+                            <div class="form-text">When checked, non-integer numbers are allowed.</div>
+                            <ValidationMessage For="@(() => numberData.WithDecimals)"></ValidationMessage>
+                        </div>
 
                         <OjedaFormField ForId="field-text-minValue" Label="Minimum Value" ValidateFor="@(() => numberData.MinValue)"
-                                        HelpText="Optional, will validate the minimum input value.">
+                                        HelpText="Restrict input to a minimum value.">
                             <OjedaInputNumber @bind-Value="numberData.MinValue" DisplayName="Minimum Value" class="form-control" id="field-text-minValue" disabled="@IsSubmitting"/>
                         </OjedaFormField>
 
                         <OjedaFormField ForId="field-text-maxValue" Label="Maximum Value" ValidateFor="@(() => numberData.MaxValue)"
-                                        HelpText="Optional, will validate the maximum input value.">
+                                        HelpText="Restrict input to a maximum value.">
                             <OjedaInputNumber @bind-Value="numberData.MaxValue" DisplayName="Maximum Value" class="form-control" id="field-text-maxValue" disabled="@IsSubmitting"/>
                         </OjedaFormField>
                     }

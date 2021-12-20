@@ -24,8 +24,8 @@ namespace NomaNova.Ojeda.Data.Context.Configurations
             builder.HasKey(_ => _.Id);
 
             builder.Property(_ => _.Properties).HasConversion(
-                fieldProperties => _serializer.Serialize(fieldProperties, _jonConverters),
-                fieldProperties => _serializer.Deserialize<FieldProperties>(fieldProperties, _jonConverters));
+                properties => _serializer.Serialize(properties, _jonConverters),
+                properties => _serializer.Deserialize<FieldProperties>(properties, _jonConverters));
         }
     }
 }
