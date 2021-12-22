@@ -31,6 +31,12 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
             return this;
         }
 
+        public AssetTypeBuilder WithAssetIdType(string id)
+        {
+            _assetType.AssetIdTypeId = id;
+            return this;
+        }
+        
         public AssetTypeBuilder WithFieldSet(FieldSet fieldSet)
         {
             _assetTypeFieldSets.Add(new AssetTypeFieldSet

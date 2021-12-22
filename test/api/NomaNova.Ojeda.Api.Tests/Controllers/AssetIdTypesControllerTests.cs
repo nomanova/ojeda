@@ -162,7 +162,7 @@ public class AssetIdTypesControllerTests : ApiTests
     }
 
     [Fact]
-    public async Task Delete_WhenAssetDoesNotExist_ShouldReturnNotFound()
+    public async Task Delete_WhenAssetIdTypeDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
         var assetIdTypeId = Guid.NewGuid().ToString();
@@ -176,4 +176,71 @@ public class AssetIdTypesControllerTests : ApiTests
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Delete_WhenAssetIdTypeUsedByAssetType_ShouldReturnBadRequest()
+    {
+        // Arrange
+        var assetIdType = await new AssetIdTypeBuilder()
+            .Build(DatabaseContext);
+
+        await new AssetTypeBuilder()
+            .WithAssetIdType(assetIdType.Id)
+            .Build(DatabaseContext);
+
+        var request = new RequestBuilder(HttpMethod.Delete, $"/api/asset-id-types/{assetIdType.Id}")
+            .Build();
+        
+        // Act
+        var response = await ApiClient.SendAsync(request);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DryRunDelete_WhenAssetIdTypeNotUsed_ShouldReturnOkEmpty()
+    {
+        // Arrange
+        var assetIdType = await new AssetIdTypeBuilder()
+            .Build(DatabaseContext);
+        
+        var request = new RequestBuilder(HttpMethod.Delete, $"/api/asset-id-types/{assetIdType.Id}/dry-run")
+            .Build();
+        
+        // Act
+        var response = await ApiClient.SendAsync(request);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        var dryRunDeleteAssetIdTypeDto = await GetPayloadAsync<DryRunDeleteAssetIdTypeDto>(response);
+        Assert.Empty(dryRunDeleteAssetIdTypeDto.AssetTypes);
+    }
+
+    [Fact]
+    public async Task DryRunDelete_WhenAssetIdTypeUsedByAssetType_ShouldReturnOkWithAssetType()
+    {
+        // Arrange
+        var assetIdType = await new AssetIdTypeBuilder()
+            .Build(DatabaseContext);
+
+        var assetType = await new AssetTypeBuilder()
+            .WithAssetIdType(assetIdType.Id)
+            .Build(DatabaseContext);
+        
+        var request = new RequestBuilder(HttpMethod.Delete, $"/api/asset-id-types/{assetIdType.Id}/dry-run")
+            .Build();
+
+        // Act
+        var response = await ApiClient.SendAsync(request);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        var dryRunDeleteAssetIdTypeDto = await GetPayloadAsync<DryRunDeleteAssetIdTypeDto>(response);
+        Assert.Single(dryRunDeleteAssetIdTypeDto.AssetTypes);
+        Assert.Equal(dryRunDeleteAssetIdTypeDto.AssetTypes[0].Id, assetType.Id);
+    }
+
 }

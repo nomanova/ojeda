@@ -20,12 +20,13 @@ namespace NomaNova.Ojeda.Api.Tests.Factories
             };
         }
 
-        public static CreateAssetTypeDto NewRandomCreateDto(params string[] fieldSetIds)
+        public static CreateAssetTypeDto NewRandomCreateDto(string assetIdTypeId, params string[] fieldSetIds)
         {
             return new CreateAssetTypeDto
             {
                 Name = FactoryHelper.RandomString(),
                 Description = FactoryHelper.RandomString(),
+                AssetIdTypeId = assetIdTypeId,
                 FieldSets = fieldSetIds.Select(id => new CreateAssetTypeFieldSetDto
                 {
                     Id = id
@@ -33,12 +34,13 @@ namespace NomaNova.Ojeda.Api.Tests.Factories
             };
         }
         
-        public static UpdateAssetTypeDto NewRandomUpdateDto(params string[] fieldSetIds)
+        public static UpdateAssetTypeDto NewRandomUpdateDto(string assetIdTypeId, params string[] fieldSetIds)
         {
             return new UpdateAssetTypeDto
             {
                 Name = FactoryHelper.RandomString(),
                 Description = FactoryHelper.RandomString(),
+                AssetIdTypeId = Guid.NewGuid().ToString(),
                 FieldSets = fieldSetIds.Select(id => new UpdateAssetTypeFieldSetDto
                 {
                     Id = id

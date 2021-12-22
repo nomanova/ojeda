@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NomaNova.Ojeda.Api.Tests.Builders;
+using NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.Fields;
@@ -14,6 +15,8 @@ namespace NomaNova.Ojeda.Api.Tests.Fixtures
      */
     public class DefaultAssetFixture
     {
+        public AssetIdType AssetIdType { get; private set; }
+        
         public Field Field1 { get; private set; }
 
         public Field Field2 { get; private set; }
@@ -44,6 +47,11 @@ namespace NomaNova.Ojeda.Api.Tests.Fixtures
         {
             var fixture = new DefaultAssetFixture();
 
+            // Asset Id Types
+            fixture.AssetIdType = await new AssetIdTypeBuilder()
+                .WithName("Asset Id Type 1")
+                .Build(databaseContext);
+            
             // Fields
             fixture.Field1 = await new FieldBuilder()
                 .WithName("Field 1")
@@ -81,11 +89,13 @@ namespace NomaNova.Ojeda.Api.Tests.Fixtures
             fixture.AssetType1 = await new AssetTypeBuilder()
                 .WithName("Asset Type 1")
                 .WithFieldSets(fixture.FieldSet1, fixture.FieldSet2)
+                .WithAssetIdType(fixture.AssetIdType.Id)
                 .Build(databaseContext);
 
             fixture.AssetType2 = await new AssetTypeBuilder()
                 .WithName("Asset Type 2")
                 .WithFieldSets(fixture.FieldSet2, fixture.FieldSet3)
+                .WithAssetIdType(fixture.AssetIdType.Id)
                 .Build(databaseContext);
 
             // Assets
