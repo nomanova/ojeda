@@ -13,19 +13,19 @@ namespace NomaNova.Ojeda.Client.Services.AssetIdTypes;
 internal class AssetIdTypesService : BaseService, IAssetIdTypesService
 {
     private const string BasePath = "api/asset-id-types";
-    
+
     public AssetIdTypesService(OjedaHttpClient httpClient) : base(httpClient)
     {
         JonConverters.Add(new SymbologyPropertiesDtoJsonConverter());
     }
-    
+
     public async Task<OjedaDataResult<AssetIdTypeDto>> GetByIdAsync(string id,
         CancellationToken cancellationToken = default)
     {
         var path = $"{BasePath}/{id}";
         return await SendForDataAsync<AssetIdTypeDto>(HttpMethod.Get, path, null, cancellationToken);
     }
-    
+
     public async Task<OjedaDataResult<PaginatedListDto<AssetIdTypeDto>>> GetAsync(
         string query = null,
         string orderBy = null,
@@ -48,24 +48,31 @@ internal class AssetIdTypesService : BaseService, IAssetIdTypesService
 
         return await SendForDataAsync<PaginatedListDto<AssetIdTypeDto>>(HttpMethod.Get, path, null, cancellationToken);
     }
-    
+
     public async Task<OjedaDataResult<AssetIdTypeDto>> CreateAsync(CreateAssetIdTypeDto assetIdType,
         CancellationToken cancellationToken = default)
     {
         var path = $"{BasePath}";
         return await SendForDataAsync<AssetIdTypeDto>(HttpMethod.Post, path, assetIdType, cancellationToken);
     }
-    
+
     public async Task<OjedaDataResult<AssetIdTypeDto>> UpdateAsync(string id, UpdateAssetIdTypeDto assetIdType,
         CancellationToken cancellationToken = default)
     {
         var path = $"{BasePath}/{id}";
         return await SendForDataAsync<AssetIdTypeDto>(HttpMethod.Put, path, assetIdType, cancellationToken);
     }
-    
+
     public async Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         var path = $"{BasePath}/{id}";
         return await SendAsync(HttpMethod.Delete, path, null, cancellationToken);
+    }
+
+    public async Task<OjedaDataResult<DryRunDeleteAssetIdTypeDto>> DryRunDeleteAsync(string id,
+        CancellationToken cancellationToken = default)
+    {
+        var path = $"{BasePath}/{id}/dry-run";
+        return await SendForDataAsync<DryRunDeleteAssetIdTypeDto>(HttpMethod.Delete, path, null, cancellationToken);
     }
 }

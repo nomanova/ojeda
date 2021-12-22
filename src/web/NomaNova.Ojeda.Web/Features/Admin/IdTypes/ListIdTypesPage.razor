@@ -103,7 +103,14 @@
 
     protected override async Task<bool> DeleteItemAsync(AssetIdTypeDto item)
     {
-        return (await _ojeda.AssetIdTypesService.DeleteAsync(item.Id)).Success;
+        var parameters = new ModalParameters();
+        parameters.Add("Id", item.Id);
+        parameters.Add("Name", item.Name);
+        
+        var deleteIdTypeModal = Modal.Show<DeleteIdTypeModal>("Delete Id Type", parameters, Constants.DefaultModalOptions);
+        
+        var result = await deleteIdTypeModal.Result;
+        return !result.Cancelled;
     }
 
     protected override async Task<OjedaDataResult<PaginatedListDto<AssetIdTypeDto>>> FetchItemsAsync(string query = null,

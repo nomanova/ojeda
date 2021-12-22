@@ -28,4 +28,7 @@ public interface IAssetIdTypesService
         CancellationToken cancellationToken = default);
 
     Task<OjedaResult> DeleteAsync(string id, CancellationToken cancellationToken = default);
+
+    Task<OjedaDataResult<DryRunDeleteAssetIdTypeDto>> DryRunDeleteAsync(string id,
+        CancellationToken cancellationToken = default);
 }

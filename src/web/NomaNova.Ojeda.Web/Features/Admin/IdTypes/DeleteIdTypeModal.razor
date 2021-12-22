@@ -1,0 +1,53 @@
+@using System.Text
+@inherits DryRunDeleteItemModal<DryRunDeleteAssetIdTypeDto>
+
+@inject OjedaClient _ojeda
+
+<ActionModalTemplate
+    Text="@Text"
+    IsLoading="@IsLoading"
+    IsDisabled="@IsDisabled"
+    Error="@Error"
+    HasActionButton="@_hasActionButton"
+    ActionCallBack="@OnDeleteAsync"
+    CancelCallBack="@OnCancelAsync"/>
+
+@code {
+
+    private bool _hasActionButton;
+    
+    protected override async Task<OjedaResult> DeleteAsync()
+    {
+        return await _ojeda.AssetIdTypesService.DeleteAsync(Id);
+    }
+    
+    protected override async Task<OjedaDataResult<DryRunDeleteAssetIdTypeDto>> DryRunDeleteAsync()
+    {
+        return await _ojeda.AssetIdTypesService.DryRunDeleteAsync(Id);
+    }
+
+    protected override string GetText(DryRunDeleteAssetIdTypeDto data)
+    {
+        var text = new StringBuilder();
+
+        if (data.AssetTypes.HasElements())
+        {
+            _hasActionButton = false;
+            
+            var count = data.AssetTypes.Count;
+            var assets = count == 1 ? "asset" : "assets";
+
+            text.AppendLine($"<p>The id type '<b>{Name}</b>' cannot be deleted, it is currently in use by <b>{data.AssetTypes.Count} {assets}</b>.</p>");
+            
+            text.AppendLine("<p>Switch to a different id type for the impacted assets, and try again.</p>");
+        }
+        else
+        {
+            _hasActionButton = true;
+            
+            text.AppendLine($"<p>Are you sure you want to delete id type '<b>{Name}</b>'?</p>");
+        }
+
+        return text.ToString();
+    }
+}

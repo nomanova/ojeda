@@ -25,5 +25,6 @@ public interface IAssetIdTypesService
     Task<AssetIdTypeDto> UpdateAsync(string id, UpdateAssetIdTypeDto assetIdTypeDto,
         CancellationToken cancellationToken = default);
 
-    Task DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task<DryRunDeleteAssetIdTypeDto> DeleteAsync(string id, bool dryRun,
+        CancellationToken cancellationToken = default);
 }

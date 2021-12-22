@@ -20,12 +20,15 @@
                 OnClick="@CancelCallBack"
                 Text="Cancel"
                 IsDisabled="@IsLoading"/>
-            <span class="ps-2"></span>
-            <OjedaButton
-                Style="@ActionButtonStyle"
-                OnClick="@ActionCallBack"
-                Text="@ActionButtonText"
-                IsDisabled="@(IsDisabled || IsLoading)"/>
+            @if (HasActionButton)
+            {
+                <span class="ps-2"></span>
+                <OjedaButton
+                    Style="@ActionButtonStyle"
+                    OnClick="@ActionCallBack"
+                    Text="@ActionButtonText"
+                    IsDisabled="@(IsDisabled || IsLoading)"/>
+            }
         </div>
 
     </div>
@@ -52,6 +55,9 @@
     [Parameter]
     public bool IsDisabled { get; set; }
 
+    [Parameter]
+    public bool HasActionButton { get; set; } = true;
+    
     [Parameter]
     public EventCallback CancelCallBack { get; set; }
 

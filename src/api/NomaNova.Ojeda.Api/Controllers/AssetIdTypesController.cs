@@ -102,10 +102,26 @@ public class AssetIdTypesController : ApiController
     /// </summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken cancellationToken = default)
     {
-        await _assetIdTypesService.DeleteAsync(id, cancellationToken);
+        await _assetIdTypesService.DeleteAsync(id, false, cancellationToken);
         return Ok();
+    }
+    
+    /// <summary>
+    /// Delete asset id type (dry run)
+    /// </summary>
+    [HttpDelete("{id}/dry-run")]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(typeof(DryRunDeleteAssetIdTypeDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DryRunDelete(
+        [FromRoute] string id,
+        CancellationToken cancellationToken = default)
+    {
+        var deleteAssetIdTypeDto = await _assetIdTypesService.DeleteAsync(id, true, cancellationToken);
+        return Ok(deleteAssetIdTypeDto);
     }
 }
