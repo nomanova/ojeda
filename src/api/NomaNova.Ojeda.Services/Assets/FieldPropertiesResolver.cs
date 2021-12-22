@@ -21,7 +21,7 @@ namespace NomaNova.Ojeda.Services.Assets
             _isRequired = isRequired;
         }
 
-        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldId)
+        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldSetId, string fieldId)
         {
             var fieldPropertiesDto = _mapper.Map<FieldPropertiesDto>(_fieldProperties);
             return (fieldPropertiesDto, _isRequired);

@@ -13,18 +13,23 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
             _assetDto = assetDto;
         }
 
-        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldId)
+        public (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldSetId, string fieldId)
         {
-            var assetField = _assetDto.FieldSets
-                .SelectMany(fs => fs.Fields)
-                .FirstOrDefault(f => f.Id.Equals(fieldId));
+            var fieldSet = _assetDto.FieldSets.FirstOrDefault(_ => _.Id == fieldSetId);
+
+            if (fieldSet == null)
+            {
+                throw new ArgumentException($"Invalid state, field set {fieldSetId} unknown.");
+            }
+
+            var field = fieldSet.Fields.FirstOrDefault(_ => _.Id == fieldId);
             
-            if (assetField == null)
+            if (field == null)
             {
                 throw new ArgumentException($"Invalid state, field {fieldId} unknown.");
             }
 
-            return (assetField.Properties, assetField.IsRequired);
+            return (field.Properties, field.IsRequired);
         }
     }
 }

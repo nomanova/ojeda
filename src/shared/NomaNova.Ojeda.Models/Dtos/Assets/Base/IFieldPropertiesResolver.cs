@@ -4,6 +4,6 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
 {
     public interface IFieldPropertiesResolver
     {
-        (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldId);
+        (FieldPropertiesDto properties, bool isRequired) Resolve(string fieldSetId, string fieldId);
     }
 }

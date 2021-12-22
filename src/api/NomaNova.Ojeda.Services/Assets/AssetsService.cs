@@ -471,7 +471,7 @@ namespace NomaNova.Ojeda.Services.Assets
                     else
                     {
                         var fieldPropertiesResolver = new FieldPropertiesResolver(Mapper, dbField.Properties, dbFieldSetField.IsRequired);
-                        var validator = (IValidator) new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver);
+                        var validator = (IValidator) new UpsertAssetFieldDtoFieldValidator(dbFieldSet.Id, fieldPropertiesResolver);
 
                         var context = ValidationContext<object>.CreateWithOptions(dtoField,
                             opt => opt.IncludeAllRuleSets());

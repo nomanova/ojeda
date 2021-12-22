@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using FluentValidation;
 
 namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
@@ -15,8 +16,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets.Base
     {
         public UpsertAssetFieldSetDtoFieldValidator(IFieldPropertiesResolver fieldPropertiesResolver)
         {
-            RuleForEach(_ => _.Fields).SetValidator(
-                new UpsertAssetFieldDtoFieldValidator(fieldPropertiesResolver));
+            RuleForEach(_ => _.Fields).SetValidator(_ =>
+                new UpsertAssetFieldDtoFieldValidator(_.Id, fieldPropertiesResolver));
         }
     }
 }

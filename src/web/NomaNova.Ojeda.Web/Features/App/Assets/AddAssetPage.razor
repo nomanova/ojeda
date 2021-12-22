@@ -247,7 +247,7 @@
         }
         else
         {
-            ToastService.ShowError($"Could not load asset type. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError( result.Error.Stringify("Could not load asset type."));
             NavManager.NavigateTo("/assets");
         }
 

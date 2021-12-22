@@ -82,8 +82,8 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
                     break;
                 default:
                 {
-                    var fieldId = GetFieldId(editContext.Model, model);
-                    validator = GetFieldDataValidator(model, assetDto, fieldId);
+                    var (fieldSetId, fieldId) = GetFieldId(editContext.Model, model);
+                    validator = GetFieldDataValidator(model, assetDto, fieldSetId, fieldId);
                     break;
                 }
             }
@@ -96,10 +96,10 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             editContext.NotifyValidationStateChanged();
         }
 
-        private static IValidator GetFieldDataValidator(object model, AssetDto assetDto, string fieldId)
+        private static IValidator GetFieldDataValidator(object model, AssetDto assetDto, string fieldSetId, string fieldId)
         {
             var resolver = new AssetDtoFieldPropertiesResolver(assetDto);
-            var (fieldProperties, isRequired) = resolver.Resolve(fieldId);
+            var (fieldProperties, isRequired) = resolver.Resolve(fieldSetId, fieldId);
             
             if (model.GetType() == typeof(StringFieldDataDto))
             {
@@ -119,7 +119,7 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             throw new NotImplementedException($"Missing validator for model: {model.GetType()}");
         }
 
-        private static string GetFieldId(object editContextModel, object fieldModel)
+        private static (string fieldSetId, string fieldId) GetFieldId(object editContextModel, object fieldModel)
         {
             if (editContextModel is CreateAssetDto createAssetDto)
             {
@@ -129,7 +129,7 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
                     {
                         if (createAssetFieldDto.Data.Equals(fieldModel))
                         {
-                            return createAssetFieldDto.Id;
+                            return (createAssetFieldSetDto.Id, createAssetFieldDto.Id);
                         }
                     }
                 }
@@ -143,12 +143,11 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
                     {
                         if (createAssetFieldDto.Data.Equals(fieldModel))
                         {
-                            return createAssetFieldDto.Id;
+                            return (createAssetFieldSetDto.Id, createAssetFieldDto.Id);
                         }
                     }
                 }
             }
-
 
             throw new ArgumentException("Invalid state, no matching field found");
         }
