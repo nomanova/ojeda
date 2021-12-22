@@ -23,6 +23,7 @@
 
             <div class="ojeda-form">
 
+                <!-- General -->
                 <FormSection Title="General" CssClass="mb-3">
 
                     <!-- Name -->
@@ -37,9 +38,29 @@
 
                 </FormSection>
 
+                <!-- Properties -->
+                <FormSection Title="Properties" CssClass="mb-3">
+                    
+                    <!-- Id Type -->
+                    <OjedaFormField ForId="assettype-assetidtypeid" Label="Id Type" IsRequired="true" ValidateFor="@(() => UpsertAssetType.AssetIdTypeId)">
+                        <div class="d-flex">
+                            <input
+                                class="form-control"
+                                value="@(AssetIdType == null? string.Empty : AssetIdType.Name)"
+                                disabled/>
+                            
+                            <OjedaInputText @bind-Value="UpsertAssetType.AssetIdTypeId" class="form-control" id="assettype-assetidtypeid" disabled="true" hidden="true"/>
+                            <div class="d-flex align-items-center">
+                                <a class="btn-link ms-4 @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnEditAssetTypeId">Edit</a>
+                            </div>
+                        </div>
+                    </OjedaFormField>
+
+                </FormSection>
+                
+                <!-- Field Sets -->
                 <FormSection Title="Field Sets">
 
-                    <!-- Field Sets -->
                     <div class="mb-3">
                         <div class="d-flex mb-2">
                             <a class="btn-link @(IsSubmitting ? "disabled" : "")" role="button" @onclick="@OnAddFieldSet">Add Field Set</a>
@@ -137,6 +158,7 @@
             FieldSets = new List<CreateAssetTypeFieldSetDto>()
         };
         FieldSets = new List<FieldSetSummaryDto>();
+        AssetIdType = null;
 
         EditContext = new EditContext(UpsertAssetType);
         EditContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
+using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Models.Shared.Interfaces;
 
 namespace NomaNova.Ojeda.Models.Dtos.AssetTypes
@@ -18,6 +19,8 @@ namespace NomaNova.Ojeda.Models.Dtos.AssetTypes
 
     public class AssetTypeDto : AssetTypeSummaryDto
     {
+        public NamedEntityDto AssetIdType { get; set; }
+
         public List<AssetTypeFieldSetDto> FieldSets { get; set; } = new();
     }
 

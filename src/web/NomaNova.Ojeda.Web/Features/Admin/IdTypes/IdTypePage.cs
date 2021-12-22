@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Components;
 using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Web.Shared.Base;
 
-namespace NomaNova.Ojeda.Web.Features.Admin.AssetIdTypes;
+namespace NomaNova.Ojeda.Web.Features.Admin.IdTypes;
 
-public abstract class AssetIdTypePage : FormPage<AssetIdTypeDto>
+public abstract class IdTypePage : FormPage<AssetIdTypeDto>
 {
     protected void OnSymbologyChange(ChangeEventArgs args)
     {

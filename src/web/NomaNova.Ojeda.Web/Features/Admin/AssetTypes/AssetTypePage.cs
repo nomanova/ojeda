@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blazored.Modal;
 using Blazored.Modal.Services;
 using Microsoft.AspNetCore.Components;
+using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes;
 using NomaNova.Ojeda.Models.Dtos.AssetTypes.Base;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
@@ -24,7 +25,9 @@ namespace NomaNova.Ojeda.Web.Features.Admin.AssetTypes
         protected abstract T UpsertAssetType { get; set; }
         
         protected List<FieldSetSummaryDto> FieldSets { get; set; }
-        
+
+        protected AssetIdTypeDto AssetIdType { get; set; }
+
         protected async Task OnAddFieldSet()
         {
             if (IsSubmitting)
@@ -56,7 +59,34 @@ namespace NomaNova.Ojeda.Web.Features.Admin.AssetTypes
                 StateHasChanged();
             }
         }
-        
+
+        protected async Task OnEditAssetTypeId()
+        {
+            if (IsSubmitting)
+            {
+                return;
+            }
+            
+            var parameters = new ModalParameters();
+
+            var excludedIds = string.IsNullOrEmpty(UpsertAssetType.AssetIdTypeId)
+                ? new List<string>()
+                : new List<string> { UpsertAssetType.AssetIdTypeId };
+            parameters.Add("ExcludedIds", excludedIds);
+            
+            var selectAssetIdTypeModal = Modal.Show<SelectAssetIdTypeModal>("Edit Id Type", parameters, Constants.DefaultModalOptions);
+            var result = await selectAssetIdTypeModal.Result;
+
+            if (!result.Cancelled)
+            {
+                AssetIdType = (AssetIdTypeDto) result.Data;
+                UpsertAssetType.AssetIdTypeId = AssetIdType.Id;
+                
+                EditContext.NotifyFieldChanged(EditContext.Field(nameof(UpsertAssetType.AssetIdTypeId)));
+                StateHasChanged();
+            }
+        }
+
         protected void OnMoveItemUp(TS item)
         {
             if (IsSubmitting)

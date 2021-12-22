@@ -11,6 +11,7 @@ public class AssetIdTypeProfile : Profile
     public AssetIdTypeProfile()
     {
         // Domain -> Dto
+        CreateMap<AssetIdType, NamedEntityDto>();
         CreateMap<AssetIdType, AssetIdTypeDto>();
         CreateMap<PaginatedList<AssetIdType>, PaginatedListDto<AssetIdTypeDto>>();
 

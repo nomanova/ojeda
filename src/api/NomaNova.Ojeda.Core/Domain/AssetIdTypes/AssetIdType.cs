@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using NomaNova.Ojeda.Core.Domain.AssetTypes;
 
 namespace NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 
@@ -17,4 +19,6 @@ public class AssetIdType : BaseEntity, INamedEntity, IDescribedEntity, ITimestam
     public bool WithManualEntry { get; set; }
     
     public SymbologyProperties Properties { get; set; }
+    
+    public virtual ICollection<AssetType> AssetTypes { get; set; }
 }

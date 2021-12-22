@@ -1,4 +1,4 @@
-@page "/admin/asset-id-types"
+@page "/admin/id-types"
 @layout AdminLayout
 @inherits ListItemsPage<AssetIdTypeDto>
 
@@ -13,7 +13,7 @@
 
         <OjedaBreadcrumb Data="@_breadcrumbItems"/>
 
-        <PageHeader Title="Asset Id Types">
+        <PageHeader Title="Id Types">
             <Toolbar>
                 <div class="d-flex align-items-center me-3">
                     <Spinner IsLoading="@IsLoading"/>
@@ -23,7 +23,7 @@
                     <Search OnValueChanged="@OnSearchAsync"></Search>
                 </div>
 
-                <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Asset Id Type"/>
+                <OjedaButton Style="@ButtonStyle.Primary" OnClick="OnAdd" Text="Add Id Type"/>
             </Toolbar>
         </PageHeader>
 
@@ -63,7 +63,7 @@
                     <td>
                         <Description Value="@assetIdType.Description"/>
                     </td>
-                    <td>@assetIdType.Properties.Symbology.ToString()?.ToUpperInvariant()</td>
+                    <td>@assetIdType.Properties.Symbology.ToString().ToUpperInvariant()</td>
                     <td>@assetIdType.UpdatedAt.ToRelativeTime(_timeKeeper)</td>
                 </RowTemplate>
             </ActionsTableTemplate>
@@ -96,10 +96,10 @@
     private readonly ICollection<BreadcrumbItem> _breadcrumbItems = new List<BreadcrumbItem>
     {
         new() { Text = "Admin", Url = "/admin" },
-        new() { Text = "Asset Id Types" }
+        new() { Text = "Id Types" }
     };
 
-    protected override string Path => "/admin/asset-id-types";
+    protected override string Path => "/admin/id-types";
 
     protected override async Task<bool> DeleteItemAsync(AssetIdTypeDto item)
     {

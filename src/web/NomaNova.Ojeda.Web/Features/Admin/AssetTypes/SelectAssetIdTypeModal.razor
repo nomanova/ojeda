@@ -1,0 +1,39 @@
+@inherits SelectItemModal<NomaNova.Ojeda.Models.Dtos.AssetIdTypes.AssetIdTypeDto>
+
+@inject OjedaClient _ojeda
+
+<SelectItemModalTemplate TItem="AssetIdTypeDto"
+                         HelpText="Select the <strong>id type</strong> to use."
+                         Error="@Error"
+                         IsLoading="@IsLoading"
+                         SearchQuery="@SearchQuery"
+                         PageCount="@PageCount"
+                         CurrentPage="@CurrentPage"
+                         Items="@Items"
+                         SearchCallback="@OnSearchAsync"
+                         SelectItemCallBack="@OnItemSelected"
+                         PageChangedCallback="@OnPageChanged"
+                         CancelCallBack="@OnCancel">
+    <TableHeader>
+        <th>Name</th>
+        <th>Description</th>
+    </TableHeader>
+    <RowTemplate Context="assetIdType">
+        <td class="pb-2">@assetIdType.Name.Truncate()</td>
+        <td class="pb-2"><Description Value="@assetIdType.Description" /></td>
+    </RowTemplate>
+</SelectItemModalTemplate>
+
+@code {
+    
+    protected override async Task<OjedaDataResult<PaginatedListDto<AssetIdTypeDto>>> FetchItemsAsync(
+        string query = null,
+        IList<string> excludedIds = null,
+        int pageNumber = Constants.DefaultPageNumber,
+        int pageSize = Constants.DefaultPageSize)
+    {
+        return await _ojeda.AssetIdTypesService.GetAsync(
+            query, null, true, ExcludedIds, pageNumber, pageSize);
+    }
+    
+}

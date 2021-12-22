@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 using NomaNova.Ojeda.Core.Domain.FieldSets;
@@ -23,17 +24,20 @@ namespace NomaNova.Ojeda.Services.AssetTypes
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Asset> _assetsRepository;
         private readonly IRepository<FieldValue> _fieldValueRepository;
+        private readonly IRepository<AssetIdType> _assetIdTypesRepository;
 
         public AssetTypesService(
             IMapper mapper,
             IRepository<FieldSet> fieldSetsRepository,
             IRepository<AssetType> assetTypesRepository,
             IRepository<Asset> assetsRepository,
-            IRepository<FieldValue> fieldValueRepository) : base(mapper, assetTypesRepository)
+            IRepository<FieldValue> fieldValueRepository,
+            IRepository<AssetIdType> assetIdTypesRepository) : base(mapper, assetTypesRepository)
         {
             _fieldSetsRepository = fieldSetsRepository;
             _assetsRepository = assetsRepository;
             _fieldValueRepository = fieldValueRepository;
+            _assetIdTypesRepository = assetIdTypesRepository;
         }
 
         public async Task<AssetTypeDto> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -41,8 +45,9 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             var assetType = await Repository.GetByIdAsync(id, query =>
             {
                 return query
-                    .Include(c => c.AssetTypeFieldSets)
-                    .ThenInclude(f => f.FieldSet);
+                    .Include(_ => _.AssetIdType)
+                    .Include(_ => _.AssetTypeFieldSets)
+                    .ThenInclude(_ => _.FieldSet);
             }, cancellationToken);
 
             if (assetType == null)
@@ -73,8 +78,9 @@ namespace NomaNova.Ojeda.Services.AssetTypes
                 searchQuery, query =>
                 {
                     return query
-                        .Include(s => s.AssetTypeFieldSets)
-                        .ThenInclude(f => f.FieldSet);
+                        .Include(_ => _.AssetIdType)
+                        .Include(_ => _.AssetTypeFieldSets)
+                        .ThenInclude(_ => _.FieldSet);
                 }, orderBy, orderAsc, pageNumber, pageSize, cancellationToken);
 
             var paginatedAssetTypesDto = Mapper.Map<PaginatedListDto<AssetTypeDto>>(paginatedAssetTypes);
@@ -92,7 +98,7 @@ namespace NomaNova.Ojeda.Services.AssetTypes
             CreateAssetTypeDto assetTypeDto, CancellationToken cancellationToken = default)
         {
             await ValidateAndThrowAsync(
-                new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, Repository), assetTypeDto,
+                new CreateAssetTypeDtoBusinessValidator(_fieldSetsRepository, Repository, _assetIdTypesRepository), assetTypeDto,
                 cancellationToken);
 
             var assetTypeId = Guid.NewGuid().ToString();
