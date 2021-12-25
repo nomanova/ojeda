@@ -45,6 +45,9 @@ RUN dotnet restore src/api/NomaNova.Ojeda.Data/NomaNova.Ojeda.Data.csproj
 COPY src/api/NomaNova.Ojeda.Services/NomaNova.Ojeda.Services.csproj ./src/api/NomaNova.Ojeda.Services/
 RUN dotnet restore src/api/NomaNova.Ojeda.Services/NomaNova.Ojeda.Services.csproj
 
+COPY test/api/NomaNova.Ojeda.Services.Tests/NomaNova.Ojeda.Services.Tests.csproj ./test/api/NomaNova.Ojeda.Services.Tests/
+RUN dotnet restore test/api/NomaNova.Ojeda.Services.Tests/NomaNova.Ojeda.Services.Tests.csproj
+
 COPY src/api/NomaNova.Ojeda.Api/NomaNova.Ojeda.Api.csproj ./src/api/NomaNova.Ojeda.Api/
 RUN dotnet restore src/api/NomaNova.Ojeda.Api/NomaNova.Ojeda.Api.csproj
 
@@ -56,6 +59,12 @@ COPY . .
 
 # Run tests
 WORKDIR ./test/shared/NomaNova.Ojeda.Utils.Tests
+RUN dotnet test \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=opencover
+WORKDIR ../../..
+
+WORKDIR ./test/api/NomaNova.Ojeda.Services.Tests
 RUN dotnet test \
   /p:CollectCoverage=true \
   /p:CoverletOutputFormat=opencover

@@ -84,23 +84,6 @@
 
 </ExpandablePage>
 
-
-@* <div class="d-flex justify-content-between mt-2 mb-4"> *@
-@*     <div class="d-flex align-items-center"> *@
-@*         <h3 class="m-0">Assets</h3> *@
-@*     </div> *@
-@*     <div class="d-flex"> *@
-@*         <div class="d-flex align-items-center me-3"> *@
-@*             <Spinner IsLoading="@IsLoading"/> *@
-@*         </div> *@
-@*         <div class="me-3" style="width: 350px;"> *@
-@*             <Search OnValueChanged="@OnSearchAsync"></Search> *@
-@*         </div> *@
-@*         <ViewSelector OnViewModeChanged="@OnViewModeChanged"/> *@
-@*         <button class="btn btn-primary ms-2" @onclick="OnAdd">Add Asset</button> *@
-@*     </div> *@
-@* </div> *@
-
 @code {
 
     private ViewMode _viewMode = ViewMode.Grid;
@@ -117,6 +100,7 @@
 
             _columnDefinitions.AddRange(new[]
             {
+                new ColumnDefinition { DataField = "AssetId", Caption = "Id" },
                 new ColumnDefinition { DataField = "Name", Caption = "Name" },
                 new ColumnDefinition { DataField = "AssetType.Name", Caption = "Type" },
                 new ColumnDefinition { DataField = "UpdatedAt", Caption = "Last Updated", DataType = DataType.RelativeDateTime, Alignment = Alignment.Right }

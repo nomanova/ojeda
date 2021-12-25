@@ -55,6 +55,10 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
+                    b.Property<string>("AssetId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("AssetTypeId")
                         .HasColumnType("text");
 
@@ -68,6 +72,9 @@ namespace NomaNova.Ojeda.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .IsUnique();
 
                     b.HasIndex("AssetTypeId");
 

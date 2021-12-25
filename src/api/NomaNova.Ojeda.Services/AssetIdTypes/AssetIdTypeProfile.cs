@@ -12,15 +12,26 @@ public class AssetIdTypeProfile : Profile
     {
         // Domain -> Dto
         CreateMap<AssetIdType, NamedEntityDto>();
+        CreateMap<AssetIdType, AssetIdTypeSummaryDto>();
         CreateMap<AssetIdType, AssetIdTypeDto>();
-        CreateMap<PaginatedList<AssetIdType>, PaginatedListDto<AssetIdTypeDto>>();
+        CreateMap<PaginatedList<AssetIdType>, PaginatedListDto<AssetIdTypeDto>>()
+            .ForMember(dest => dest.Items, opt => opt.Ignore());
 
         CreateMap<SymbologyProperties, SymbologyPropertiesDto>().IncludeAllDerived();
         CreateMap<Ean13SymbologyProperties, Ean13SymbologyPropertiesDto>();
 
         // Dto -> Domain
-        CreateMap<CreateAssetIdTypeDto, AssetIdType>();
+        CreateMap<CreateAssetIdTypeDto, AssetIdType>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.AssetTypes, opt => opt.Ignore());
+            
         CreateMap<UpdateAssetIdTypeDto, AssetIdType>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.AssetTypes, opt => opt.Ignore())
             .ForMember(dest => dest.Properties, opt => opt.Ignore());
 
         CreateMap<SymbologyPropertiesDto, SymbologyProperties>().IncludeAllDerived();

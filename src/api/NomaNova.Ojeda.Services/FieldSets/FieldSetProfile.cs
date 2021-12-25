@@ -15,13 +15,27 @@ namespace NomaNova.Ojeda.Services.FieldSets
             CreateMap<FieldSet, FieldSetSummaryDto>();
             CreateMap<FieldSet, FieldSetDto>()
                 .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.FieldSetFields));
-            CreateMap<PaginatedList<FieldSet>, PaginatedListDto<FieldSetDto>>();
+            CreateMap<PaginatedList<FieldSet>, PaginatedListDto<FieldSetDto>>()
+                .ForMember(dest => dest.Items, opt => opt.Ignore());
             
             CreateMap<FieldSetField, FieldSetFieldDto>();
             
             // Dto -> Domain
-            CreateMap<CreateFieldSetDto, FieldSet>();
-            CreateMap<UpdateFieldSetDto, FieldSet>();
+            CreateMap<CreateFieldSetDto, FieldSet>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSetFields, opt => opt.Ignore())
+                .ForMember(dest => dest.AssetTypeFieldSets, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
+                
+            CreateMap<UpdateFieldSetDto, FieldSet>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSetFields, opt => opt.Ignore())
+                .ForMember(dest => dest.AssetTypeFieldSets, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
             
             CreateMap<CreateFieldSetFieldDto, FieldSetField>()
                 .ForMember(dest => dest.Field, opt => opt.Ignore())

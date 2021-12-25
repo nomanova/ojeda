@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <ProjectGuid>{E74D1C91-74B1-4732-9BF2-BCAF943E3D33}</ProjectGuid>
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 

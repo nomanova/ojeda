@@ -169,12 +169,14 @@
         if (_isModified)
         {
             _updateAsset.Name = Asset.Name;
+            _updateAsset.AssetId = Asset.AssetId;
         }
         else
         {
             _updateAsset = new UpdateAssetDto
             {
                 Name = Asset.Name,
+                AssetId = Asset.AssetId,
                 AssetTypeId = Asset.AssetType.Id,
                 FieldSets = Asset.FieldSets.Select(fs => new UpdateAssetFieldSetDto
                 {

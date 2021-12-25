@@ -10,8 +10,22 @@
     <!-- Body -->
     <div class="card-body">
         <h5 class="card-title" style="margin-bottom: 0.3rem;">@Asset.Name.Truncate(28)</h5>
-        <p class="card-text text-muted" style="margin-bottom: 0.75rem;">@Asset.AssetType.Name</p>
-        <small class="text-muted" style="font-size: .75rem;">Last updated: @Asset.UpdatedAt.ToRelativeTime(_timeKeeper)</small>
+
+        <p class="card-text text-muted" style="margin-bottom: 0.75rem;">@Asset.AssetId.Truncate(28)</p>
+
+        <div class="d-flex justify-content-between">
+
+            <small class="text-muted" style="font-size: .75rem;">@Asset.AssetType.Name</small>
+
+            <div class="d-flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#6c757d" class="bi bi-activity" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"/>
+                </svg>
+                <small class="text-muted ms-1" style="font-size: .75rem;">@Asset.UpdatedAt.ToRelativeTime(_timeKeeper)</small>
+            </div>
+
+        </div>
+
     </div>
 
 </div>

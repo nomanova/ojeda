@@ -1,5 +1,6 @@
 @page "/assets/add"
 
+@using NomaNova.Ojeda.Web.Features.App.Assets.Helpers
 @inherits UpsertAssetPage
 
 <ExpandablePage
@@ -35,7 +36,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-4 d-flex align-items-center justify-content-center">
+                                <div class="mt-3 col-4 d-flex justify-content-center">
 
                                     <!-- Image -->
                                     <div class="image bg-light d-flex align-items-center justify-content-center">
@@ -53,22 +54,58 @@
                                             value="@Asset.AssetType.Name"
                                             disabled/>
                                     </OjedaFormField>
-
+                                    
                                     <!-- Name -->
                                     <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createAsset.Name)">
                                         <OjedaInputText @bind-Value="_createAsset.Name" class="form-control" id="field-name" disabled="@_isSubmitting"/>
                                     </OjedaFormField>
 
+                                    <!-- Asset Id -->
+                                    @{
+                                        var assetIdType = Asset.AssetType.AssetIdType;
+                                        var withManualEntry = assetIdType.WithManualEntry;
+
+                                        var (helpText, placeholder) = AssetIdHelper.GetUserInfo(assetIdType);
+                                    }
+
+                                    <OjedaFormField ForId="field-assetId" Label="Asset Id" IsRequired="true" HelpText="@helpText" ValidateFor="@(() => _createAsset.AssetId)">
+                                        @if (withManualEntry)
+                                        {
+                                            <div class="d-flex flex-grow-1">
+                                                <OjedaInputText @bind-Value="_createAsset.AssetId" 
+                                                                class="form-control" 
+                                                                id="field-assetId" 
+                                                                disabled="@(_isSubmitting || _isGenerating)"
+                                                                placeholder="@placeholder"/>
+                                                
+                                                    <OjedaButton
+                                                        CssClass="ms-2"
+                                                        Style="@ButtonStyle.Light"
+                                                        IsDisabled="@(_isSubmitting || _isGenerating)"
+                                                        IsLoading="@_isGenerating"
+                                                        Text="Generate"
+                                                        OnClick="@OnGenerateAssetId"/>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <OjedaInputText @bind-Value="_createAsset.AssetId" 
+                                                            class="form-control" 
+                                                            id="field-assetId" 
+                                                            disabled="true"/>
+                                        }
+                                    </OjedaFormField>
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Field Sets -->
-                    @for(var i = 0; i < _createAsset.FieldSets.Count; i++)
+                    @for (var i = 0; i < _createAsset.FieldSets.Count; i++)
                     {
                         var fieldSet = _createAsset.FieldSets[i];
-                        
+
                         var formSectionClass = "mb-3";
 
                         if (i == 0 && _createAsset.FieldSets.Count == 1)
@@ -166,6 +203,8 @@
     private bool _isSubmitting;
     private string _error;
 
+    private bool _isGenerating;
+
     protected override async Task OnInitializedAsync()
     {
         NavManager.TryGetQueryString<string>("assetTypeId", out var assetTypeId);
@@ -191,7 +230,7 @@
         }
         else if (!result.Success)
         {
-            ToastService.ShowError($"Could not submit asset. {result.Error?.Message} ({result.Error?.Code}).");
+            ToastService.ShowError( result.Error.Stringify("Could not submit asset."));
         }
         else
         {
@@ -222,6 +261,27 @@
         Init();
     }
 
+    private async Task OnGenerateAssetId()
+    {
+        _isGenerating = true;
+
+        var result = await Ojeda.AssetIdsService.GenerateAsync(Asset.AssetType.Id);
+
+        if (result.Success)
+        {
+            var generateAssetId = result.Data;
+            _createAsset.AssetId = generateAssetId.AssetId;
+            
+            _editContext.NotifyFieldChanged(_editContext.Field(nameof(CreateAssetDto.AssetId)));
+        }
+        else
+        {
+            ToastService.ShowError( result.Error.Stringify("Could not generate asset id."));
+        }
+
+        _isGenerating = false;
+    }
+
     private async Task GetAssetType(string assetTypeId)
     {
         if (string.IsNullOrEmpty(assetTypeId))
@@ -247,7 +307,7 @@
         }
         else
         {
-            ToastService.ShowError( result.Error.Stringify("Could not load asset type."));
+            ToastService.ShowError(result.Error.Stringify("Could not load asset type."));
             NavManager.NavigateTo("/assets");
         }
 
@@ -256,9 +316,12 @@
 
     private void Init()
     {
+        var withManualEntry = Asset.AssetType.AssetIdType.WithManualEntry;
+        
         _createAsset = new CreateAssetDto
         {
             AssetTypeId = Asset.AssetType.Id,
+            AssetId = withManualEntry ? "" : Asset.AssetId,
             FieldSets = Asset.FieldSets.Select(fs => new CreateAssetFieldSetDto
             {
                 Id = fs.Id,
@@ -273,5 +336,4 @@
         _editContext = new EditContext(_createAsset);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
-
 }

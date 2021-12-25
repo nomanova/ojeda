@@ -1,3 +1,4 @@
+@using NomaNova.Ojeda.Models.Shared.Validation
 @inject OjedaClient _ojeda
 @inject IToastService _toastService
 
@@ -7,7 +8,7 @@
 
         <EditForm id="form-asset-edit-name" EditContext="_editContext" OnValidSubmit="OnSubmitForm">
 
-            <FluentValidationValidator/>
+            <FluentValidationValidator Validator="@(new NamedFieldValidator())"/>
             <ServerSideFluentValidation @ref="_serverValidation"/>
 
             <OjedaFormField ForId="asset-name" CssClass="mt-2 mx-1" ValidateFor="@(() => _patchAsset.Name)">

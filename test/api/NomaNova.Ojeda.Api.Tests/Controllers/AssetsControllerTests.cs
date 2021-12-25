@@ -58,7 +58,11 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
         public async Task GetByAssetType_WhenAssetTypeExists_ShouldReturnOk()
         {
             // Arrange
+            var assetIdType = await new AssetIdTypeBuilder()
+                .Build(DatabaseContext);
+            
             var assetType = await new AssetTypeBuilder()
+                .WithAssetIdType(assetIdType.Id)
                 .Build(DatabaseContext);
             
             var request = new RequestBuilder($"/api/assets/new?assetTypeId={assetType.Id}")
@@ -134,7 +138,11 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
         public async Task Create_WhenValid_ShouldReturnCreated()
         {
             // Arrange
+            var assetIdType = await new AssetIdTypeBuilder()
+                .Build(DatabaseContext);
+            
             var assetType = await new AssetTypeBuilder()
+                .WithAssetIdType(assetIdType.Id)
                 .Build(DatabaseContext);
 
             var createAssetDto = AssetFactory.NewRandomCreateDto(assetType.Id);
@@ -163,7 +171,11 @@ namespace NomaNova.Ojeda.Api.Tests.Controllers
         public async Task Update_WhenValidAndExists_ShouldReturnOk()
         {
             // Arrange
+            var assetIdType = await new AssetIdTypeBuilder()
+                .Build(DatabaseContext);
+            
             var assetType = await new AssetTypeBuilder()
+                .WithAssetIdType(assetIdType.Id)
                 .Build(DatabaseContext);
 
             var asset = await new AssetBuilder(assetType.Id)

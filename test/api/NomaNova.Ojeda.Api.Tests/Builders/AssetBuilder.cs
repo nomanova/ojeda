@@ -15,7 +15,7 @@ namespace NomaNova.Ojeda.Api.Tests.Builders
         private readonly Asset _asset;
         private readonly ICollection<FieldValue> _fieldValues;
 
-        public AssetBuilder(string assetTypeId, string id = null)
+        public AssetBuilder(string assetTypeId, string id = null, string assetId = null)
         {
             _asset = AssetFactory.NewRandom(assetTypeId, id);
             _fieldValues = new List<FieldValue>();

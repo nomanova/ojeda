@@ -1,10 +1,16 @@
-<button class="@(GetButtonClass())" type="@(GetButtonType())" form="@Form" @onclick="OnClick" disabled="@IsDisabled">
+<button class="@(GetButtonClass()) @CssClass" type="@(GetButtonType())" form="@Form" @onclick="OnClick" disabled="@IsDisabled">
     @if (IsLoading)
     {
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        <span class="visually-hidden">Loading...</span>
+        <div class="d-flex align-items-center">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="ms-2">@Text</span>
+        </div>
     }
-    @Text
+    else
+    {
+        @Text
+    }
+    
 </button>
 
 @code {
@@ -30,6 +36,9 @@
     [Parameter]
     public EventCallback OnClick { get; set; }
 
+    [Parameter]
+    public string CssClass { get; set; }
+    
     private string GetButtonClass()
     {
         switch (Style)
@@ -40,6 +49,8 @@
                 return "btn btn-secondary";
             case ButtonStyle.Danger:
                 return "btn btn-danger";
+            case ButtonStyle.Light:
+                return "btn btn-light";
             default:
                 return "btn";
         }

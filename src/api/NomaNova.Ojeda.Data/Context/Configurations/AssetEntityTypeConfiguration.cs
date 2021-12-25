@@ -9,7 +9,13 @@ namespace NomaNova.Ojeda.Data.Context.Configurations
         public void Configure(EntityTypeBuilder<Asset> builder)
         {
             builder.HasKey(_ => _.Id);
-        
+
+            builder.HasIndex(_ => _.AssetId)
+                .IsUnique();
+
+            builder.Property(_ => _.AssetId)
+                .IsRequired();
+            
             builder.HasOne(_ => _.AssetType)
                 .WithMany(_ => _.Assets)
                 .HasForeignKey(_ => _.AssetTypeId)

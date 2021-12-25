@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
+    <ProjectGuid>{A34B1C4E-D028-4E57-B7A6-E7B001D64DF2}</ProjectGuid>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 

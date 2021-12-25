@@ -12,6 +12,8 @@ using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Utils.Services;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
+using NomaNova.Ojeda.Web.Features.App.Assets.Services;
+using NomaNova.Ojeda.Web.Features.App.Assets.Services.Interfaces;
 
 namespace NomaNova.Ojeda.Web
 {
@@ -42,11 +44,18 @@ namespace NomaNova.Ojeda.Web
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddBlazoredModal();
 
-            builder.Services.AddSingleton<ITimeKeeper, TimeKeeper>();
-            
+            RegisterServices(builder.Services);
             RegisterValidators(builder.Services);
 
             await builder.Build().RunAsync();
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            services.AddSingleton<ITimeKeeper, TimeKeeper>();
+            
+            services.AddSingleton<ISymbologyService, SymbologyService>();
+            services.AddSingleton<IEan13SymbologyService, Ean13SymbologyService>();
         }
 
         private static void RegisterValidators(IServiceCollection services)

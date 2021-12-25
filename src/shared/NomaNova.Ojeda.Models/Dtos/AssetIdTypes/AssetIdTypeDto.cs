@@ -7,8 +7,8 @@ namespace NomaNova.Ojeda.Models.Dtos.AssetIdTypes
     {
         Ean13
     }
-    
-    public class AssetIdTypeDto : IIdentityDto, INamedDto
+
+    public class AssetIdTypeSummaryDto : IIdentityDto, INamedDto
     {
         public string Id { get; set; }
 
@@ -19,7 +19,10 @@ namespace NomaNova.Ojeda.Models.Dtos.AssetIdTypes
         public string Description { get; set; }
 
         public bool WithManualEntry { get; set; }
+    }
 
+    public class AssetIdTypeDto : AssetIdTypeSummaryDto
+    {
         public SymbologyPropertiesDto Properties { get; set; }
     }
 }

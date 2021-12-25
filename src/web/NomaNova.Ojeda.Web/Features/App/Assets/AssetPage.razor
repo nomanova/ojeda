@@ -13,8 +13,8 @@
             IsLoading="@_isLoading"
             AssetDto="@_asset"
             OnDelete="@OnDelete"
-            OnEditName="@OnEditName"
-            OnEditTag="@OnEditTag" />
+            OnEditName="@OnEditAssetName"
+            OnEditAssetId="@OnEditAssetId" />
 
         <!-- Tabs -->
         <ul class="nav nav-tabs px-3 mb-3">
@@ -94,14 +94,14 @@
         _asset.UpdatedAt = _timeKeeper.UtcNow;
     }
 
-    private async Task OnEditName()
+    private async Task OnEditAssetName()
     {
         var parameters = new ModalParameters();
         parameters.Add("Id", AssetId);
         parameters.Add("Name", _asset.Name);
         
-        var editNameModal = Modal.Show<EditNameModal>("Edit Asset Name", parameters, Constants.DefaultModalOptions);
-        var result = await editNameModal.Result;
+        var editAssetNameModal = Modal.Show<EditAssetNameModal>("Edit Asset Name", parameters, Constants.DefaultModalOptions);
+        var result = await editAssetNameModal.Result;
         
         if (!result.Cancelled)
         {
@@ -111,9 +111,22 @@
         }
     }
 
-    private void OnEditTag()
+    private async Task OnEditAssetId()
     {
-        Console.WriteLine("Editing tag");
+        var parameters = new ModalParameters();
+        parameters.Add("Id", AssetId);
+        parameters.Add("AssetId", _asset.AssetId);
+        parameters.Add("AssetIdType", _asset.AssetType.AssetIdType);
+        parameters.Add("AssetTypeId", _asset.AssetType.Id);
+        
+        var editAssetIdModal = Modal.Show<EditAssetIdModal>("Edit Asset Id", parameters, Constants.DefaultModalOptions);
+        var result = await editAssetIdModal.Result;
+
+        if (!result.Cancelled)
+        {
+            _asset.AssetId = (string)result.Data;
+            _asset.UpdatedAt = _timeKeeper.UtcNow;
+            StateHasChanged();
+        }
     }
-    
 }

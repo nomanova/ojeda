@@ -16,7 +16,7 @@ using NomaNova.Ojeda.Utils.Extensions;
 
 namespace NomaNova.Ojeda.Services.AssetIdTypes;
 
-public class AssetIdTypesService : BaseService<AssetIdType>, IAssetIdTypesService
+public class AssetIdTypesService : BaseEntityService<AssetIdType>, IAssetIdTypesService
 {
     private readonly IRepository<AssetType> _assetTypesRepository;
 

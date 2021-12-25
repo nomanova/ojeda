@@ -12,7 +12,10 @@ namespace NomaNova.Ojeda.Core.Domain.Assets
 
         [Searchable]
         public string Name { get; set; }
-        
+
+        [Searchable]
+        public string AssetId { get; set; }
+
         public string AssetTypeId { get; set; }
         
         public AssetType AssetType { get; set; }

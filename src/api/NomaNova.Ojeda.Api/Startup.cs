@@ -24,6 +24,8 @@ using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Models.Shared.Converters;
+using NomaNova.Ojeda.Services.AssetIds;
+using NomaNova.Ojeda.Services.AssetIds.Interfaces;
 using NomaNova.Ojeda.Services.AssetIdTypes;
 using NomaNova.Ojeda.Services.AssetIdTypes.Interfaces;
 using NomaNova.Ojeda.Services.Assets;
@@ -113,6 +115,9 @@ namespace NomaNova.Ojeda.Api
             services.TryAddSingleton<ITimeKeeper, TimeKeeper>();
             services.TryAddSingleton<ISerializer, Serializer>();
             
+            services.TryAddSingleton<ISymbologyService, SymbologyService>();
+            services.TryAddSingleton<IEan13SymbologyService, Ean13SymbologyService>();
+            
             services.TryAddSingleton<IFieldDataConverter, FieldDataConverter>();
             
             services.TryAddScoped<IFieldsService, FieldsService>();
@@ -120,6 +125,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IAssetTypesService, AssetTypesService>();
             services.TryAddScoped<IAssetsService, AssetsService>();
             services.TryAddScoped<IAssetIdTypesService, AssetIdTypesService>();
+            services.TryAddScoped<IAssetIdsService, AssetIdsService>();
         }
 
         private static void AddRepositories(IServiceCollection services)

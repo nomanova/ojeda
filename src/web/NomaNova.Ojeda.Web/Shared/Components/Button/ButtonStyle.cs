@@ -5,6 +5,7 @@ namespace NomaNova.Ojeda.Web.Shared.Components.Button
         NotSet,
         Primary,
         Secondary,
-        Danger
+        Danger,
+        Light
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using FluentValidation;
 
 namespace NomaNova.Ojeda.Models.Dtos.Assets.Base

@@ -19,9 +19,9 @@ namespace NomaNova.Ojeda.Data.Repositories
         private readonly ITimeKeeper _timeKeeper;
         private readonly DatabaseContext _context;
         private readonly DatabaseOptions _options;
- 
+
         public EntityRepository(
-            ITimeKeeper timeKeeper, 
+            ITimeKeeper timeKeeper,
             DatabaseContext context,
             IOptions<DatabaseOptions> options)
         {
@@ -29,21 +29,21 @@ namespace NomaNova.Ojeda.Data.Repositories
             _context = context;
             _options = options.Value;
         }
-        
+
         public async Task<TEntity> GetByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            return await _context.Set<TEntity>().FindAsync(new object[] {id}, cancellationToken);
+            return await _context.Set<TEntity>().FindAsync(new object[] { id }, cancellationToken);
         }
 
         public async Task<TEntity> GetByIdAsync(
-            string id, 
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null, 
+            string id,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
             CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().Where(e => e.Id.Equals(id));
-            
+
             queryable = func != null ? func(queryable) : queryable;
-            
+
             return await queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
@@ -51,18 +51,26 @@ namespace NomaNova.Ojeda.Data.Repositories
             Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null, CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
-            
+
             queryable = func != null ? func(queryable) : queryable;
 
             return await queryable.ToListAsync(cancellationToken);
         }
 
+        public async Task<List<T>> GetAllAsync<T>(
+            Func<IQueryable<TEntity>, IQueryable<T>> func,
+            CancellationToken cancellationToken = default)
+        {
+            var queryable = func(_context.Set<TEntity>());
+            return await queryable.ToListAsync(cancellationToken);
+        }
+
         public async Task<PaginatedList<TEntity>> GetAllPaginatedAsync(
             string searchQuery,
-            string orderBy, 
+            string orderBy,
             bool orderAsc,
             IList<string> excludedIds,
-            int pageNumber, 
+            int pageNumber,
             int pageSize,
             CancellationToken cancellationToken = default)
         {
@@ -76,7 +84,7 @@ namespace NomaNova.Ojeda.Data.Repositories
             queryable = queryable
                 .ExecuteSearchQueryFilter(searchQuery, _options.Type)
                 .ExecuteOrderBy(orderBy, orderAsc);
-            
+
             return await PaginatedList<TEntity>.CreateAsync(queryable, pageNumber, pageSize, cancellationToken);
         }
 
@@ -88,13 +96,13 @@ namespace NomaNova.Ojeda.Data.Repositories
             CancellationToken cancellationToken = default)
         {
             var queryable = _context.Set<TEntity>().AsQueryable();
-            
+
             queryable = queryable
                 .ExecuteSearchQueryFilter(searchQuery, _options.Type)
                 .ExecuteOrderBy(orderBy, orderAsc);
-            
+
             queryable = func != null ? func(queryable) : queryable;
-            
+
             return await PaginatedList<TEntity>.CreateAsync(queryable, pageNumber, pageSize, cancellationToken);
         }
 
@@ -102,13 +110,13 @@ namespace NomaNova.Ojeda.Data.Repositories
         {
             if (entity == null)
             {
-                throw new ArgumentNullException(nameof(entity));    
+                throw new ArgumentNullException(nameof(entity));
             }
 
             if (entity is ITimestampedEntity timestampedEntity)
             {
                 var utcNow = _timeKeeper.UtcNow;
-                
+
                 timestampedEntity.CreatedAt = utcNow;
                 timestampedEntity.UpdatedAt = utcNow;
             }
@@ -123,9 +131,9 @@ namespace NomaNova.Ojeda.Data.Repositories
         {
             if (entity == null)
             {
-                throw new ArgumentNullException(nameof(entity));    
+                throw new ArgumentNullException(nameof(entity));
             }
-            
+
             if (entity is ITimestampedEntity timestampedEntity)
             {
                 timestampedEntity.UpdatedAt = _timeKeeper.UtcNow;
@@ -141,18 +149,18 @@ namespace NomaNova.Ojeda.Data.Repositories
         {
             if (entity == null)
             {
-                throw new ArgumentNullException(nameof(entity));    
+                throw new ArgumentNullException(nameof(entity));
             }
 
             _context.Set<TEntity>().Remove(entity);
             await _context.SaveChangesAsync(cancellationToken);
         }
-        
+
         public async Task DeleteRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             if (entities == null)
             {
-                throw new ArgumentNullException(nameof(entities)); 
+                throw new ArgumentNullException(nameof(entities));
             }
 
             _context.Set<TEntity>().RemoveRange(entities);

@@ -16,7 +16,7 @@ using NomaNova.Ojeda.Services.Fields.Validators;
 
 namespace NomaNova.Ojeda.Services.Fields
 {
-    public class FieldsService : BaseService<Field>, IFieldsService
+    public class FieldsService : BaseEntityService<Field>, IFieldsService
     {
         private readonly IRepository<FieldSet> _fieldSetsRepository;
         private readonly IRepository<Asset> _assetsRepository;

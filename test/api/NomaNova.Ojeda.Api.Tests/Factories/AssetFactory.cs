@@ -9,7 +9,7 @@ namespace NomaNova.Ojeda.Api.Tests.Factories
 {
     public static class AssetFactory
     {
-        public static Asset NewRandom(string assetTypeId, string id = null)
+        public static Asset NewRandom(string assetTypeId, string id = null, string assetId = null)
         {
             return new Asset
             {
@@ -17,17 +17,19 @@ namespace NomaNova.Ojeda.Api.Tests.Factories
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 Name = FactoryHelper.RandomString(),
+                AssetId = assetId ?? "0",
                 AssetTypeId = assetTypeId
             };
         }
 
         public static CreateAssetDto NewRandomCreateDto(
-            string assetTypeId, Dictionary<string, ICollection<string>> ids = null)
+            string assetTypeId, string assetId = null, Dictionary<string, ICollection<string>> ids = null)
         {
             var createAssetDto = new CreateAssetDto
             {
                 Name = FactoryHelper.RandomString(),
                 AssetTypeId = assetTypeId,
+                AssetId = assetId ?? "0",
                 FieldSets = new List<CreateAssetFieldSetDto>()
             };
 
@@ -53,12 +55,13 @@ namespace NomaNova.Ojeda.Api.Tests.Factories
         }
         
         public static UpdateAssetDto NewRandomUpdateDto(
-            string assetTypeId, Dictionary<string, ICollection<string>> ids = null)
+            string assetTypeId, string assetId = null, Dictionary<string, ICollection<string>> ids = null)
         {
             var updateAssetDto = new UpdateAssetDto
             {
                 Name = FactoryHelper.RandomString(),
                 AssetTypeId = assetTypeId,
+                AssetId = assetId ?? "0",
                 FieldSets = new List<UpdateAssetFieldSetDto>()
             };
 

@@ -14,6 +14,8 @@ namespace NomaNova.Ojeda.Models.Dtos.Assets
 
         public string Name { get; set; }
         
+        public string AssetId { get; set; }
+
         public AssetTypeSummaryDto AssetType { get; set; }
     }
 

@@ -1,4 +1,5 @@
 using System;
+using NomaNova.Ojeda.Client.Services.AssetIds;
 using NomaNova.Ojeda.Client.Services.AssetIdTypes;
 using NomaNova.Ojeda.Client.Services.Assets;
 using NomaNova.Ojeda.Client.Services.AssetTypes;
@@ -34,6 +35,7 @@ namespace NomaNova.Ojeda.Client
             AssetTypesService = new AssetTypesService(_httpClient);
             AssetsService = new AssetsService(_httpClient);
             AssetIdTypesService = new AssetIdTypesService(_httpClient);
+            AssetIdsService = new AssetIdsService(_httpClient);
         }
 
         public IFieldsService FieldsService { get; private set; }
@@ -45,6 +47,8 @@ namespace NomaNova.Ojeda.Client
         public IAssetsService AssetsService { get; private set; }
         
         public IAssetIdTypesService AssetIdTypesService { get; private set; }
+
+        public IAssetIdsService AssetIdsService { get; private set; }
 
         public void Dispose()
         {

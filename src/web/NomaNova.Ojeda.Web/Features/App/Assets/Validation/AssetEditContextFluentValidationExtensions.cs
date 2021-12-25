@@ -34,9 +34,11 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
         {
             IValidator validator;
 
+            var assetIdType = assetDto.AssetType.AssetIdType;
+            
             if (editContext.Model is CreateAssetDto)
             {
-                validator = new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+                validator = new CreateAssetDtoFieldValidator(assetIdType, new AssetDtoFieldPropertiesResolver(assetDto));
             }
             else
             {
@@ -71,11 +73,12 @@ namespace NomaNova.Ojeda.Web.Features.App.Assets.Validation
             var context = new ValidationContext<object>(model, new PropertyChain(), new MemberNameValidatorSelector(properties));
             
             IValidator validator;
+            var assetIdType = assetDto.AssetType.AssetIdType;
             
             switch (model)
             {
                 case CreateAssetDto:
-                    validator = new CreateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));
+                    validator = new CreateAssetDtoFieldValidator(assetIdType, new AssetDtoFieldPropertiesResolver(assetDto));
                     break;
                 case UpdateAssetDto:
                     validator = new UpdateAssetDtoFieldValidator(new AssetDtoFieldPropertiesResolver(assetDto));

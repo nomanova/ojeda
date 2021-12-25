@@ -12,18 +12,32 @@ namespace NomaNova.Ojeda.Services.Fields
         {
             // Domain -> Dto
             CreateMap<Field, FieldDto>();
-            CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>();
+            CreateMap<PaginatedList<Field>, PaginatedListDto<FieldDto>>()
+                .ForMember(dest => dest.Items, opt => opt.Ignore());
 
-            CreateMap<FieldProperties, FieldPropertiesDto>().IncludeAllDerived();
+            CreateMap<FieldProperties, FieldPropertiesDto>()
+                .IncludeAllDerived();
             CreateMap<TextFieldProperties, TextFieldPropertiesDto>();
             CreateMap<NumberFieldProperties, NumberFieldPropertiesDto>();
-            
+
             // Dto -> Domain
-            CreateMap<CreateFieldDto, Field>();
+            CreateMap<CreateFieldDto, Field>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSetFields, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore());
+
             CreateMap<UpdateFieldDto, Field>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldSetFields, opt => opt.Ignore())
+                .ForMember(dest => dest.FieldValues, opt => opt.Ignore())
                 .ForMember(dest => dest.Properties, opt => opt.Ignore());
-            
-            CreateMap<FieldPropertiesDto, FieldProperties>().IncludeAllDerived();
+
+            CreateMap<FieldPropertiesDto, FieldProperties>()
+                .IncludeAllDerived();
             CreateMap<TextFieldPropertiesDto, TextFieldProperties>();
             CreateMap<NumberFieldPropertiesDto, NumberFieldProperties>();
         }

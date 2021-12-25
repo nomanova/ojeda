@@ -20,6 +20,10 @@ namespace NomaNova.Ojeda.Data.Repositories
         Task<List<TEntity>> GetAllAsync(
             Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
             CancellationToken cancellationToken = default);
+
+        Task<List<T>> GetAllAsync<T>(
+            Func<IQueryable<TEntity>, IQueryable<T>> func,
+            CancellationToken cancellationToken = default);
         
         Task<PaginatedList<TEntity>> GetAllPaginatedAsync(
             string searchQuery,

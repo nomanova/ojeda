@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <ProjectGuid>{DABCC871-B98F-4506-8DC4-11FDF5503C6E}</ProjectGuid>
         <TargetFramework>net6.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 

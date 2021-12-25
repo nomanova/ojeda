@@ -8,7 +8,7 @@
     @ChildContent
     @if (!string.IsNullOrEmpty(HelpText))
     {
-        <div class="form-text">@HelpText</div>
+        <div class="form-text">@((MarkupString)HelpText)</div>
     }
     @if (ValidateFor != null)
     {

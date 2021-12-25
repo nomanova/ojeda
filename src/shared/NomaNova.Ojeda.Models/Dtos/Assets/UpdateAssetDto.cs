@@ -1,4 +1,5 @@
 using FluentValidation;
+using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Models.Dtos.Assets.Base;
 
 namespace NomaNova.Ojeda.Models.Dtos.Assets

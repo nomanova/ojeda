@@ -19,7 +19,7 @@ using NomaNova.Ojeda.Utils.Extensions;
 
 namespace NomaNova.Ojeda.Services.FieldSets
 {
-    public class FieldSetsService : BaseService<FieldSet>, IFieldSetsService
+    public class FieldSetsService : BaseEntityService<FieldSet>, IFieldSetsService
     {
         private readonly IRepository<Field> _fieldsRepository;
         private readonly IRepository<AssetType> _assetTypeRepository;

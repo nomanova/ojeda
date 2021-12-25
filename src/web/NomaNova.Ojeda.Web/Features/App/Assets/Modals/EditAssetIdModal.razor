@@ -1,0 +1,169 @@
+@using NomaNova.Ojeda.Models.Dtos.AssetIdTypes
+@using NomaNova.Ojeda.Models.Dtos.Assets.Validation
+@using NomaNova.Ojeda.Web.Features.App.Assets.Helpers
+@using NomaNova.Ojeda.Web.Features.App.Assets.Services.Interfaces
+
+@inject OjedaClient _ojeda
+@inject IToastService _toastService
+@inject ISymbologyService _symbologyService
+
+<div class="d-flex flex-column justify-content-between">
+
+    <div class="mb-3" style="height: 200px; overflow-y: auto;">
+
+        <EditForm id="form-asset-edit-id" EditContext="_editContext" OnValidSubmit="OnSubmitForm">
+
+            <FluentValidationValidator Validator="@(new AssetIdentityFieldValidator(AssetIdType.Properties))"/>
+            <ServerSideFluentValidation @ref="_serverValidation"/>
+
+            @{
+                var (helpText, placeholder) = AssetIdHelper.GetUserInfo(AssetIdType);
+            }
+
+            <OjedaFormField ForId="asset-assetId" CssClass="mt-2 mx-1" HelpText="@helpText" ValidateFor="@(() => _patchAsset.AssetId)">
+
+                <div class="d-flex flex-grow-1">
+                    <OjedaInputText @bind-Value="_patchAsset.AssetId"
+                                    class="form-control"
+                                    id="asset-assetId"
+                                    disabled="@(_isSubmitting || _isGenerating)"
+                                    placeholder="@placeholder"/>
+
+                    <OjedaButton
+                        CssClass="ms-2"
+                        Style="@ButtonStyle.Light"
+                        IsDisabled="@(_isSubmitting || _isGenerating)"
+                        IsLoading="@_isGenerating"
+                        Text="Generate"
+                        OnClick="@OnGenerateAssetId"/>
+                </div>
+
+            </OjedaFormField>
+
+        </EditForm>
+
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <div class="d-flex align-items-center"></div>
+
+        <div>
+            <OjedaButton
+                OnClick="@OnCancel"
+                Text="Cancel"
+                IsDisabled="@(_isSubmitting || _isGenerating)"/>
+            <span class="ps-2"></span>
+            <OjedaButton
+                Style="@ButtonStyle.Primary"
+                Type="@ButtonType.Submit"
+                Form="form-asset-edit-id"
+                IsDisabled="@(_isSubmitting || _isGenerating)"
+                IsLoading="_isSubmitting"
+                Text="Submit"/>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string AssetId { get; set; }
+    
+    [Parameter]
+    public AssetIdTypeDto AssetIdType { get; set; }
+
+    [Parameter]
+    public string AssetTypeId { get; set; }
+
+    private PatchAssetDto _patchAsset;
+
+    private EditContext _editContext;
+    private ServerSideFluentValidation _serverValidation;
+
+    private bool _isSubmitting;
+    private bool _isGenerating;
+
+    private async Task OnCancel()
+    {
+        await ModalInstance.CancelAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        _patchAsset = new PatchAssetDto
+        {
+            AssetId = AssetIdHelper.ToMinimalForm(AssetId, AssetIdType.Properties, _symbologyService)
+        };
+
+        _editContext = new EditContext(_patchAsset);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+
+    private async Task OnSubmitForm()
+    {
+        if (_isSubmitting)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        _serverValidation.ClearErrors();
+
+        var patchDto = new JsonPatchDocument<PatchAssetDto>();
+        patchDto.Replace(_ => _.AssetId, _patchAsset.AssetId);
+
+        var result = await _ojeda.AssetsService.PatchAsync(Id, patchDto);
+
+        if (result.StatusCode == HttpStatusCode.BadRequest && result.Error.ValidationErrors.Any())
+        {
+            _serverValidation.DisplayErrors(result.Error.ValidationErrors);
+        }
+        else if (!result.Success)
+        {
+            _toastService.ShowError(result.Error.Stringify("Could not update name."));
+        }
+        else
+        {
+            var fullAssetId = AssetIdHelper.ToFullForm(_patchAsset.AssetId, AssetIdType.Properties, _symbologyService);
+            await ModalInstance.CloseAsync(ModalResult.Ok(fullAssetId));
+        }
+
+        _isSubmitting = false;
+    }
+
+    private async Task OnGenerateAssetId()
+    {
+        _isGenerating = true;
+
+        var result = await _ojeda.AssetIdsService.GenerateAsync(AssetTypeId);
+
+        if (result.Success)
+        {
+            var generateAssetId = result.Data;
+            _patchAsset.AssetId = generateAssetId.AssetId;
+
+            _editContext.NotifyFieldChanged(_editContext.Field(nameof(PatchAssetDto.AssetId)));
+        }
+        else
+        {
+            _toastService.ShowError(result.Error.Stringify("Could not generate asset id."));
+        }
+
+        _isGenerating = false;
+    }
+
+}

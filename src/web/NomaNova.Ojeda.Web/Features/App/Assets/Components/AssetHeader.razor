@@ -27,12 +27,12 @@
                     }
                 </div>
                 <div class="d-flex align-items-center">
-                    <span class="mt-1 tag">@_tag</span>
-                    @if (!string.IsNullOrEmpty(_tag))
+                    <span class="mt-1 text-muted asset-id">@_assetId</span>
+                    @if (!string.IsNullOrEmpty(_assetId))
                     {
-                        <div class="ms-1 mt-1" @onclick="@OnEditTag">
-                            <i class="bi bi-pencil edit-tag px-2 py-1"></i>
-                        </div>
+                        <div class="ms-1 mt-1" @onclick="@OnEditAssetId">
+                                <i class="bi bi-pencil edit-asset-id px-2 py-1"></i>
+                            </div>
                     }
                 </div>
             </div>
@@ -85,12 +85,12 @@
 
     [Parameter]
     public EventCallback OnEditName { get; set; }
-    
+
     [Parameter]
-    public EventCallback OnEditTag { get; set; }
-    
+    public EventCallback OnEditAssetId { get; set; }
+
     private string _title;
-    private string _tag;
+    private string _assetId;
     private string _assetType;
     private string _lastUpdated;
 
@@ -99,9 +99,10 @@
         if (AssetDto != null)
         {
             _title = AssetDto.Name;
-            _tag = "123456789"; // TODO
+            _assetId = AssetDto.AssetId;
             _assetType = AssetDto.AssetType.Name;
             _lastUpdated = $"Last updated: {AssetDto.UpdatedAt.ToRelativeTime(_timeKeeper)}";
         }
     }
+
 }
