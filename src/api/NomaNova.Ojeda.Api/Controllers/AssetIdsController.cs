@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetIds;
 using NomaNova.Ojeda.Services.AssetIds.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers;
 
@@ -13,6 +14,8 @@ namespace NomaNova.Ojeda.Api.Controllers;
 [Route("api/asset-ids")]
 public class AssetIdsController : ApiController
 {
+    private const string Tag = "Asset Ids";
+    
     private readonly IAssetIdsService _assetIdsService;
     
     public AssetIdsController(IAssetIdsService assetIdsService)
@@ -24,6 +27,7 @@ public class AssetIdsController : ApiController
     /// Generate asset id
     /// </summary>
     [HttpGet("generate")]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(GenerateAssetIdDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -8,6 +8,7 @@ using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Models.Shared;
 using NomaNova.Ojeda.Services.AssetIdTypes.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers;
 
@@ -15,6 +16,8 @@ namespace NomaNova.Ojeda.Api.Controllers;
 [Route("api/asset-id-types")]
 public class AssetIdTypesController : ApiController
 {
+    private const string Tag = "Asset Id Types";
+    
     private readonly IAssetIdTypesService _assetIdTypesService;
 
     public AssetIdTypesController(IAssetIdTypesService assetIdTypesService)
@@ -26,6 +29,7 @@ public class AssetIdTypesController : ApiController
     /// Get asset id type by id
     /// </summary>
     [HttpGet("{id}")]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(AssetIdTypeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -47,6 +51,7 @@ public class AssetIdTypesController : ApiController
     /// <param name="pageNumber">Optional result page number.</param>
     /// <param name="pageSize">Optional result page size.</param>
     [HttpGet]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(PaginatedListDto<AssetIdTypeDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(
@@ -67,6 +72,7 @@ public class AssetIdTypesController : ApiController
     /// Create asset id type
     /// </summary>
     [HttpPost]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(AssetIdTypeDto), StatusCodes.Status201Created)]
@@ -83,6 +89,7 @@ public class AssetIdTypesController : ApiController
     /// Update asset id type
     /// </summary>
     [HttpPut("{id}")]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Consumes(MediaTypeNames.Application.Json)]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(AssetIdTypeDto), StatusCodes.Status200OK)]
@@ -101,6 +108,7 @@ public class AssetIdTypesController : ApiController
     /// Delete asset id type
     /// </summary>
     [HttpDelete("{id}")]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDto), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -114,6 +122,7 @@ public class AssetIdTypesController : ApiController
     /// Delete asset id type (dry run)
     /// </summary>
     [HttpDelete("{id}/dry-run")]
+    [SwaggerOperation(Tags = new[] {Tag})]
     [Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(typeof(DryRunDeleteAssetIdTypeDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
