@@ -46,3 +46,7 @@
 .ojeda-form {
     max-width: 850px;
 }
+
+.card-brand {
+    border-left: 3px solid #6c757d30;
+}
