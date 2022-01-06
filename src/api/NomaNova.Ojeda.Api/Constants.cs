@@ -23,5 +23,7 @@ namespace NomaNova.Ojeda.Api
         public const int DefaultQueryPageNumber = 1;
         
         public const string CorsPolicy = "default";
+
+        public const string ContentTypeMultipartFormData = "multipart/form-data";
     }
 }

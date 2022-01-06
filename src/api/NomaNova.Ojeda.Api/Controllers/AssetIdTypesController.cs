@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.AssetIdTypes;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.AssetIdTypes.Interfaces;
+using NomaNova.Ojeda.Services.Features.AssetIdTypes.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers;

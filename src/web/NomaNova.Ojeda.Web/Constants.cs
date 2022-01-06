@@ -22,5 +22,7 @@ namespace NomaNova.Ojeda.Web
         
         public const string StorageKeyPageSize = "key-pager-page-size";
         public const string StorageKeyViewMode = "key-view-selector-mode";
+        
+        public const long MaxImageSizeBytes = 2_097_152; // 2MB
     }
 }

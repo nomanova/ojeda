@@ -22,6 +22,45 @@ namespace NomaNova.Ojeda.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetAttachments.AssetAttachment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AssetId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentType")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayFileName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("SizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StorageFileName")
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("Thumbnail")
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("AssetAttachments");
+                });
+
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetIdTypes.AssetIdType", b =>
                 {
                     b.Property<string>("Id")
@@ -222,6 +261,16 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.ToTable("FieldSetFields");
                 });
 
+            modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetAttachments.AssetAttachment", b =>
+                {
+                    b.HasOne("NomaNova.Ojeda.Core.Domain.Assets.Asset", "Asset")
+                        .WithMany("Attachments")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Asset");
+                });
+
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
                 {
                     b.HasOne("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", "AssetType")
@@ -310,6 +359,8 @@ namespace NomaNova.Ojeda.Data.Migrations
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("FieldValues");
                 });
 

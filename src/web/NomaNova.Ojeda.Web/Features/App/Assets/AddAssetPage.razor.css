@@ -5,7 +5,25 @@
     border-radius: .25rem;
 }
 
-.image i {
+.placeholder-image {
     font-size: 90px !important; 
     color: #ced4da !important;
+}
+
+.preview-image {
+    border: 1px solid #dee2e6;
+    border-radius: .25rem;
+}
+
+.edit-image {
+    position: absolute;
+    bottom: 0; 
+    right: 0; 
+    font-size: 1.5rem !important;
+    color: #52525225 !important;
+    transition: .5s;
+}
+
+.edit-image:hover {
+    color: #525252;
 }

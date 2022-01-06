@@ -1,9 +1,10 @@
 using AutoMapper;
-using NomaNova.Ojeda.Services.AssetIdTypes;
-using NomaNova.Ojeda.Services.Assets;
-using NomaNova.Ojeda.Services.AssetTypes;
-using NomaNova.Ojeda.Services.Fields;
-using NomaNova.Ojeda.Services.FieldSets;
+using NomaNova.Ojeda.Services.Features.AssetAttachments;
+using NomaNova.Ojeda.Services.Features.AssetIdTypes;
+using NomaNova.Ojeda.Services.Features.Assets;
+using NomaNova.Ojeda.Services.Features.AssetTypes;
+using NomaNova.Ojeda.Services.Features.Fields;
+using NomaNova.Ojeda.Services.Features.FieldSets;
 using Xunit;
 
 namespace NomaNova.Ojeda.Services.Tests;
@@ -20,6 +21,7 @@ public class AutoMapperProfileTests
             c.AddProfile<FieldSetProfile>();
             c.AddProfile<AssetTypeProfile>();
             c.AddProfile<AssetProfile>();
+            c.AddProfile<AssetAttachmentProfile>();
         });
         configuration.AssertConfigurationIsValid();
     }

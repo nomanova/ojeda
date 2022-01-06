@@ -1,18 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Newtonsoft.Json;
-using NomaNova.Ojeda.Api.FileStore;
-using NomaNova.Ojeda.Api.FileStore.Interfaces;
 using NomaNova.Ojeda.Api.Middleware;
 using NomaNova.Ojeda.Api.Options;
 using NomaNova.Ojeda.Api.Options.Application;
 using NomaNova.Ojeda.Api.Options.Framework;
 using NomaNova.Ojeda.Api.Utils;
+using NomaNova.Ojeda.Core.Domain.AssetAttachments;
 using NomaNova.Ojeda.Core.Domain.AssetIdTypes;
 using NomaNova.Ojeda.Core.Domain.Assets;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
@@ -23,19 +20,22 @@ using NomaNova.Ojeda.Data.Context.Interfaces;
 using NomaNova.Ojeda.Data.Options;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Models.Shared.Converters;
-using NomaNova.Ojeda.Services.AssetIds;
-using NomaNova.Ojeda.Services.AssetIds.Interfaces;
-using NomaNova.Ojeda.Services.AssetIdTypes;
-using NomaNova.Ojeda.Services.AssetIdTypes.Interfaces;
-using NomaNova.Ojeda.Services.Assets;
-using NomaNova.Ojeda.Services.Assets.Interfaces;
-using NomaNova.Ojeda.Services.AssetTypes;
-using NomaNova.Ojeda.Services.AssetTypes.Interfaces;
-using NomaNova.Ojeda.Services.Fields;
-using NomaNova.Ojeda.Services.Fields.Interfaces;
-using NomaNova.Ojeda.Services.FieldSets;
-using NomaNova.Ojeda.Services.FieldSets.Interfaces;
+using NomaNova.Ojeda.Services.Features.AssetAttachments;
+using NomaNova.Ojeda.Services.Features.AssetAttachments.Interfaces;
+using NomaNova.Ojeda.Services.Features.AssetIds;
+using NomaNova.Ojeda.Services.Features.AssetIds.Interfaces;
+using NomaNova.Ojeda.Services.Features.AssetIdTypes;
+using NomaNova.Ojeda.Services.Features.AssetIdTypes.Interfaces;
+using NomaNova.Ojeda.Services.Features.Assets;
+using NomaNova.Ojeda.Services.Features.Assets.Interfaces;
+using NomaNova.Ojeda.Services.Features.AssetTypes;
+using NomaNova.Ojeda.Services.Features.AssetTypes.Interfaces;
+using NomaNova.Ojeda.Services.Features.Fields;
+using NomaNova.Ojeda.Services.Features.Fields.Interfaces;
+using NomaNova.Ojeda.Services.Features.FieldSets;
+using NomaNova.Ojeda.Services.Features.FieldSets.Interfaces;
+using NomaNova.Ojeda.Services.Shared.FileStore;
+using NomaNova.Ojeda.Services.Shared.FileStore.Interfaces;
 using NomaNova.Ojeda.Utils.Services;
 using NomaNova.Ojeda.Utils.Services.Interfaces;
 
@@ -126,6 +126,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IAssetsService, AssetsService>();
             services.TryAddScoped<IAssetIdTypesService, AssetIdTypesService>();
             services.TryAddScoped<IAssetIdsService, AssetIdsService>();
+            services.TryAddScoped<IAssetAttachmentsService, AssetAttachmentsService>();
         }
 
         private static void AddRepositories(IServiceCollection services)
@@ -136,6 +137,7 @@ namespace NomaNova.Ojeda.Api
             services.TryAddScoped<IRepository<Asset>, EntityRepository<Asset>>();
             services.TryAddScoped<IRepository<FieldValue>, EntityRepository<FieldValue>>();
             services.TryAddScoped<IRepository<AssetIdType>, EntityRepository<AssetIdType>>();
+            services.TryAddScoped<IRepository<AssetAttachment>, EntityRepository<AssetAttachment>>();
         }
 
         private void AddFileStore(IServiceCollection services)
@@ -144,7 +146,9 @@ namespace NomaNova.Ojeda.Api
             {
                 case FileStoreType.FileSystem:
                     services.TryAddSingleton<IFileStore, FileSystem>();
-                    services.ConfigureAndValidate<FileSystemOptions>(nameof(AppOptions.FileStore.FileSystem), _configuration);
+                    const string fileSystemSectionName = 
+                        $"{nameof(AppOptions.FileStore)}:{nameof(AppOptions.FileStore.FileSystem)}";
+                    services.ConfigureAndValidate<FileSystemOptions>(fileSystemSectionName, _configuration);
                     break;
                 default:
                     throw new NotImplementedException(_appOptions.FileStore.Type.ToString());

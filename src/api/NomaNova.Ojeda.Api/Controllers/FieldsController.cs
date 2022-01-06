@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.Fields;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.Fields.Interfaces;
+using NomaNova.Ojeda.Services.Features.Fields.Interfaces;
 
 namespace NomaNova.Ojeda.Api.Controllers;
 

@@ -1,6 +1,9 @@
 @page "/assets/add"
 
+@inject IToastService _toastService
+
 @using NomaNova.Ojeda.Web.Features.App.Assets.Helpers
+@using System.IO
 @inherits UpsertAssetPage
 
 <ExpandablePage
@@ -8,185 +11,211 @@
     ContentCssClass="px-3"
     FooterCssClass="mx-3 ojeda-form">
 
-    <Header>
-        <PageHeader Title="Add Asset"/>
-    </Header>
+<Header>
+    <PageHeader Title="Add Asset"/>
+</Header>
 
-    <Content>
+<Content>
 
-        @if (_error != null)
-        {
-            <p class="text-danger fst-italic">@_error</p>
-            <a href="/assets">Return to Assets</a>
-        }
-        else if (_isLoading)
-        {
-            <p class="text-muted fst-italic">Loading...</p>
-        }
-        else
-        {
-            <EditForm id="form-add-asset" EditContext="_editContext" OnValidSubmit="OnSubmitForm">
+    @if (_error != null)
+    {
+        <p class="text-danger fst-italic">@_error</p>
+        <a href="/assets">Return to Assets</a>
+    }
+    else if (_isLoading)
+    {
+        <p class="text-muted fst-italic">Loading...</p>
+    }
+    else
+    {
+        <EditForm id="form-add-asset" EditContext="_editContext" OnValidSubmit="OnSubmitForm">
 
-                <AssetFluentValidationValidator Asset="@Asset"/>
-                <ServerSideFluentValidation @ref="_serverValidation"/>
+            <AssetFluentValidationValidator Asset="@Asset"/>
+            <ServerSideFluentValidation @ref="_serverValidation"/>
 
-                <div class="ojeda-form">
+            <div class="ojeda-form">
 
-                    <!-- Header -->
-                    <div class="card card-brand">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="mt-3 col-4 d-flex justify-content-center">
+                <!-- Header -->
+                <div class="card card-brand">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="mt-3 col-4 d-flex justify-content-center">
 
-                                    <!-- Image -->
-                                    <div class="image bg-light d-flex align-items-center justify-content-center">
-                                        <i class="fs-6 bi-box" style="font-size: 90px !important; color: rgba(206, 212, 218, 0.5);"></i>
-                                    </div>
-
-                                </div>
-                                <div class="col-8">
-
-                                    <!-- Type -->
-                                    <OjedaFormField ForId="field-type" Label="Type" IsRequired="false">
-                                        <input
-                                            class="form-control"
-                                            id="field-type"
-                                            value="@Asset.AssetType.Name"
-                                            disabled/>
-                                    </OjedaFormField>
-                                    
-                                    <!-- Name -->
-                                    <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createAsset.Name)">
-                                        <OjedaInputText @bind-Value="_createAsset.Name" class="form-control" id="field-name" disabled="@_isSubmitting"/>
-                                    </OjedaFormField>
-
-                                    <!-- Asset Id -->
-                                    @{
-                                        var assetIdType = Asset.AssetType.AssetIdType;
-                                        var withManualEntry = assetIdType.WithManualEntry;
-
-                                        var (helpText, placeholder) = AssetIdHelper.GetUserInfo(assetIdType);
-                                    }
-
-                                    <OjedaFormField ForId="field-assetId" Label="Asset Id" IsRequired="true" HelpText="@helpText" ValidateFor="@(() => _createAsset.AssetId)">
-                                        @if (withManualEntry)
+                                <!-- Image -->
+                                <div>
+                                    <div class="image bg-light d-flex align-items-center justify-content-center position-relative">
+                                        @if (_imageData == null)
                                         {
-                                            <div class="d-flex flex-grow-1">
-                                                <OjedaInputText @bind-Value="_createAsset.AssetId" 
-                                                                class="form-control" 
-                                                                id="field-assetId" 
-                                                                disabled="@(_isSubmitting || _isGenerating)"
-                                                                placeholder="@placeholder"/>
-                                                
-                                                    <OjedaButton
-                                                        CssClass="ms-2"
-                                                        Style="@ButtonStyle.Light"
-                                                        IsDisabled="@(_isSubmitting || _isGenerating)"
-                                                        IsLoading="@_isGenerating"
-                                                        Text="Generate"
-                                                        OnClick="@OnGenerateAssetId"/>
-                                            </div>
+                                            <i class="fs-6 bi-box placeholder-image" style="font-size: 90px !important; color: rgba(206, 212, 218, 0.8);"></i>
                                         }
                                         else
                                         {
-                                            <OjedaInputText @bind-Value="_createAsset.AssetId" 
-                                                            class="form-control" 
-                                                            id="field-assetId" 
-                                                            disabled="true"/>
+                                            <div class="d-flex justify-content-center align-content-center overflow-hidden" style="width:100%; height:100%;">
+                                                <img src="@_imageData" alt="Asset" class="preview-image" style="width:100%; height:100%; object-fit: cover;"/>
+                                            </div>
                                         }
-                                    </OjedaFormField>
-                                    
+
+                                        <i class="bi bi-pencil edit-image px-2 py-1"></i>
+                                        <InputFile style="opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer;" OnChange="OnLoadImage" accept=".png,.jpg,.jpeg"/>
+                                    </div>
+
+                                    @if (_imageData != null)
+                                    {
+                                    <OjedaButton
+                                        CssClass="mt-2 w-100"
+                                        Style="@ButtonStyle.Light"
+                                        IsDisabled="@_isSubmitting"
+                                        Text="Clear"
+                                        OnClick="@OnClearImage"/>
+                                    }
+
                                 </div>
+
+
+                            </div>
+                            <div class="col-8">
+
+                                <!-- Type -->
+                                <OjedaFormField ForId="field-type" Label="Type" IsRequired="false">
+                                    <input
+                                        class="form-control"
+                                        id="field-type"
+                                        value="@Asset.AssetType.Name"
+                                        disabled/>
+                                </OjedaFormField>
+
+                                <!-- Name -->
+                                <OjedaFormField ForId="field-name" Label="Name" IsRequired="true" ValidateFor="@(() => _createAsset.Name)">
+                                    <OjedaInputText @bind-Value="_createAsset.Name" class="form-control" id="field-name" disabled="@_isSubmitting"/>
+                                </OjedaFormField>
+
+                                <!-- Asset Id -->
+                                @{
+                                    var assetIdType = Asset.AssetType.AssetIdType;
+                                    var withManualEntry = assetIdType.WithManualEntry;
+
+                                    var (helpText, placeholder) = AssetIdHelper.GetUserInfo(assetIdType);
+                                }
+
+                                <OjedaFormField ForId="field-assetId" Label="Asset Id" IsRequired="true" HelpText="@helpText" ValidateFor="@(() => _createAsset.AssetId)">
+                                    @if (withManualEntry)
+                                    {
+                                        <div class="d-flex flex-grow-1">
+                                            <OjedaInputText @bind-Value="_createAsset.AssetId"
+                                                            class="form-control"
+                                                            id="field-assetId"
+                                                            disabled="@(_isSubmitting || _isGenerating)"
+                                                            placeholder="@placeholder"/>
+
+                                            <OjedaButton
+                                                CssClass="ms-2"
+                                                Style="@ButtonStyle.Light"
+                                                IsDisabled="@(_isSubmitting || _isGenerating)"
+                                                IsLoading="@_isGenerating"
+                                                Text="Generate"
+                                                OnClick="@OnGenerateAssetId"/>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <OjedaInputText @bind-Value="_createAsset.AssetId"
+                                                        class="form-control"
+                                                        id="field-assetId"
+                                                        disabled="true"/>
+                                    }
+                                </OjedaFormField>
+
                             </div>
                         </div>
                     </div>
-
-                    <!-- Field Sets -->
-                    @for (var i = 0; i < _createAsset.FieldSets.Count; i++)
-                    {
-                        var fieldSet = _createAsset.FieldSets[i];
-
-                        var formSectionClass = "mb-3";
-
-                        if (i == 0 && _createAsset.FieldSets.Count == 1)
-                        {
-                            formSectionClass = "mt-3";
-                        }
-                        else if (i == 0)
-                        {
-                            formSectionClass = "my-3";
-                        }
-                        else if (i == _createAsset.FieldSets.Count - 1)
-                        {
-                            formSectionClass = "";
-                        }
-
-                        <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))" CssClass="@formSectionClass">
-                            @foreach (var field in fieldSet.Fields)
-                            {
-                                var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
-
-                                <div class="mb-3">
-                                    <label for="@hash" class="form-label">@(GetFieldLabel(fieldSet.Id, field.Id))</label>
-
-                                    @{
-                                        var fieldDataType = GetFieldDataType(fieldSet.Id, field.Id);
-                                    }
-
-                                    @if (fieldDataType == FieldDataTypeDto.String)
-                                    {
-                                        var fieldData = (StringFieldDataDto)field.Data;
-
-                                        <OjedaInputText @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                                        placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
-
-                                        <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
-                                    }
-
-                                    @if (fieldDataType == FieldDataTypeDto.Long)
-                                    {
-                                        var fieldData = (LongFieldDataDto)field.Data;
-
-                                        <OjedaInputNumber @bind-Value="fieldData.Value"
-                                                          ParsingErrorMessage="Value must be integer."
-                                                          class="form-control" id="@hash" disabled="@_isSubmitting"
-                                                          placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
-
-                                        <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
-                                    }
-
-                                    @if (fieldDataType == FieldDataTypeDto.Double)
-                                    {
-                                        var fieldData = (DoubleFieldDataDto)field.Data;
-
-                                        <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
-                                                          placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
-
-                                        <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
-                                    }
-                                </div>
-                            }
-                        </FormSection>
-                    }
-
                 </div>
 
-            </EditForm>
-        }
+                <!-- Field Sets -->
+                @for (var i = 0; i < _createAsset.FieldSets.Count; i++)
+                {
+                    var fieldSet = _createAsset.FieldSets[i];
 
-    </Content>
+                    var formSectionClass = "mb-3";
 
-    <Footer>
+                    if (i == 0 && _createAsset.FieldSets.Count == 1)
+                    {
+                        formSectionClass = "mt-3";
+                    }
+                    else if (i == 0)
+                    {
+                        formSectionClass = "my-3";
+                    }
+                    else if (i == _createAsset.FieldSets.Count - 1)
+                    {
+                        formSectionClass = "";
+                    }
 
-        <OjedaFormFooter
-            CssClass="my-3"
-            Alignment="@FormFooterAlignment.End"
-            Form="form-add-asset"
-            IsSubmitting="@_isSubmitting"
-            OnCancel="@OnCancel"
-            OnReset="@OnReset"/>
+                    <FormSection Title="@(GetFieldSetName(fieldSet.Id))" HelpText="@(GetFieldSetDescription(fieldSet.Id))" CssClass="@formSectionClass">
+                        @foreach (var field in fieldSet.Fields)
+                        {
+                            var hash = $"{fieldSet.Id}-{field.Id}".ToShortHash();
 
-    </Footer>
+                            <div class="mb-3">
+                                <label for="@hash" class="form-label">@(GetFieldLabel(fieldSet.Id, field.Id))</label>
+
+                                @{
+                                    var fieldDataType = GetFieldDataType(fieldSet.Id, field.Id);
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.String)
+                                {
+                                    var fieldData = (StringFieldDataDto)field.Data;
+
+                                    <OjedaInputText @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                    placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.Long)
+                                {
+                                    var fieldData = (LongFieldDataDto)field.Data;
+
+                                    <OjedaInputNumber @bind-Value="fieldData.Value"
+                                                      ParsingErrorMessage="Value must be integer."
+                                                      class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                      placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+
+                                @if (fieldDataType == FieldDataTypeDto.Double)
+                                {
+                                    var fieldData = (DoubleFieldDataDto)field.Data;
+
+                                    <OjedaInputNumber @bind-Value="fieldData.Value" class="form-control" id="@hash" disabled="@_isSubmitting"
+                                                      placeholder="@(GetFieldDescription(fieldSet.Id, field.Id))"/>
+
+                                    <ValidationMessage For="@(() => fieldData.Value)"></ValidationMessage>
+                                }
+                            </div>
+                        }
+                    </FormSection>
+                }
+
+            </div>
+
+        </EditForm>
+    }
+
+</Content>
+
+<Footer>
+
+    <OjedaFormFooter
+        CssClass="my-3"
+        Alignment="@FormFooterAlignment.End"
+        Form="form-add-asset"
+        IsSubmitting="@_isSubmitting"
+        OnCancel="@OnCancel"
+        OnReset="@OnReset"/>
+
+</Footer>
 
 </ExpandablePage>
 
@@ -204,6 +233,8 @@
     private string _error;
 
     private bool _isGenerating;
+
+    private string _imageData;
 
     protected override async Task OnInitializedAsync()
     {
@@ -230,7 +261,7 @@
         }
         else if (!result.Success)
         {
-            ToastService.ShowError( result.Error.Stringify("Could not submit asset."));
+            ToastService.ShowError(result.Error.Stringify("Could not submit asset."));
         }
         else
         {
@@ -271,12 +302,12 @@
         {
             var generateAssetId = result.Data;
             _createAsset.AssetId = generateAssetId.AssetId;
-            
+
             _editContext.NotifyFieldChanged(_editContext.Field(nameof(CreateAssetDto.AssetId)));
         }
         else
         {
-            ToastService.ShowError( result.Error.Stringify("Could not generate asset id."));
+            ToastService.ShowError(result.Error.Stringify("Could not generate asset id."));
         }
 
         _isGenerating = false;
@@ -317,7 +348,7 @@
     private void Init()
     {
         var withManualEntry = Asset.AssetType.AssetIdType.WithManualEntry;
-        
+
         _createAsset = new CreateAssetDto
         {
             AssetTypeId = Asset.AssetType.Id,
@@ -333,7 +364,35 @@
             }).ToList()
         };
 
+        _imageData = null;
+
         _editContext = new EditContext(_createAsset);
         _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
+
+    private void OnClearImage()
+    {
+        _imageData = null;
+    }
+
+    private async Task OnLoadImage(InputFileChangeEventArgs e)
+    {
+        var imageFile = e.File;
+        const string format = "image/png";
+        var resizedImage = await imageFile.RequestImageFileAsync(format, 512, 512);
+        var buffer = new byte[resizedImage.Size];
+
+        try
+        {
+            await resizedImage.OpenReadStream(Constants.MaxImageSizeBytes).ReadAsync(buffer);
+        }
+        catch (IOException)
+        {
+            _toastService.ShowError($"Could not generate a preview for '{imageFile.Name}'. Please check file size and format.");
+            return;
+        }
+
+        _imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+    }
+
 }

@@ -2,24 +2,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NomaNova.Ojeda.Core.Domain.Assets;
 
-namespace NomaNova.Ojeda.Data.Context.Configurations
+namespace NomaNova.Ojeda.Data.Context.Configurations;
+
+public class AssetEntityTypeConfiguration : IEntityTypeConfiguration<Asset>
 {
-    public class AssetEntityTypeConfiguration : IEntityTypeConfiguration<Asset>
+    public void Configure(EntityTypeBuilder<Asset> builder)
     {
-        public void Configure(EntityTypeBuilder<Asset> builder)
-        {
-            builder.HasKey(_ => _.Id);
+        builder.HasKey(_ => _.Id);
 
-            builder.HasIndex(_ => _.AssetId)
-                .IsUnique();
+        builder.HasIndex(_ => _.AssetId)
+            .IsUnique();
 
-            builder.Property(_ => _.AssetId)
-                .IsRequired();
+        builder.Property(_ => _.AssetId)
+            .IsRequired();
             
-            builder.HasOne(_ => _.AssetType)
-                .WithMany(_ => _.Assets)
-                .HasForeignKey(_ => _.AssetTypeId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
+        builder.HasOne(_ => _.AssetType)
+            .WithMany(_ => _.Assets)
+            .HasForeignKey(_ => _.AssetTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

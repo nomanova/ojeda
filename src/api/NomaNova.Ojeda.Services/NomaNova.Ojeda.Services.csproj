@@ -19,5 +19,9 @@
       <ProjectReference Include="..\NomaNova.Ojeda.Data\NomaNova.Ojeda.Data.csproj" />
       <ProjectReference Include="..\..\shared\NomaNova.Ojeda.Models\NomaNova.Ojeda.Models.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Features" />
+    </ItemGroup>
 
 </Project>

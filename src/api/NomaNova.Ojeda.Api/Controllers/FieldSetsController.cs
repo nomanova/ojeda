@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NomaNova.Ojeda.Api.Controllers.Base;
 using NomaNova.Ojeda.Models.Dtos.FieldSets;
 using NomaNova.Ojeda.Models.Shared;
-using NomaNova.Ojeda.Services.FieldSets.Interfaces;
+using NomaNova.Ojeda.Services.Features.FieldSets.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomaNova.Ojeda.Api.Controllers

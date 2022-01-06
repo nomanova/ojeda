@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NomaNova.Ojeda.Core.Domain.AssetAttachments;
 using NomaNova.Ojeda.Core.Domain.AssetTypes;
 
 namespace NomaNova.Ojeda.Core.Domain.Assets
@@ -21,5 +22,7 @@ namespace NomaNova.Ojeda.Core.Domain.Assets
         public AssetType AssetType { get; set; }
 
         public virtual ICollection<FieldValue> FieldValues { get; set; }
+        
+        public virtual ICollection<AssetAttachment> Attachments { get; set; }
     }
 }
