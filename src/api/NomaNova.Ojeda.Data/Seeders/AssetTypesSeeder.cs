@@ -17,6 +17,7 @@ namespace NomaNova.Ojeda.Data.Seeders
                 Id = "fe6b1ed7-2c67-4cfa-97b6-00b559df5feb",
                 Name = "Mobile Phone",
                 Description = "iPhone or Android phones",
+                AssetIdTypeId = "79c1a519-a683-4306-b5e7-e89b0da0a1b5",
                 AssetTypeFieldSets = new List<AssetTypeFieldSet>
                 {
                     new() // Support
@@ -28,8 +29,7 @@ namespace NomaNova.Ojeda.Data.Seeders
                 }
             };
             assetTypes.Add(mobilePhoneAssetType);
-            
-            
+
             foreach (var assetType in assetTypes)
             {
                 await UpsertAssetType(context, timeKeeper, assetType);
@@ -51,7 +51,7 @@ namespace NomaNova.Ojeda.Data.Seeders
             else
             {
                 dbAssetType.Description = assetType.Description;
-                
+                dbAssetType.AssetIdTypeId = assetType.AssetIdTypeId;
                 dbAssetType.UpdatedAt = now;
                 
                 context.Set<AssetType>().Update(dbAssetType);

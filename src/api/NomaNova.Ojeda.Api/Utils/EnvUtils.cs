@@ -9,6 +9,16 @@ namespace NomaNova.Ojeda.Api.Utils
             return IsEnvironment(Constants.EnvTest);
         }
         
+        public static bool IsDevelopment()
+        {
+            return IsEnvironment(Constants.EnvDevelopment);
+        }
+        
+        public static bool IsProduction()
+        {
+            return IsEnvironment(Constants.EnvProduction);
+        }
+        
         private static bool IsEnvironment(string name)
         {
             var environmentName = Environment.GetEnvironmentVariable(Constants.AspNetCoreEnvironmentVar);

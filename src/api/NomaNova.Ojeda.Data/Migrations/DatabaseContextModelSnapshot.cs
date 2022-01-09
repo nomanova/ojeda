@@ -17,6 +17,7 @@ namespace NomaNova.Ojeda.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("app")
                 .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -48,9 +49,6 @@ namespace NomaNova.Ojeda.Data.Migrations
                     b.Property<string>("StorageFileName")
                         .HasColumnType("text");
 
-                    b.Property<byte[]>("Thumbnail")
-                        .HasColumnType("bytea");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -58,7 +56,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("AssetId");
 
-                    b.ToTable("AssetAttachments");
+                    b.ToTable("AssetAttachments", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetIdTypes.AssetIdType", b =>
@@ -86,7 +84,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AssetIdTypes");
+                    b.ToTable("AssetIdTypes", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.Asset", b =>
@@ -117,7 +115,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("AssetTypeId");
 
-                    b.ToTable("Assets");
+                    b.ToTable("Assets", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Assets.FieldValue", b =>
@@ -145,7 +143,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("FieldSetId");
 
-                    b.ToTable("FieldValues");
+                    b.ToTable("FieldValues", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetType", b =>
@@ -172,7 +170,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("AssetIdTypeId");
 
-                    b.ToTable("AssetTypes");
+                    b.ToTable("AssetTypes", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetTypes.AssetTypeFieldSet", b =>
@@ -190,7 +188,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("AssetTypeId");
 
-                    b.ToTable("AssetTypeFieldSets");
+                    b.ToTable("AssetTypeFieldSets", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.Fields.Field", b =>
@@ -215,7 +213,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Fields");
+                    b.ToTable("Fields", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.FieldSets.FieldSet", b =>
@@ -237,7 +235,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FieldSets");
+                    b.ToTable("FieldSets", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.FieldSets.FieldSetField", b =>
@@ -258,7 +256,7 @@ namespace NomaNova.Ojeda.Data.Migrations
 
                     b.HasIndex("FieldSetId");
 
-                    b.ToTable("FieldSetFields");
+                    b.ToTable("FieldSetFields", "app");
                 });
 
             modelBuilder.Entity("NomaNova.Ojeda.Core.Domain.AssetAttachments.AssetAttachment", b =>

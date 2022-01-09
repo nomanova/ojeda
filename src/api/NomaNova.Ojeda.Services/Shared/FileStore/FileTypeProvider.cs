@@ -8,13 +8,17 @@ namespace NomaNova.Ojeda.Services.Shared.FileStore;
  */
 public static class FileTypeProvider
 {
+    public const string ContentTypeImagePng = "image/png";
+    public const string ContentTypeImageJpeg = "image/jpeg";
+    public const string ContentTypeImageJpg = "image/jpg";
+    
     public static readonly IList<FileType> FileTypes = new List<FileType>();
 
     static FileTypeProvider()
     {
         FileTypes.Add(new FileType
         {
-            ContentType = "image/png",
+            ContentType = ContentTypeImagePng,
             Extension = ".png",
             IsImage = true,
             Signatures = new List<byte[]> { new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A } }
@@ -22,7 +26,7 @@ public static class FileTypeProvider
 
         FileTypes.Add(new FileType
         {
-            ContentType = "image/jpeg",
+            ContentType = ContentTypeImageJpeg,
             Extension = ".jpeg",
             IsImage = true,
             Signatures = new List<byte[]>
@@ -35,7 +39,7 @@ public static class FileTypeProvider
 
         FileTypes.Add(new FileType
         {
-            ContentType = "image/jpg",
+            ContentType = ContentTypeImageJpg,
             Extension = ".jpg",
             IsImage = true,
             Signatures = new List<byte[]>

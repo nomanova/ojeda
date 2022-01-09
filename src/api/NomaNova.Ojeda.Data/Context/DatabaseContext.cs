@@ -61,6 +61,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     public void EnsureSeeded()
     {
+        AssetIdTypesSeeder.Seed(this, _timeKeeper).Wait();
         FieldsSeeder.Seed(this, _timeKeeper).Wait();
         FieldSetsSeeder.Seed(this, _timeKeeper).Wait();
         AssetTypesSeeder.Seed(this, _timeKeeper).Wait();
@@ -69,7 +70,9 @@ public class DatabaseContext : DbContext, IDatabaseContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-            
+
+        modelBuilder.HasDefaultSchema(DatabaseContextBuilder.DefaultSchema);
+        
         modelBuilder.ApplyConfiguration(new FieldEntityTypeConfiguration(_serializer));
         modelBuilder.ApplyConfiguration(new FieldSetEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new FieldSetFieldEntityTypeConfiguration());

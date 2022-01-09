@@ -14,45 +14,48 @@ using NomaNova.Ojeda.Core.Exceptions;
 using NomaNova.Ojeda.Data.Repositories;
 using NomaNova.Ojeda.Models.Dtos.AssetAttachments;
 using NomaNova.Ojeda.Services.Features.AssetAttachments.Interfaces;
-using NomaNova.Ojeda.Services.Features.AssetAttachments.Models;
+using NomaNova.Ojeda.Services.Shared.Background.Interfaces;
 using NomaNova.Ojeda.Services.Shared.FileStore;
-using NomaNova.Ojeda.Services.Shared.FileStore.Interfaces;
 
 namespace NomaNova.Ojeda.Services.Features.AssetAttachments;
 
-public class AssetAttachmentsService : IAssetAttachmentsService
+public class AssetAttachmentsService : IAssetAttachmentsService 
 {
-    private const string AssetsDirectory = "assets";
-
     private class ProcessedFile
     {
-        public string DisplayFileName { get; set; }
+        public string DisplayFileName { get; init; }
 
-        public string ContentType { get; set; }
+        public string ContentType { get; init; }
 
-        public long SizeInBytes { get; set; }
+        public long SizeInBytes { get; init; }
 
-        public byte[] Data { get; set; }
+        public byte[] Data { get; init; }
     }
 
     private readonly FileStoreOptions _options;
+    private readonly IJobService _jobService;
     private readonly IMapper _mapper;
-    private readonly IFileStore _fileStore;
+    private readonly IAssetFileStore _assetFileStore;
     private readonly IRepository<Asset> _assetsRepository;
     private readonly IRepository<AssetAttachment> _assetAttachmentsRepository;
+    private readonly IThumbnailGenerator _thumbnailGenerator;
 
     public AssetAttachmentsService(
         IOptions<FileStoreOptions> options,
+        IJobService jobService,
         IMapper mapper,
-        IFileStore fileStore,
+        IAssetFileStore assetFileStore,
         IRepository<Asset> assetsRepository,
-        IRepository<AssetAttachment> assetAttachmentsRepository)
+        IRepository<AssetAttachment> assetAttachmentsRepository,
+        IThumbnailGenerator thumbnailGenerator)
     {
         _options = options.Value;
+        _jobService = jobService;
         _mapper = mapper;
-        _fileStore = fileStore;
+        _assetFileStore = assetFileStore;
         _assetsRepository = assetsRepository;
         _assetAttachmentsRepository = assetAttachmentsRepository;
+        _thumbnailGenerator = thumbnailGenerator;
     }
 
     public async Task<AssetAttachmentDto> GetByIdAsync(
@@ -68,7 +71,7 @@ public class AssetAttachmentsService : IAssetAttachmentsService
         return _mapper.Map<AssetAttachmentDto>(assetAttachment);
     }
 
-    public async Task<AssetAttachmentDownload> GetAsDownloadAsync(string id,
+    public async Task<FileDownload> GetRawDownloadAsync(string id,
         CancellationToken cancellationToken = default)
     {
         var assetAttachment = await _assetAttachmentsRepository.GetByIdAsync(id, cancellationToken);
@@ -78,12 +81,31 @@ public class AssetAttachmentsService : IAssetAttachmentsService
             throw new NotFoundException();
         }
 
-        var assetAttachmentPath = GetPath(assetAttachment.AssetId, assetAttachment.StorageFileName);
-        var absolutePath = _fileStore.ToAbsolutePath(assetAttachmentPath);
-
-        return new AssetAttachmentDownload
+        var absolutePath = _assetFileStore.GetAttachmentAbsolutePath(assetAttachment.AssetId, assetAttachment.StorageFileName);
+        
+        return new FileDownload
         {
             ContentType = assetAttachment.ContentType,
+            FileName = assetAttachment.DisplayFileName,
+            AbsolutePath = absolutePath
+        };
+    }
+
+    public async Task<FileDownload> GetThumbnailDownloadAsync(string id,
+        CancellationToken cancellationToken = default)
+    {
+        var assetAttachment = await _assetAttachmentsRepository.GetByIdAsync(id, cancellationToken);
+
+        if (assetAttachment == null)
+        {
+            throw new NotFoundException();
+        }
+        
+        var absolutePath = _assetFileStore.GetAttachmentThumbnailAbsolutePath(assetAttachment.AssetId, assetAttachment.StorageFileName);
+        
+        return new FileDownload
+        {
+            ContentType = _thumbnailGenerator.ThumbnailContentType,
             FileName = assetAttachment.DisplayFileName,
             AbsolutePath = absolutePath
         };
@@ -109,10 +131,7 @@ public class AssetAttachmentsService : IAssetAttachmentsService
             await ProcessFormFileAsync(createAssetAttachment.File, _options.MaxSizeInBytes, allowedExtensions);
 
         // Store file on disk
-        var storageFileName = Path.GetRandomFileName();
-        var filePath = GetPath(asset.Id, storageFileName);
-
-        await _fileStore.WriteBytesAsync(filePath, processedFile.Data, cancellationToken);
+        var storageFileName = await _assetFileStore.StoreAttachmentAsync(asset.Id, processedFile.Data, cancellationToken);
 
         // Store database entry
         AssetAttachment assetAttachment;
@@ -135,8 +154,7 @@ public class AssetAttachmentsService : IAssetAttachmentsService
             assetAttachment = await _assetAttachmentsRepository.UpdateAsync(primaryAssetAttachment, cancellationToken);
 
             // Delete existing file
-            var deletableFilePath = GetPath(asset.Id, oldStorageFileName);
-            await _fileStore.DeleteAsync(deletableFilePath, cancellationToken);
+            await _assetFileStore.DeleteAttachmentAsync(asset.Id, oldStorageFileName, cancellationToken);
         }
         else
         {
@@ -154,6 +172,9 @@ public class AssetAttachmentsService : IAssetAttachmentsService
             assetAttachment = await _assetAttachmentsRepository.InsertAsync(newAssetAttachment, cancellationToken);
         }
 
+        // Trigger thumbnail generation
+        _jobService.Fire(() => _thumbnailGenerator.GenerateForAssetAttachment(assetAttachment.Id, null));
+        
         return _mapper.Map<AssetAttachmentDto>(assetAttachment);
     }
 
@@ -167,8 +188,7 @@ public class AssetAttachmentsService : IAssetAttachmentsService
         }
 
         // Remove file
-        var deletableFilePath = GetPath(assetAttachment.AssetId, assetAttachment.StorageFileName);
-        await _fileStore.DeleteAsync(deletableFilePath, cancellationToken);
+        await _assetFileStore.DeleteAttachmentAsync(assetAttachment.AssetId, assetAttachment.StorageFileName, cancellationToken);
 
         await _assetAttachmentsRepository.DeleteAsync(assetAttachment, cancellationToken);
     }
@@ -259,10 +279,5 @@ public class AssetAttachmentsService : IAssetAttachmentsService
 
         var headerBytes = reader.ReadBytes(fileType.Signatures.Max(m => m.Length));
         return fileType.Signatures.Any(_ => headerBytes.Take(_.Length).SequenceEqual(_)) ? fileType : null;
-    }
-
-    private static string GetPath(string assetId, string fileName)
-    {
-        return Path.Combine(AssetsDirectory, assetId, fileName);
     }
 }

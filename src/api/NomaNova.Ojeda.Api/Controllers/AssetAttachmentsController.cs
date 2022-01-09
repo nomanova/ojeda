@@ -50,7 +50,22 @@ public class AssetAttachmentsController : ApiController
         [FromRoute] string id,
         CancellationToken cancellationToken = default)
     {
-        var download = await _assetAttachmentsService.GetAsDownloadAsync(id, cancellationToken);
+        var download = await _assetAttachmentsService.GetRawDownloadAsync(id, cancellationToken);
+        return PhysicalFile(download.AbsolutePath, download.ContentType, download.FileName);
+    }
+
+    /// <summary>
+    /// Get asset attachment thumbnail data file
+    /// </summary>
+    [HttpGet("{id}/thumbnail")]
+    [Produces(MediaTypeNames.Application.Octet)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetByIdThumbnail(
+        [FromRoute] string id,
+        CancellationToken cancellationToken = default)
+    {
+        var download = await _assetAttachmentsService.GetThumbnailDownloadAsync(id, cancellationToken);
         return PhysicalFile(download.AbsolutePath, download.ContentType, download.FileName);
     }
 

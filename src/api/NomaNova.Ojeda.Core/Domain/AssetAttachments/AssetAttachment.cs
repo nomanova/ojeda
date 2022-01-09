@@ -22,6 +22,4 @@ public class AssetAttachment : BaseEntity, ITimestampedEntity
     public long SizeInBytes { get; set; }
 
     public bool IsPrimary { get; set; }
-
-    public byte[] Thumbnail { get; set; }
 }

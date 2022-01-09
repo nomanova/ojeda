@@ -1,6 +1,6 @@
-namespace NomaNova.Ojeda.Services.Features.AssetAttachments.Models;
+namespace NomaNova.Ojeda.Services.Shared.FileStore;
 
-public class AssetAttachmentDownload
+public class FileDownload
 {
     public string ContentType { get; set; }
 

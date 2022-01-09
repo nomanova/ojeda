@@ -13,6 +13,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+        <!-- Hangfire -->
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.9.5" />
     </ItemGroup>
     
     <ItemGroup>
